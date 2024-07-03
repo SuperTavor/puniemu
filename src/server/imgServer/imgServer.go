@@ -8,14 +8,22 @@ import (
 	"strings"
 )
 
-func Handle(w http.ResponseWriter, r *http.Request) {
-	toDownload := fmt.Sprintf("srv_data/dataDownload/%s", strings.TrimPrefix(r.URL.Path, "/dataDownload/"))
+var cachedFiles map[string][]byte
 
-	fileContent, err := os.ReadFile(toDownload)
-	if err != nil {
-		log.Println(err)
-		return
+func Handle(w http.ResponseWriter, r *http.Request) {
+	if _, ok := cachedFiles[r.URL.Path]; ok {
+		w.Write(cachedFiles[r.URL.Path])
+	} else {
+		toDownload := fmt.Sprintf("srv_data/dataDownload/%s", strings.TrimPrefix(r.URL.Path, "/dataDownload/"))
+
+		fileContent, err := os.ReadFile(toDownload)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		w.Write(fileContent)
+		cachedFiles[r.URL.Path] = fileContent
+		log.Printf("Cached %s\n", r.URL.Path)
 	}
-	w.Header().Set("Transfer-Encoding", "identity")
-	w.Write(fileContent)
+
 }
