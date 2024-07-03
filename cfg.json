@@ -1,0 +1,16 @@
+{
+    "static-jsons": {
+        "MasterData": "srv_data/static-jsons/MasterData.json",
+        "ymoneyShopSaleList": "srv_data/static-jsons/ymoneyShopSaleList.json",
+        "ywp_mst_version_master": "srv_data/static-jsons/ywp_mst_version_master.txt",
+        "hitodamaShopSaleList": "srv_data/static-jsons/hitodamaShopSaleList.json",
+        "shopSaleList": "srv_data/static-jsons/shopSaleList.json",
+        "noticePageList": "srv_data/static-jsons/noticePageList.json"
+    },
+    "port": "8080",
+    "ogGameServerUrl": "https:\/\/gameserver.yw-p.com",
+    "l5IDEmulatedAPIKey": "a-zrhgm09pgcgjc1iv9cxvpk3xm9b0ynyo4u00sny6bjq10nrx3up2yrhjnq2lhg",
+    "matchingGameVer": "4.121.0",
+    "mstVersionMaster": 16265,
+    "getUpdateLink": "https:\/\/play.google.com\/store\/apps\/details?id=com.Level5.YWP&hl=en"
+}
