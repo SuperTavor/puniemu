@@ -1,8 +1,7 @@
 package userdatamanager
 
 import (
-	"bytes"
-	"encoding/gob"
+	"encoding/json"
 	"fmt"
 	"log"
 
@@ -19,41 +18,18 @@ func InitializeDB() {
 		log.Fatal(err)
 	}
 }
-func serialize(item any) []byte {
-	var buf bytes.Buffer
-	encoder := gob.NewEncoder(&buf)
-	encoder.Encode(item)
-	bytes := buf.Bytes()
 
-	return bytes
-}
-
-func deserialize[T any](bytesToDe []byte) T {
-	var buf bytes.Buffer
-	buf.Write(bytesToDe)
-
-	dec := gob.NewDecoder(&buf)
-
-	var item T
-	err := dec.Decode(&item)
-	if err != nil {
-		log.Fatal("Decode error:", err)
-	}
-
-	return item
-}
 func CloseDB() {
 	db.Close()
 }
-
-func AddGDKeyToUDKey(udkey string, gdkey string) {
-	formattedKey := fmt.Sprintf("%s::gdkeys", udkey)
+func GetGDKeysFromUDKey(udkey string) []string {
 	var existingGdKeys []string
+	formattedKey := fmt.Sprintf("%s::gdkeys", udkey)
 	db.View(func(txn *badger.Txn) error {
 		gdkeys, err := txn.Get([]byte(formattedKey))
 		if err == nil {
 			err = gdkeys.Value(func(val []byte) error {
-				existingGdKeys = deserialize[[]string](val)
+				json.Unmarshal(val, &existingGdKeys)
 				return nil
 			})
 			if err != nil {
@@ -63,9 +39,15 @@ func AddGDKeyToUDKey(udkey string, gdkey string) {
 		}
 		return nil
 	})
+	return existingGdKeys
+}
+func AddGDKeyToUDKey(udkey string, gdkey string) {
+	formattedKey := fmt.Sprintf("%s::gdkeys", udkey)
+	existingGdKeys := GetGDKeysFromUDKey(udkey)
 	existingGdKeys = append(existingGdKeys, gdkey)
 	err := db.Update(func(txn *badger.Txn) error {
-		err := txn.Set([]byte(formattedKey), serialize(existingGdKeys))
+		serializedGdkeys, _ := json.Marshal(existingGdKeys)
+		err := txn.Set([]byte(formattedKey), serializedGdkeys)
 		return err
 	})
 	if err != nil {
