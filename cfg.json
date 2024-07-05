@@ -2,15 +2,14 @@
     "static-jsons": {
         "MasterData": "srv_data/static-jsons/MasterData.json",
         "ymoneyShopSaleList": "srv_data/static-jsons/ymoneyShopSaleList.json",
-        "ywp_mst_version_master": "srv_data/static-jsons/ywp_mst_version_master.txt",
         "hitodamaShopSaleList": "srv_data/static-jsons/hitodamaShopSaleList.json",
         "shopSaleList": "srv_data/static-jsons/shopSaleList.json",
         "noticePageList": "srv_data/static-jsons/noticePageList.json",
         "ywp_mst_youkai_skill_group": "srv_data/static-jsons/ywp_mst/ywp_mst_youkai_skill_group.json",
         "ywp_mst_shop_hitodama_list": "srv_data/static-jsons/ywp_mst/ywp_mst_shop_hitodama_list.json",
         "ywp_mst_dash_gear": "srv_data/static-jsons/ywp_mst/ywp_mst_dash_gear.json",
-	"all": "srv_data/static-jsons/all.json",
-	"ywp_mst_youkai_bonus_effect_exclude": "srv_data/static-jsons/ywp_mst/ywp_mst_youkai_bonus_effect_exclude.json",
+        "all": "srv_data/static-jsons/all.json",
+        "ywp_mst_youkai_bonus_effect_exclude": "srv_data/static-jsons/ywp_mst/ywp_mst_youkai_bonus_effect_exclude.json",
         "ywp_mst_event_stage_assist": "srv_data/static-jsons/ywp_mst/ywp_mst_event_stage_assist.json",
         "ywp_mst_event_youkai_assist": "srv_data/static-jsons/ywp_mst/ywp_mst_event_youkai_assist.json",
         "ywp_mst_gacha_youkai_choice": "srv_data/static-jsons/ywp_mst/ywp_mst_gacha_youkai_choice.json",
@@ -123,6 +122,6 @@
     "ogGameServerUrl": "https://gameserver.yw-p.com",
     "l5IDEmulatedAPIKey": "a-zrhgm09pgcgjc1iv9cxvpk3xm9b0ynyo4u00sny6bjq10nrx3up2yrhjnq2lhg",
     "matchingGameVer": "4.121.0",
-    "mstVersionMaster": 16265,
+    "mstVersionMaster": 16268,
     "getUpdateLink": "https://play.google.com/store/apps/details?id=com.Level5.YWP&hl=en"
 }
