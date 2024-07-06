@@ -1,6 +1,7 @@
 package punitableparser
 
 import (
+	"errors"
 	"strings"
 )
 
@@ -12,52 +13,49 @@ type Row struct {
 	Items []string
 }
 
-func removeItem(slice []string, index int) []string {
-	return append(slice[:index], slice[index+1:]...)
-}
-func insertItemAtIndex(slice []string, item string, insertIndex int) []string {
-	newSlice := make([]string, 0, len(slice)+1)
-	newSlice = append(newSlice, slice[:insertIndex]...)
-	newSlice = append(newSlice, item)
-	newSlice = append(newSlice, slice[insertIndex:]...)
-	return newSlice
-}
-func (tbl *Table) AsMap(keyIndex int) map[string][]string {
-	outputMap := make(map[string][]string)
-
-	for _, row := range tbl.Rows {
-		key := row.Items[keyIndex]
-		outputMap[key] = removeItem(row.Items, keyIndex)
+// ItemIndices basically means that if the items i wanna search for are "3" and "ha" - at which index in the row should the function be looking for them?
+func (tbl *Table) GetIndexByItems(itemIndices []int, itemsToSearch []string) (int, error) {
+	if len(itemIndices) != len(itemsToSearch) {
+		return -1, errors.New("ItemIndices and ItemToSearch should have the same length")
 	}
-
-	return outputMap
-}
-func (tbl *Table) ApplyMap(tableMap map[string][]string, keyIndex int) {
-	var index int = 0
-	for k, v := range tableMap {
-		items := insertItemAtIndex(v, k, keyIndex)
-		tbl.Rows[index].Items = items
-		index++
-	}
-}
-func (tbl *Table) Get(rowIndex int, stringIndex int) string {
-	return tbl.Rows[rowIndex].Items[stringIndex]
-}
-
-func NewTable(tableStr string) *Table {
-	initialItems := strings.Split(tableStr, "|")
-	rows := make([]Row, 1)
-	for _, item := range initialItems {
-		currentRow := &rows[len(rows)-1]
-		if !strings.Contains(item, "*") {
-			currentRow.Items = append(currentRow.Items, item)
-		} else {
-			parts := strings.Split(item, "*")
-			currentRow.Items = append(currentRow.Items, parts[0])
-			rows = append(rows, Row{
-				Items: []string{parts[1]},
-			})
+	var outIndex int = -1
+	for i, row := range tbl.Rows {
+		var foundItems = 0
+		for j, item := range itemsToSearch {
+			if row.Items[itemIndices[j]] == item {
+				foundItems++
+			}
+		}
+		if foundItems == len(itemsToSearch) {
+			outIndex = i
 		}
 	}
-	return &Table{Rows: rows}
+	return outIndex, nil
+}
+func (tbl *Table) AddRow(row Row) {
+	tbl.Rows = append(tbl.Rows, row)
+}
+func (tbl *Table) String() string {
+	var builder strings.Builder
+	for i, row := range tbl.Rows {
+		for j, item := range row.Items {
+			builder.WriteString(item)
+			//if not last item in the row, add pipe
+			if j != len(row.Items)-1 {
+				builder.WriteString("|")
+			}
+		}
+		if i != len(tbl.Rows)-1 {
+			builder.WriteString("*")
+		}
+	}
+	return builder.String()
+}
+func NewTable(tableStr string) *Table {
+	rowStrings := strings.Split(tableStr, "*")
+	populatedRows := make([]Row, len(rowStrings))
+	for i, rowStr := range rowStrings {
+		populatedRows[i] = Row{Items: strings.Split(rowStr, "|")}
+	}
+	return &Table{Rows: populatedRows}
 }

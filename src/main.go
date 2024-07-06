@@ -10,13 +10,14 @@ import (
 	nhnrequests "github.com/SuperTavor/Puniemu/src/nhnRequests"
 	createUserHandler "github.com/SuperTavor/Puniemu/src/server/gameserver/createUser/handler"
 	gdkeyAccsHandler "github.com/SuperTavor/Puniemu/src/server/gameserver/getGdkeyAccounts/handler"
+	l5idStatusHandler "github.com/SuperTavor/Puniemu/src/server/gameserver/getL5idStatus/handler"
 	getMasterHandler "github.com/SuperTavor/Puniemu/src/server/gameserver/getMaster/handler"
 	initHandler "github.com/SuperTavor/Puniemu/src/server/gameserver/init/handler"
 	generalGameServerModels "github.com/SuperTavor/Puniemu/src/server/gameserver/models"
+	updateTutorialFlgHandler "github.com/SuperTavor/Puniemu/src/server/gameserver/updateTutorialFlg/handler"
 	imgserver "github.com/SuperTavor/Puniemu/src/server/imgServer"
 	activeHandler "github.com/SuperTavor/Puniemu/src/server/l5idapi/active/handler"
 	create_gdkeyHandler "github.com/SuperTavor/Puniemu/src/server/l5idapi/create_gdkey/handler"
-	l5idStatusHandler "github.com/SuperTavor/Puniemu/src/server/gameserver/getL5idStatus/handler"
 	userdatamanager "github.com/SuperTavor/Puniemu/src/userDataManager"
 )
 
@@ -62,6 +63,7 @@ func setGameserverHandles() {
 	http.HandleFunc("/createUser.nhn", createUserHandler.Handle)
 	http.HandleFunc("/getGdkeyAccounts.nhn", gdkeyAccsHandler.Handle)
 	http.HandleFunc("/getL5IdStatus.nhn", l5idStatusHandler.Handle)
+	http.HandleFunc("/updateTutorialFlg.nhn", updateTutorialFlgHandler.Handle)
 }
 
 func loadServerFiles() {
