@@ -16,6 +16,7 @@ import (
 	imgserver "github.com/SuperTavor/Puniemu/src/server/imgServer"
 	activeHandler "github.com/SuperTavor/Puniemu/src/server/l5idapi/active/handler"
 	create_gdkeyHandler "github.com/SuperTavor/Puniemu/src/server/l5idapi/create_gdkey/handler"
+	l5idStatusHandler "github.com/SuperTavor/Puniemu/src/server/gameserver/getL5idStatus/handler"
 	userdatamanager "github.com/SuperTavor/Puniemu/src/userDataManager"
 )
 
@@ -60,6 +61,7 @@ func setGameserverHandles() {
 	http.HandleFunc("/init.nhn", initHandler.Handle)
 	http.HandleFunc("/createUser.nhn", createUserHandler.Handle)
 	http.HandleFunc("/getGdkeyAccounts.nhn", gdkeyAccsHandler.Handle)
+	http.HandleFunc("/getL5IdStatus.nhn", l5idStatusHandler.Handle)
 }
 
 func loadServerFiles() {
