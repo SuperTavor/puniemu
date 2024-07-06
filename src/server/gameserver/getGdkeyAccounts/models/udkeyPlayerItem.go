@@ -10,7 +10,7 @@ import (
 
 type UDKeyPlayerItem struct {
 	//ID of the player's icon.
-	IconID int `json:"iconID"`
+	IconID int `json:"iconId"`
 	//Name of the player
 	PlayerName string `json:"playerName"`
 	//The center yokai in the party, which is displayed next to the user's name.
