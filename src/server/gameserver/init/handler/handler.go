@@ -22,16 +22,19 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 	encryptedRequest, err = io.ReadAll(r.Body)
 	if err != nil {
 		log.Println(err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 	decodedRequest, err = nhnrequests.DecodeAndDecrypt(string(encryptedRequest[:]))
 	if err != nil {
-		log.Println("Could not decode/decrypt request: " + err.Error())
+		log.Println(err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 	err = json.Unmarshal([]byte(decodedRequest), &request)
 	if err != nil {
 		log.Println(err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 	if configmanager.CurrentConfig.MatchingGameVersion != fmt.Sprintf("%v", request["appVer"]) {
@@ -52,6 +55,7 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal([]byte(configmanager.StaticJsons["hitodamaShopSaleList"]), &hitodamaShopSaleList)
 	if err != nil {
 		log.Println(err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 	outputJson["hitodamaShopSaleList"] = hitodamaShopSaleList
@@ -66,6 +70,7 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal([]byte(configmanager.StaticJsons["shopSaleList"]), &shopSaleList)
 	if err != nil {
 		log.Println(err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 	outputJson["shopSaleList"] = shopSaleList
@@ -74,12 +79,14 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal([]byte(configmanager.StaticJsons["ymoneyShopSaleList"]), &ymoneyShopSaleList)
 	if err != nil {
 		log.Println(err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 	var noticePageList []map[string]int
 	err = json.Unmarshal([]byte(configmanager.StaticJsons["noticePageList"]), &noticePageList)
 	if err != nil {
 		log.Println(err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 	outputJson["noticePageList"] = noticePageList

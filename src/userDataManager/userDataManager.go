@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/dgraph-io/badger/v3"
 )
@@ -64,4 +65,28 @@ func StoreYwpUser(udkey, gdkey, tableName string, content []byte) error {
 		return nil
 	})
 	return err
+}
+
+func GetYwpUser(udkey, gdkey, tableName string) ([]byte, error) {
+	var outputBytes []byte
+	err := db.View(func(txn *badger.Txn) error {
+		formattedKey := fmt.Sprintf("%s::%s::ywp_user::%s", udkey, gdkey, tableName)
+		item, err := txn.Get([]byte(formattedKey))
+		if err != nil {
+			return err
+		} else {
+			item.Value(func(val []byte) error {
+				outputBytes = val
+				return nil
+			})
+			return nil
+		}
+	})
+	return outputBytes, err
+}
+
+func UnixTimeToDate(timestamp int64) string {
+	t := time.Unix(timestamp, 0)
+	formattedTime := t.Format("2006-01-02 15:04:05")
+	return formattedTime
 }

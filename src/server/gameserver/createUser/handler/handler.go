@@ -1,10 +1,12 @@
 package handler
 
 import (
+	"encoding/binary"
 	"encoding/json"
 	"io"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/SuperTavor/Puniemu/src/config-manager/configmanager"
 	nhnrequests "github.com/SuperTavor/Puniemu/src/nhnRequests"
@@ -35,22 +37,35 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 	marshalledUserData, err := json.Marshal(generatedUserData)
 	if err != nil {
 		log.Println(err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 	err = userdatamanager.StoreYwpUser(request.DeviceID, request.Level5UserID, "ywp_user_data", marshalledUserData)
 	if err != nil {
 		log.Println(err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 	err = userdatamanager.StoreYwpUser(request.DeviceID, request.Level5UserID, "ywp_user_tutorial_list", []byte(configmanager.StaticJsons["DefaultTutorialList"]))
 	if err != nil {
 		log.Println(err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 	response := models.NewCreateUserResponse(configmanager.StaticJsons["DefaultTutorialList"], *generatedUserData)
 	marshalledResponse, err := json.Marshal(response)
 	if err != nil {
 		log.Println(err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	timeRn := time.Now().Unix()
+	timeRnBytes := make([]byte, 8)
+	binary.LittleEndian.PutUint64(timeRnBytes, uint64(timeRn))
+	err = userdatamanager.StoreYwpUser(request.DeviceID, request.Level5UserID, "START_DATE", timeRnBytes)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")

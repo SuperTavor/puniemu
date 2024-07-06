@@ -39,11 +39,13 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 	bodyJsonString, err := nhnrequests.DecodeAndDecrypt(string(body))
 	if err != nil {
 		log.Println(err)
+		http.Error(w, "Bad request", http.StatusBadRequest)
 		return
 	}
 	err = json.Unmarshal([]byte(bodyJsonString), &bodyJson)
 	if err != nil {
 		log.Println(err)
+		http.Error(w, "Bad request", http.StatusBadRequest)
 		return
 	}
 	// Load base MasterData JSON. the base MasterData JSON contains data other than the requested tables that is shipped with the requested tables.
@@ -51,6 +53,7 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 	pMasterDataJson, err = UnmarshalOrGetFromCache("BaseMasterData", configmanager.StaticJsons["MasterData"])
 	if err != nil {
 		log.Println(err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 	MasterDataJson := *pMasterDataJson
@@ -74,6 +77,7 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 			pSelectedMstJsonUnmarshalled, err := UnmarshalOrGetFromCache(tableName, selectedMstJsonContent)
 			if err != nil {
 				log.Println(err)
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
 				return
 			}
 			selectedMstJsonUnmarshalled := *pSelectedMstJsonUnmarshalled
@@ -92,6 +96,7 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 	encodedMasterData, err := nhnrequests.EncryptAndEncode(MasterDataJsonString)
 	if err != nil {
 		log.Println(err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 	w.Write([]byte(encodedMasterData))

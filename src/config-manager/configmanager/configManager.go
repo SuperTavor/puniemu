@@ -8,7 +8,6 @@ import (
 
 var (
 	CurrentConfig = models.GetConfigModel()
-	KeyMap        map[string][]string
 	StaticJsons   map[string]string
 )
 

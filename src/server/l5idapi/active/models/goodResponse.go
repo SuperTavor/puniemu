@@ -3,8 +3,8 @@ package models
 import (
 	"time"
 
-	"github.com/SuperTavor/Puniemu/src/config-manager/configmanager"
 	l5idapi_models "github.com/SuperTavor/Puniemu/src/server/l5idapi/models"
+	userdatamanager "github.com/SuperTavor/Puniemu/src/userDataManager"
 )
 
 type Active_GoodResponse struct {
@@ -30,7 +30,7 @@ type Active_GoodResponse struct {
 
 func NewActiveGoodResponse(udkeyValue string) Active_GoodResponse {
 	var gdkeys []l5idapi_models.Key
-	for _, v := range retrieveGdkeysFromUdkey(udkeyValue) {
+	for _, v := range userdatamanager.GetGDKeysFromUDKey(udkeyValue) {
 		gdkeys = append(gdkeys, l5idapi_models.NewKey(v))
 	}
 	if gdkeys == nil {
@@ -54,8 +54,4 @@ func NewActiveGoodResponse(udkeyValue string) Active_GoodResponse {
 	}
 
 	return obj
-}
-
-func retrieveGdkeysFromUdkey(udkeyValue string) []string {
-	return configmanager.KeyMap[udkeyValue]
 }

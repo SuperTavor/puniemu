@@ -1,7 +1,6 @@
 package models
 
 import (
-	"log"
 	"time"
 
 	userdatamanager "github.com/SuperTavor/Puniemu/src/userDataManager"
@@ -22,7 +21,6 @@ func NewCreateGDKeyGoodResponse(udkey string) (CreateGDKey_GoodResponse, error) 
 	var generatedGdkey string = l5idapi_models.NewKeyAutoGen(udkey, "g-")
 	err := userdatamanager.AddGDKeyToUDKey(udkey, generatedGdkey)
 	if err != nil {
-		log.Println(err)
 		return CreateGDKey_GoodResponse{}, err
 	}
 	return CreateGDKey_GoodResponse{Result: true, GDKey: l5idapi_models.NewKey(generatedGdkey), SignNonce: "123", SignTimestamp: int(time.Now().Unix())}, nil

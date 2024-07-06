@@ -9,6 +9,7 @@ import (
 	"github.com/SuperTavor/Puniemu/src/config-manager/configmanager"
 	nhnrequests "github.com/SuperTavor/Puniemu/src/nhnRequests"
 	createUserHandler "github.com/SuperTavor/Puniemu/src/server/gameserver/createUser/handler"
+	gdkeyAccsHandler "github.com/SuperTavor/Puniemu/src/server/gameserver/getGdkeyAccounts/handler"
 	getMasterHandler "github.com/SuperTavor/Puniemu/src/server/gameserver/getMaster/handler"
 	initHandler "github.com/SuperTavor/Puniemu/src/server/gameserver/init/handler"
 	generalGameServerModels "github.com/SuperTavor/Puniemu/src/server/gameserver/models"
@@ -58,6 +59,7 @@ func setGameserverHandles() {
 	http.HandleFunc("/getMaster.nhn", getMasterHandler.Handle)
 	http.HandleFunc("/init.nhn", initHandler.Handle)
 	http.HandleFunc("/createUser.nhn", createUserHandler.Handle)
+	http.HandleFunc("/getGdkeyAccounts.nhn", gdkeyAccsHandler.Handle)
 }
 
 func loadServerFiles() {
