@@ -47,7 +47,7 @@ func NewUDKeyPlayerItem(udkey, gdkey string) (*UDKeyPlayerItem, error) {
 	if err != nil {
 		return nil, err
 	}
-	startTimeString := userdatamanager.UnixTimeToDate(int64(binary.LittleEndian.Uint64(startTimestamp[8:])))
+	startTimeString := userdatamanager.UnixTimeToDate(int64(binary.LittleEndian.Uint64(startTimestamp)))
 	playerItem.StartDate = startTimeString
 	//Placeholder - this will be changed when implementing login.nhn
 	playerItem.LastUpdateDate = "1970-01-01 00:00:00"
