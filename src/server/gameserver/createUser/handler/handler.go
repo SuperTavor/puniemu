@@ -16,6 +16,10 @@ import (
 )
 
 func Handle(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Only POST is supported for this path.", http.StatusBadRequest)
+		return
+	}
 	encryptedRequest, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "No request.", http.StatusBadRequest)

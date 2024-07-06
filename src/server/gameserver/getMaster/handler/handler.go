@@ -27,6 +27,10 @@ func UnmarshalOrGetFromCache(jsonName, jsonString string) (*map[string]interface
 	return unmarshalCache[jsonName], nil
 }
 func Handle(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Only POST is supported for this path.", http.StatusBadRequest)
+		return
+	}
 	// Get request body
 	body, err := io.ReadAll(r.Body)
 	if err != nil {

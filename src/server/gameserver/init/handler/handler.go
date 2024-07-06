@@ -14,6 +14,10 @@ import (
 )
 
 func Handle(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Only POST is supported for this path.", http.StatusBadRequest)
+		return
+	}
 	w.Header().Set("Content-Type", "application/json")
 	var request map[string]any = make(map[string]any)
 	var err error
