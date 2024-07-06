@@ -8,6 +8,7 @@ import (
 
 	"github.com/SuperTavor/Puniemu/src/config-manager/configmanager"
 	nhnrequests "github.com/SuperTavor/Puniemu/src/nhnRequests"
+	createUserHandler "github.com/SuperTavor/Puniemu/src/server/gameserver/createUser/handler"
 	getMasterHandler "github.com/SuperTavor/Puniemu/src/server/gameserver/getMaster/handler"
 	initHandler "github.com/SuperTavor/Puniemu/src/server/gameserver/init/handler"
 	generalGameServerModels "github.com/SuperTavor/Puniemu/src/server/gameserver/models"
@@ -56,6 +57,7 @@ func setImgServerHandles() {
 func setGameserverHandles() {
 	http.HandleFunc("/getMaster.nhn", getMasterHandler.Handle)
 	http.HandleFunc("/init.nhn", initHandler.Handle)
+	http.HandleFunc("/createUser.nhn", createUserHandler.Handle)
 }
 
 func loadServerFiles() {

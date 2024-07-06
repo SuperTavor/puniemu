@@ -41,7 +41,8 @@ func GetGDKeysFromUDKey(udkey string) []string {
 	})
 	return existingGdKeys
 }
-func AddGDKeyToUDKey(udkey string, gdkey string) {
+
+func AddGDKeyToUDKey(udkey string, gdkey string) error {
 	formattedKey := fmt.Sprintf("%s::gdkeys", udkey)
 	existingGdKeys := GetGDKeysFromUDKey(udkey)
 	existingGdKeys = append(existingGdKeys, gdkey)
@@ -50,7 +51,17 @@ func AddGDKeyToUDKey(udkey string, gdkey string) {
 		err := txn.Set([]byte(formattedKey), serializedGdkeys)
 		return err
 	})
-	if err != nil {
-		log.Fatal(err)
-	}
+	return err
+}
+
+func StoreYwpUser(udkey, gdkey, tableName string, content []byte) error {
+	err := db.Update(func(txn *badger.Txn) error {
+		formattedKey := fmt.Sprintf("%s::%s::ywp_user::%s", udkey, gdkey, tableName)
+		err := txn.Set([]byte(formattedKey), content)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	return err
 }

@@ -3,9 +3,9 @@ package models
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"fmt"
-	"math"
-	"math/rand"
+	"time"
+
+	"strconv"
 )
 
 type Key struct {
@@ -23,10 +23,9 @@ func NewKey(keyValue string) Key {
 }
 
 func NewKeyAutoGen(baseOn string, prefix string) string {
-	randomNumber := rand.Intn(math.MaxInt32 + 1)
-	randomString := fmt.Sprintf("%d", randomNumber)
-	//Add random onto key based on
-	combined := baseOn + randomString
+	timeRightNow := time.Now().UnixMicro()
+	//Add time onto key based on
+	combined := baseOn + strconv.FormatInt(timeRightNow, 10)
 	//Hash
 	hash := md5.Sum([]byte(combined))
 	generatedKey := prefix + hex.EncodeToString(hash[:])

@@ -1,9 +1,10 @@
 package models
 
 import (
+	"log"
 	"time"
 
-	"github.com/SuperTavor/Puniemu/src/config-manager/configmanager"
+	userdatamanager "github.com/SuperTavor/Puniemu/src/userDataManager"
 
 	l5idapi_models "github.com/SuperTavor/Puniemu/src/server/l5idapi/models"
 )
@@ -17,15 +18,12 @@ type CreateGDKey_GoodResponse struct {
 	SignTimestamp int                `json:"sign_timestamp"`
 }
 
-func NewCreateGDKeyGoodResponse(udkey string) CreateGDKey_GoodResponse {
-	generatedGdkey := l5idapi_models.NewKeyAutoGen(udkey, "g-")
-	addCorrelationToKeyMap(udkey, generatedGdkey)
-	return CreateGDKey_GoodResponse{Result: true, GDKey: l5idapi_models.NewKey(generatedGdkey), SignNonce: "123", SignTimestamp: int(time.Now().Unix())}
-}
-func addCorrelationToKeyMap(udkey string, gdkey string) {
-	if _, ok := configmanager.KeyMap[udkey]; ok {
-		configmanager.KeyMap[udkey] = append(configmanager.KeyMap[udkey], gdkey)
-	} else {
-		configmanager.KeyMap[udkey] = []string{gdkey}
+func NewCreateGDKeyGoodResponse(udkey string) (CreateGDKey_GoodResponse, error) {
+	var generatedGdkey string = l5idapi_models.NewKeyAutoGen(udkey, "g-")
+	err := userdatamanager.AddGDKeyToUDKey(udkey, generatedGdkey)
+	if err != nil {
+		log.Println(err)
+		return CreateGDKey_GoodResponse{}, err
 	}
+	return CreateGDKey_GoodResponse{Result: true, GDKey: l5idapi_models.NewKey(generatedGdkey), SignNonce: "123", SignTimestamp: int(time.Now().Unix())}, nil
 }

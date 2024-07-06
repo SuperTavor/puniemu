@@ -19,7 +19,10 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 		json, _ := json.Marshal(badResponse)
 		w.Write(json)
 	} else {
-		goodResponse := createGdKeyModels.NewCreateGDKeyGoodResponse(query.Get("udkey"))
+		goodResponse, err := createGdKeyModels.NewCreateGDKeyGoodResponse(query.Get("udkey"))
+		if err != nil {
+			return
+		}
 		json, _ := json.Marshal(goodResponse)
 		w.Write(json)
 	}

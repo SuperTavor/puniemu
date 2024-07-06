@@ -1,5 +1,6 @@
 {
     "static-jsons": {
+        "DefaultTutorialList": "srv_data/static-jsons/defaultTutorialList.json",
         "MasterData": "srv_data/static-jsons/MasterData.json",
         "ymoneyShopSaleList": "srv_data/static-jsons/ymoneyShopSaleList.json",
         "hitodamaShopSaleList": "srv_data/static-jsons/hitodamaShopSaleList.json",
