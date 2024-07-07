@@ -1,11 +1,11 @@
 package models
 
 import (
-	"encoding/base32"
-	"encoding/binary"
-	"hash/crc32"
-	"strconv"
+	"crypto/rand"
+	"math/big"
 	"time"
+
+	userdatamanager "github.com/SuperTavor/Puniemu/src/userDataManager"
 )
 
 type YwpUserData struct {
@@ -91,7 +91,7 @@ func NewUserData(iconID int, gdkey, playerName string) *YwpUserData {
 		ChargeYmoney:              0,
 		CrystalCollectCount:       0,
 		EventPointUpItemID:        0,
-		CharacterID:               generateFriendCode(gdkey),
+		CharacterID:               generateAndStoreFriendCode(),
 		IconID:                    iconID,
 		LimitTimeSaleRemainSec:    0,
 		TotMedalPoint:             0,
@@ -113,11 +113,22 @@ func getRemainSec() int {
 	const SECONDS_IN_DAY = 86400
 	return SECONDS_IN_DAY - secondsPassed
 }
-func generateFriendCode(gdkey string) string {
-	timestamp := []byte(strconv.FormatInt(time.Now().Unix(), 10))
-	friendCodeInt := crc32.ChecksumIEEE(append([]byte(gdkey), timestamp...))
-	var friendCodeBytes = make([]byte, 4)
-	binary.LittleEndian.PutUint32(friendCodeBytes, friendCodeInt)
-	encoded := base32.StdEncoding.EncodeToString(friendCodeBytes)
-	return encoded
+func generateAndStoreFriendCode() string {
+	generateID := func() string {
+		const letterBytes = "abcdefghijklmnopqrstuvwxyz0123456789"
+		b := make([]byte, 8)
+		for i := range b {
+			num, _ := rand.Int(rand.Reader, big.NewInt(int64(len(letterBytes))))
+			b[i] = letterBytes[num.Int64()]
+		}
+		return string(b)
+	}
+	id := generateID()
+	//Generate a new ID if already exists.
+	for userdatamanager.IsFriendCodeExists(id) {
+		id = generateID()
+	}
+
+	userdatamanager.StoreFriendCode(id)
+	return id
 }

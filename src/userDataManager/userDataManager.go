@@ -18,6 +18,7 @@ func InitializeDB() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	initFriendCodesMap()
 }
 
 func CloseDB() {
@@ -67,6 +68,46 @@ func StoreYwpUser(udkey, gdkey, tableName string, content []byte) error {
 	return err
 }
 
+// We use a map so I can see if a friend code is already registered in o(n)
+var friendCodes map[string]bool
+
+const FRIEND_CODE_DB_KEY = "FRIEND_CODES"
+
+func IsFriendCodeExists(friendCode string) bool {
+	_, ok := friendCodes[friendCode]
+	return ok
+}
+func initFriendCodesMap() {
+	err := db.View(func(txn *badger.Txn) error {
+		item, err := txn.Get([]byte(FRIEND_CODE_DB_KEY))
+		if err != nil {
+			friendCodes = make(map[string]bool)
+		} else {
+			item.Value(func(val []byte) error {
+				return json.Unmarshal(val, &friendCodes)
+			})
+		}
+		return nil
+	})
+	if err != nil {
+		log.Fatal("Could not retrieve friend code list: " + err.Error())
+	}
+}
+func StoreFriendCode(friendCode string) error {
+	friendCodes[friendCode] = true
+	err := db.Update(func(txn *badger.Txn) error {
+		marshalledFriendCodes, err := json.Marshal(friendCodes)
+		if err != nil {
+			return err
+		}
+		err = txn.Set([]byte(FRIEND_CODE_DB_KEY), marshalledFriendCodes)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	return err
+}
 func GetYwpUser(udkey, gdkey, tableName string) ([]byte, error) {
 	var outputBytes []byte
 	err := db.View(func(txn *badger.Txn) error {
