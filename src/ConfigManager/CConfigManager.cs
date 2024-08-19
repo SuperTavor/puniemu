@@ -2,24 +2,21 @@
 
 namespace Puniemu.Src.ConfigManager
 {
-    public class CConfigManager
+    public static class CConfigManager
     {
-        //Config fields
-        public int Port { get; set; }
-        public int MaxAllocForDataDownloadCache { get; set; }
-        public string FirestoreDatabaseProjectID { get; set; }
-
-        [JsonIgnore]
-        private const string CONFIG_PATH = "server_data/cfg.json";
-
-        [JsonIgnore]
-        public static CConfigManager? Shared
+        public struct ConfigStructure
         {
-            get; private set;
+            public string FirestoreDatabaseProjectID { get; set; }
+            public string BaseDataDownloadURL { get; set; }
         }
-        public static void LoadConfigToShared()
+
+        public static ConfigStructure? Cfg;
+        //Logic
+        [JsonIgnore]
+        private const string CONFIG_PATH = "cfg.json";
+
+        public static void Initialize()
         {
-            Shared = new();
             if(!File.Exists(CONFIG_PATH))
             {
                 throw new FileNotFoundException("Can't find config file. Please make sure it is located is server_data/cfg.json");
@@ -27,8 +24,8 @@ namespace Puniemu.Src.ConfigManager
             else
             {
                 var configFileContent = File.ReadAllText(CONFIG_PATH);
-                Shared = JsonConvert.DeserializeObject<CConfigManager>(configFileContent);
-                if (Shared == null)
+                Cfg = JsonConvert.DeserializeObject<ConfigStructure>(configFileContent);
+                if (Cfg == null)
                 {
                     throw new FormatException("Config file deserialization failed, perhaps it's formatted incorrectly?");
                 }

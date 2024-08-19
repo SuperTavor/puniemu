@@ -1,3 +1,5 @@
+using Puniemu.src.Utils.UserDataManager;
+using Puniemu.Src.ConfigManager;
 using Puniemu.Src.Server.L5ID.API.V1.Active;
 
 namespace Puniemu.Src;
@@ -8,6 +10,9 @@ class Program
         var builder = WebApplication.CreateBuilder(args);
 
         var app = builder.Build();
+        //Init database connection
+        CUserDataManager.Initialize();
+        CConfigManager.Initialize();
 
         app.UseHttpsRedirection();
         //Assign handlers

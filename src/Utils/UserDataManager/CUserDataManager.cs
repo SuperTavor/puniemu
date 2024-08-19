@@ -5,31 +5,32 @@ namespace Puniemu.src.Utils.UserDataManager
     public static class CUserDataManager
     {
         private static FirestoreDb? _db;
+        //Check credentials and connect to the Firestore database.
         public static void Initialize()
         {
-            if(!CloudfireCredentialsExist())
+            if(!CredsExist())
             {
                Console.WriteLine("Please make sure your GOOGLE_APPLICATION_CREDENTIALS environment variable is set to your credentials path.");
                Environment.Exit(1);
             }
             else
             {
-                var firestoreProjectId = CConfigManager.Shared!.FirestoreDatabaseProjectID;
+                var firestoreProjectId = CConfigManager.Cfg!.Value.FirestoreDatabaseProjectID;
                 _db = FirestoreDb.Create(firestoreProjectId);
             }
         }
-
-        private static bool CloudfireCredentialsExist()
+        //Checks if the Google Application credentials exist.
+        private static bool CredsExist()
         {
             var credPath = Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS");
             //GetEnvironmentVariable returns null when the environment variable is not found.
             return credPath == null;
         }
-
+        //Gets all corresponding GDKeys from under a specified UDKey.
         public static async Task<List<string>> GetGdkeysFromUdkeyAsync(string udkey)
         {
             List<string> existingGdkeys = new List<string>();
-            DocumentReference udkeyDoc = _db.Collection("UDKeys").Document(udkey);
+            DocumentReference udkeyDoc = _db!.Collection("Users").Document(udkey);
             DocumentSnapshot snap = await udkeyDoc.GetSnapshotAsync();
 
             if (!snap.Exists)

@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using Newtonsoft.Json;
+using Puniemu.src.Utils.UserDataManager;
 using Puniemu.Src.Server.L5ID.DataClasses;
 using System.Collections;
 namespace Puniemu.Src.Server.L5ID.API.V1.Active.DataClasses
@@ -27,15 +29,48 @@ namespace Puniemu.Src.Server.L5ID.API.V1.Active.DataClasses
         public SRcClientVersion RCClientVersion { get; set; }
         //Account creation time in Unix time
         [JsonProperty("sign_timestamp")]
-        public int SignTimestamp { get; set; }
+        public long SignTimestamp { get; set; }
         //Idk what this does, but setting it to anything but 0 works.
         [JsonProperty("sign_nonce")]
         public string SignNonce { get; set; }
 
-        public CGoodActiveResponse(string udkeyValue)
+
+        /*Using this instead of the constructors as constructors don't support async.
+        Refer to comments on the actual class properties for explanations on the wrappedKeySet
+        and anything else you are not sure about. If you still have questions, fire an issue!
+        */
+        public static async Task<CGoodActiveResponse> CreateAsync(string udkeyValue)
         {
-            this.Result = true;
+            var gdkeys = new List<CKey>();
+            var udkey = new CKey(udkeyValue);
+            foreach (var key in await CUserDataManager.GetGdkeysFromUdkeyAsync(udkeyValue))
+            {
+                gdkeys.Add(udkey);
+            }
             
+            var wrappedKeySet = new SKeySet[]
+            {
+                new SKeySet
+                {
+                    GDKeys = gdkeys,
+                    UDKey = udkey
+                }
+            };
+
+            var instance = new CGoodActiveResponse
+            {
+                Result=true,
+                UserKeys=wrappedKeySet,
+                UnwrappedUDKey=udkey,
+                UnwrappedGDKeys=gdkeys,
+                IsLinked = false,
+                MaxGDKeys = 3,
+                RCClientVersion = new SRcClientVersion(),
+                SignTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                SignNonce="123"
+            };
+
+            return instance;
         }
     }
 }
