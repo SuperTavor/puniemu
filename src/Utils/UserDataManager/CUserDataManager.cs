@@ -24,7 +24,7 @@ namespace Puniemu.src.Utils.UserDataManager
         {
             var credPath = Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS");
             //GetEnvironmentVariable returns null when the environment variable is not found.
-            return credPath == null;
+            return credPath != null;
         }
         //Gets all corresponding GDKeys from under a specified UDKey.
         public static async Task<List<string>> GetGdkeysFromUdkeyAsync(string udkey)

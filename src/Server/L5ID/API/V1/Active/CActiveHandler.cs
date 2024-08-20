@@ -17,7 +17,7 @@ namespace Puniemu.Src.Server.L5ID.API.V1.Active
             }
             else
             {
-                 udkey = queryParams["udkey"];
+                 udkey = queryParams["udkey"]!;
             }
             var res = CGoodActiveResponse.CreateAsync(udkey);
             var json = JsonConvert.SerializeObject(res);

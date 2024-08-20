@@ -1,4 +1,8 @@
 {
-  "FirestoreDatabaseProjectID": "",
-  "BaseDataDownloadURL": ""
+  "FirestoreDatabaseProjectID": "ProjectID",
+  "BaseDataDownloadURL": "YourURL",
+  "MstVersionMaster": 0,
+  "GameDataPath": "./data",
+  "ClientVersion": "4.124.0",
+  "ServerName": "Test server"
 }

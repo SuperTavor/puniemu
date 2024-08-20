@@ -1,18 +1,12 @@
 ﻿using Newtonsoft.Json;
-
+using Puniemu.Src.ConfigManager.DataClasses;
 namespace Puniemu.Src.ConfigManager
 {
     public static class CConfigManager
     {
-        public struct ConfigStructure
-        {
-            public string FirestoreDatabaseProjectID { get; set; }
-            public string BaseDataDownloadURL { get; set; }
-        }
 
-        public static ConfigStructure? Cfg;
-        //Logic
-        [JsonIgnore]
+        public static CStaticGameDataManager GameDataManager = new CStaticGameDataManager();
+        public static SConfigStructure? Cfg;
         private const string CONFIG_PATH = "cfg.json";
 
         public static void Initialize()
@@ -24,7 +18,7 @@ namespace Puniemu.Src.ConfigManager
             else
             {
                 var configFileContent = File.ReadAllText(CONFIG_PATH);
-                Cfg = JsonConvert.DeserializeObject<ConfigStructure>(configFileContent);
+                Cfg = JsonConvert.DeserializeObject<SConfigStructure>(configFileContent);
                 if (Cfg == null)
                 {
                     throw new FormatException("Config file deserialization failed, perhaps it's formatted incorrectly?");
