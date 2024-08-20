@@ -15,7 +15,7 @@ namespace Puniemu.Src.Server.GameServer.Init
             ctx.Response.StatusCode = 400;
             await ctx.Response.WriteAsync("Bad request");
         }
-        public static async void HandleAsync(HttpContext ctx)
+        public static async Task HandleAsync(HttpContext ctx)
         {
             //read and decrypt request
             var requestBuf = ctx.Request.BodyReader.ReadAsync().Result.Buffer;

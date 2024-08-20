@@ -5,7 +5,7 @@ namespace Puniemu.Src.ConfigManager
     public static class CConfigManager
     {
 
-        public static CStaticGameDataManager GameDataManager = new CStaticGameDataManager();
+        public static CStaticGameDataManager GameDataManager;
         public static SConfigStructure? Cfg;
         private const string CONFIG_PATH = "cfg.json";
 
@@ -13,7 +13,7 @@ namespace Puniemu.Src.ConfigManager
         {
             if(!File.Exists(CONFIG_PATH))
             {
-                throw new FileNotFoundException("Can't find config file. Please make sure it is located is server_data/cfg.json");
+                throw new FileNotFoundException($"Can't find config file. Please make sure it is located in {CONFIG_PATH}");
             } 
             else
             {
@@ -24,6 +24,7 @@ namespace Puniemu.Src.ConfigManager
                     throw new FormatException("Config file deserialization failed, perhaps it's formatted incorrectly?");
                 }
             }
+            GameDataManager = new CStaticGameDataManager();
         }
     }
 }

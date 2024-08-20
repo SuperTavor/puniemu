@@ -40,8 +40,6 @@ namespace Puniemu.Src.Utils.NHNCrypt
         {
             using (var result = new MemoryStream())
             {
-                var lengthBytes = BitConverter.GetBytes(input.Length);
-                result.Write(lengthBytes, 0, 4);
 
                 using (var compressionStream = new GZipStream(result,
                     CompressionMode.Compress))
