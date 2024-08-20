@@ -3,18 +3,14 @@ using Puniemu.Src.ConfigManager;
 using Puniemu.Src.Server.GameServer.DataClasses;
 using Puniemu.Src.Server.GameServer.Init.DataClasses;
 using Puniemu.Src.Utils.NHNCrypt;
+using Puniemu.Src.Utils.GeneralUtils;
 using System.Text;
 
 namespace Puniemu.Src.Server.GameServer.Init
 {
     public class CInitHandler
     {
-        static async Task SendBadRequest(HttpContext ctx)
-        {
-            ctx.Response.Headers.ContentType = "text/plain";
-            ctx.Response.StatusCode = 400;
-            await ctx.Response.WriteAsync("Bad request");
-        }
+       
         public static async Task HandleAsync(HttpContext ctx)
         {
             ctx.Response.ContentType = "application/json";
@@ -34,7 +30,7 @@ namespace Puniemu.Src.Server.GameServer.Init
             }
             catch
             {
-                await SendBadRequest(ctx);
+                await CGeneralUtils.SendBadRequest(ctx);
                 return;
             }
             string? decrypted;
@@ -44,7 +40,7 @@ namespace Puniemu.Src.Server.GameServer.Init
             }
             catch
             {
-                await SendBadRequest(ctx);
+                await CGeneralUtils.SendBadRequest(ctx);
                 return;
             }
             
@@ -52,7 +48,7 @@ namespace Puniemu.Src.Server.GameServer.Init
             var dict = JsonConvert.DeserializeObject<Dictionary<string,object>>(decrypted);
             if(dict == null)
             {
-                await SendBadRequest(ctx);
+                await CGeneralUtils.SendBadRequest(ctx);
                 return;
             }
             if(dict.ContainsKey("appVer"))
@@ -76,7 +72,7 @@ namespace Puniemu.Src.Server.GameServer.Init
             }
             else
             {
-                await SendBadRequest(ctx);
+                await CGeneralUtils.SendBadRequest(ctx);
                 return;
             }
         }

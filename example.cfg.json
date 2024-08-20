@@ -5,5 +5,5 @@
   "ClientVersion": "4.124.0",
   "ServerName": "Test server",
   "IsMaintenance": false,
-  "MaintenanceEndTime": "soon"
+  "MaintenanceEndTime": "never"
 }

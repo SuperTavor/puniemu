@@ -1,17 +1,12 @@
 ﻿using Newtonsoft.Json;
 using Puniemu.Src.ConfigManager;
 using Puniemu.Src.Server.GameServer.DataClasses;
-
+using Puniemu.Src.Utils.GeneralUtils;
 namespace Puniemu.Src.Server.GameServer.Init.DataClasses
 {
     public struct SInitResponse
     {
-        private T DeserializeGameDataToTypeAndCheckValidity<T>(string gamedataName)
-        {
-            T? output = JsonConvert.DeserializeObject<T>(CConfigManager.GameDataManager.GamedataCache[gamedataName]);
-            if (output == null) throw new FormatException($"{gamedataName} static gamedata should be a(n) {typeof(T).FullName}");
-            return output;
-        }
+      
         public SInitResponse()
         {
             this.ServerDt = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
@@ -19,7 +14,7 @@ namespace Puniemu.Src.Server.GameServer.Init.DataClasses
             this.ResultCode = 0;
             this.NextScreenType = 0;
             this.YwpMstVersionMaster = CConfigManager.GameDataManager.GamedataCache["ywp_mst_version_master"];
-            this.HitodamaShopSaleList = DeserializeGameDataToTypeAndCheckValidity<List<int>>("hitodamaShopSaleList");
+            this.HitodamaShopSaleList = CGeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("hitodamaShopSaleList");
             this.GameServerURL = CConsts.OG_GAMESERVER_URL;
             this.StoreURL = "";
             this.IsEnableSerialCode = 1;
@@ -27,10 +22,10 @@ namespace Puniemu.Src.Server.GameServer.Init.DataClasses
             this.ImgServer = CConfigManager.Cfg!.Value.BaseDataDownloadURL;
             this.ResultType = 0;
             this.DispNoticeFlag = 2;
-            this.ShopSaleList = DeserializeGameDataToTypeAndCheckValidity<List<int>>("shopSaleList");
+            this.ShopSaleList = CGeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("shopSaleList");
             this.YwpToken = "";
-            this.YMoneyShopSaleList = DeserializeGameDataToTypeAndCheckValidity<List<int>>("ymoneyShopSaleList");
-            this.NoticePageList = DeserializeGameDataToTypeAndCheckValidity<List<Dictionary<string,int>>>("noticePageList");
+            this.YMoneyShopSaleList = CGeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("ymoneyShopSaleList");
+            this.NoticePageList = CGeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<Dictionary<string,int>>>("noticePageList");
             this.IsEnableFriendInvite = 1;
             this.MasterReacquisitionHour = 2;
             this.IsEnableYokaiMedal = 1;

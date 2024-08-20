@@ -4,6 +4,8 @@ using Puniemu.Src.Server.GameServer;
 using Puniemu.Src.Server.GameServer.Init;
 using Puniemu.Src.Server.L5ID.API.V1.Active;
 using Microsoft.AspNetCore.Rewrite;
+using Puniemu.Src.Server.GameServer.GetL5IDStatus;
+using Puniemu.Src.Server.GameServer.GetMaster;
 
 namespace Puniemu.Src;
 class Program
@@ -46,6 +48,11 @@ class Program
         {
             await CInitHandler.HandleAsync(ctx);
         });
+        app.MapPost("/getMaster.nhn", async ctx =>
+        {
+            await CGetMasterHandler.HandleAsync(ctx);
+        });
+        app.MapPost("/getL5idStatus.nhn", CGetL5IDStatusHandler.Handle);
     }
 
     //Assigns all other, unknown request paths
