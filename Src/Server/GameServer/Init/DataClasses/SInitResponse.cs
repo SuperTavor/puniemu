@@ -37,6 +37,8 @@ namespace Puniemu.Src.Server.GameServer.Init.DataClasses
             this.IsEnableL5ID = 0;
             this.ThreeKingdomTeamEventButtonHiddenFlg = 1;
             this.TeamEventButtonHiddenFlg = 1;
+            this.L5IDURL = "/l5id";
+            this.IsAppleTrial = false;
         }
         // Timestamp when the response was sent
         [JsonProperty("serverDt")]
