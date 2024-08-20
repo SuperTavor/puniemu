@@ -4,9 +4,10 @@
     {
         public string FirestoreDatabaseProjectID { get; set; }
         public string BaseDataDownloadURL { get; set; }
-        public int MstVersionMaster { get; set; }
         public string GameDataPath { get; set; }
         public string ClientVersion { get; set; }
         public string ServerName { get; set; }
+        public bool IsMaintenance { get; set; }
+        public string MaintenanceEndTime { get; set; }
     }
 }

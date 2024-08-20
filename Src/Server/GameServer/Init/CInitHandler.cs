@@ -17,6 +17,14 @@ namespace Puniemu.Src.Server.GameServer.Init
         }
         public static async Task HandleAsync(HttpContext ctx)
         {
+            ctx.Response.ContentType = "application/json";
+            if (CConfigManager.Cfg!.Value.IsMaintenance)
+            {
+                var msg = new SMsgAndGoBackToTitle($"The server is under maintenance\nuntil {CConfigManager.Cfg.Value.MaintenanceEndTime}", CConfigManager.Cfg.Value.ServerName);
+                var encryptedMsgJson = CNHNCrypt.EncryptResponse(JsonConvert.SerializeObject(msg));
+                await ctx.Response.WriteAsync(encryptedMsgJson);
+                return;
+            }
             //read and decrypt request
             var requestBuf = ctx.Request.BodyReader.ReadAsync().Result.Buffer;
             string requestStr;
@@ -47,7 +55,6 @@ namespace Puniemu.Src.Server.GameServer.Init
                 await SendBadRequest(ctx);
                 return;
             }
-            ctx.Response.ContentType = "application/json";
             if(dict.ContainsKey("appVer"))
             {
                 var appVer = dict["appVer"];

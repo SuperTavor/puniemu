@@ -6,7 +6,7 @@ namespace Puniemu.Src.Server.GameServer.Init.DataClasses
 {
     public struct SInitResponse
     {
-        T DeserializeGameDataToTypeAndCheckValidity<T>(string gamedataName)
+        private T DeserializeGameDataToTypeAndCheckValidity<T>(string gamedataName)
         {
             T? output = JsonConvert.DeserializeObject<T>(CConfigManager.GameDataManager.GamedataCache[gamedataName]);
             if (output == null) throw new FormatException($"{gamedataName} static gamedata should be a(n) {typeof(T).FullName}");
@@ -15,7 +15,7 @@ namespace Puniemu.Src.Server.GameServer.Init.DataClasses
         public SInitResponse()
         {
             this.ServerDt = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-            this.MstVersionMaster = CConfigManager.Cfg!.Value.MstVersionMaster;
+            this.MstVersionMaster = int.Parse(CConfigManager.GameDataManager.GamedataCache["mstVersionMaster"]);
             this.ResultCode = 0;
             this.NextScreenType = 0;
             this.YwpMstVersionMaster = CConfigManager.GameDataManager.GamedataCache["ywp_mst_version_master"];
