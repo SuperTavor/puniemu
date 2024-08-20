@@ -1,11 +1,11 @@
-from base64 import b64decode, b64encode
+import requests
+import json
+from base64 import b64encode, b64decode
 from gzip import decompress
 from Cryptodome.Cipher import AES
 from Cryptodome.Util.Padding import unpad, pad
 import hashlib
 import os
-import requests
-import json
 
 KEY = bytes([0xa8, 0x65, 0xd7, 0xe5, 0xe2, 0x45, 0x8f, 0x8c, 0xe1, 0xb5, 0xec, 0xd0, 0x87, 0xe5, 0x45, 0x94])
 
@@ -45,21 +45,35 @@ init_request = json.dumps({
     "ywpToken": "0"
 })
 
-encrypted_res = requests.post(SERVER + "init.nhn", data=encrypt_req(init_request), headers={"Content-Type": "application/json"}).text
-res_dict = json.loads(decrypt_res(encrypted_res))
+encoded_payload = ("OjJL5BoedRXqPuM3gCOvqR1imLmeSFYvVwDvp3u5KVuVhkzAxCdFdeHf4xdqLUuJ7bevsNj18QnbXTHiCCimnLZxZb6gOi1QuY2nD2DhIygns07zJf9FiQ3A_cWtZbtrYY6EqNWtHPr3Vysb2vJfsiishJR-JHGSyvkfwrnY9PbjNYslfOD-lEn05-vNnTvDFBHhFz4kMfg0k28jezdMmPz44ahgztDmZu6AwBY_CjZaD-_9qmb4Kxz-F0CcV5R-yFP9HyovAZ3FNaTERHZPHnWDHkPSzE4x65xWGfkkirzgpeEhX6JOvtFIshBXxstJsBw00RenzLMbKt85OQ8lGw==")
 
-files = {
-    "ywp_mst_version_master": res_dict["ywp_mst_version_master"],
-    "hitodamaShopSaleList": str(res_dict["hitodamaShopSaleList"]),
-    "shopSaleList": str(res_dict["shopSaleList"]),
-    "ymoneyShopSaleList": str(res_dict["ymoneyShopSaleList"]),
-    "noticePageList": str(res_dict["noticePageList"])
+headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "Accept-Encoding": "identity",
+    "Connection": "Keep-Alive",
+    "User-Agent": "Dalvik/2.1.0 (Linux; U; Android 9; SM-G965N Build/QP1A.190711.020)"
 }
 
-os.makedirs(output_folder, exist_ok=True)
+try:
+    encrypted_res = requests.post(SERVER+"init.nhn", headers=headers, data=encoded_payload)
+    res_dict = json.loads(decrypt_res(encrypted_res.text))
 
-for key, value in files.items():
-    with open(os.path.join(output_folder, f"{key}.txt"), "w") as f:
-        f.write(value.replace("'", "\""))
+    files = {
+        "ywp_mst_version_master": res_dict["ywp_mst_version_master"],
+        "hitodamaShopSaleList": str(res_dict["hitodamaShopSaleList"]),
+        "shopSaleList": str(res_dict["shopSaleList"]),
+        "ymoneyShopSaleList": str(res_dict["ymoneyShopSaleList"]),
+        "noticePageList": str(res_dict["noticePageList"]),
+        "mstVersionMaster": str(res_dict["mstVersionMaster"])
+    }
 
-print("Finished")
+    os.makedirs(output_folder, exist_ok=True)
+
+    for key, value in files.items():
+        with open(os.path.join(output_folder, f"{key}.txt"), "w") as f:
+            f.write(value.replace("'", "\""))
+
+    print("Finished")
+except Exception as e:
+    print(f"An error occurred: {e}")

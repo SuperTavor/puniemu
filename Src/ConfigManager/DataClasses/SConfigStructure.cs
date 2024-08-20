@@ -8,6 +8,6 @@
         public string ClientVersion { get; set; }
         public string ServerName { get; set; }
         public bool IsMaintenance { get; set; }
-        public string MaintenanceEndTime { get; set; }
+        public string MaintenanceMsg { get; set; }
     }
 }

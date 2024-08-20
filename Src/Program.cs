@@ -33,8 +33,8 @@ class Program
 
     static void AssignL5IDHandlers(WebApplication app)
     {
-        const string L5ID_BASE = "/l5id/api/v1";
-        app.MapGet(L5ID_BASE+"/active", async ctx =>
+        const string L5ID_BASE = "/l5id/api/v1/";
+        app.MapGet(L5ID_BASE+"active/", async ctx =>
         {
             await CActiveHandler.HandleAsync(ctx);
         });
