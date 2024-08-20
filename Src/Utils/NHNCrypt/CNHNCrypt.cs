@@ -54,20 +54,34 @@ namespace Puniemu.Src.Utils.NHNCrypt
         // Calculates a double SHA1 hash with a specific salt
         private static byte[] CalcDigest(byte[] content)
         {
-            byte[] CombineWithSalt(byte[] salt, byte[] data)
+            byte space = (byte)' ';
+
+            byte[] CombineWithSaltAndSpace(byte[] salt, byte[] data, bool addSpace)
             {
-                var combined = new byte[salt.Length + data.Length];
-                Buffer.BlockCopy(salt, 0, combined, 0, salt.Length);
-                Buffer.BlockCopy(data, 0, combined, salt.Length, data.Length);
+                byte[] combined;
+                if (addSpace)
+                {
+                    combined = new byte[salt.Length + 1 + data.Length];
+                    Buffer.BlockCopy(salt, 0, combined, 0, salt.Length);
+                    combined[salt.Length] = space;
+                    Buffer.BlockCopy(data, 0, combined, salt.Length + 1, data.Length);
+                }
+                else
+                {
+                    combined = new byte[salt.Length + data.Length];
+                    Buffer.BlockCopy(salt, 0, combined, 0, salt.Length);
+                    Buffer.BlockCopy(data, 0, combined, salt.Length, data.Length);
+                }
                 return combined;
             }
 
-            byte[] saltedContent = CombineWithSalt(DIGEST_SALT, content);
+            byte[] saltedContent = CombineWithSaltAndSpace(DIGEST_SALT, content, true);
             byte[] firstHash = SHA1.HashData(saltedContent);
 
-            byte[] saltedFirstHash = CombineWithSalt(DIGEST_SALT, firstHash);
+            byte[] saltedFirstHash = CombineWithSaltAndSpace(DIGEST_SALT, firstHash, false);
             return SHA1.HashData(saltedFirstHash);
         }
+
 
     }
 }

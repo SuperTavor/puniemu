@@ -17,6 +17,7 @@ class Program
         var rewriteOptions = new RewriteOptions()
             .AddRewrite(@"(.*\..*)$", "$1/", skipRemainingRules: true);
         app.UseRewriter(rewriteOptions);
+
         CConfigManager.Initialize();
 
         //Init database connection
@@ -32,7 +33,8 @@ class Program
 
     static void AssignL5IDHandlers(WebApplication app)
     {
-        app.MapGet("/l5id/api/v1/active", async ctx =>
+        const string L5ID_BASE = "/l5id/api/v1";
+        app.MapGet(L5ID_BASE+"/active", async ctx =>
         {
             await CActiveHandler.HandleAsync(ctx);
         });

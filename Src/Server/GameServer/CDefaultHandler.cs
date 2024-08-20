@@ -9,13 +9,6 @@ namespace Puniemu.Src.Server.GameServer
     {
         public static async Task HandleAsync(HttpContext ctx)
         {
-            if (ctx.Request.Method != HttpMethods.Post)
-            {
-                ctx.Response.StatusCode = StatusCodes.Status405MethodNotAllowed; 
-                await ctx.Response.WriteAsync("Method Not Allowed");
-                return;
-            }
-
             try
             {
                 var path = ctx.Request.Path;
