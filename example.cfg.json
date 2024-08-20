@@ -1,5 +1,5 @@
 {
-  "FirestoreDatabaseProjectID": "ProjectID",
+  "FirestoreDatabaseProjectID": "MyProjectID",
   "BaseDataDownloadURL": "YourURL",
   "MstVersionMaster": 0,
   "GameDataPath": "./data",
