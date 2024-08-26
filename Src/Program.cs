@@ -6,6 +6,8 @@ using Puniemu.Src.Server.L5ID.API.V1.Active;
 using Microsoft.AspNetCore.Rewrite;
 using Puniemu.Src.Server.GameServer.GetL5IDStatus;
 using Puniemu.Src.Server.GameServer.GetMaster;
+using Puniemu.Src.Server.GameServer.CreateUser;
+using Puniemu.Src.Server.L5ID.API.V1.CreateGDKey;
 
 namespace Puniemu.Src;
 class Program
@@ -40,6 +42,10 @@ class Program
         {
             await CActiveHandler.HandleAsync(ctx);
         });
+        app.MapGet(L5ID_BASE + "create_gdkey/", async ctx =>
+        {
+            await CCreateGDKeyHandler.HandleAsync(ctx);
+        });
     }
 
     static void AssignGameServerHandlers(WebApplication app)
@@ -51,6 +57,10 @@ class Program
         app.MapPost("/getMaster.nhn", async ctx =>
         {
             await CGetMasterHandler.HandleAsync(ctx);
+        });
+        app.MapPost("/createUser.nhn", async ctx =>
+        {
+            await CCreateUserHandler.HandleAsync(ctx);
         });
         app.MapPost("/getL5idStatus.nhn", CGetL5IDStatusHandler.Handle);
     }

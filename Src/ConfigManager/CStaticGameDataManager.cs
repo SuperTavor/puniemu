@@ -1,4 +1,6 @@
-﻿namespace Puniemu.Src.ConfigManager
+﻿using System.Reflection;
+
+namespace Puniemu.Src.ConfigManager
 {
     public class CStaticGameDataManager
     {
@@ -11,10 +13,26 @@
 
         private void CacheStaticGameData()
         {
-            var gamedataPath = CConfigManager.Cfg!.Value.GameDataPath;
-            foreach (var file in Directory.GetFiles(gamedataPath))
+            var assembly = Assembly.GetExecutingAssembly();
+            string rootNamespace = assembly.GetName().Name;
+            string[] resourceNames = assembly.GetManifestResourceNames();
+
+            foreach (var resourceName in resourceNames)
             {
-                GamedataCache[Path.GetFileNameWithoutExtension(file)] = File.ReadAllText(file);
+                using (Stream stream = assembly.GetManifestResourceStream(resourceName)!)
+                {
+                    if (stream != null)
+                    {
+                        using (StreamReader reader = new StreamReader(stream))
+                        {
+                            string content = reader.ReadToEnd();
+                            GamedataCache[resourceName
+                                .Replace($"{rootNamespace}.Resources.","")
+                                .Replace(".txt","")
+                                                    ] = content;
+                        }
+                    }
+                }
             }
         }
     }

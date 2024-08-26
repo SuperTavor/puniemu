@@ -13,7 +13,7 @@ namespace Puniemu.Src.ConfigManager
         {
             if(!File.Exists(CONFIG_PATH))
             {
-                throw new FileNotFoundException($"Can't find config file. Please make sure it is located in {CONFIG_PATH}");
+                throw new FileNotFoundException($"Can't find config file. Please make sure it is located at {CONFIG_PATH}");
             } 
             else
             {

@@ -13,12 +13,13 @@ namespace Puniemu.Src.Server.L5ID.DataClasses
         public const string UDKEY_PREFIX = "d-";
         [JsonIgnore]
         public const string GDKEY_PREFIX = "g-";
-        public CKey(string prefix, string? keyValue = null)
+        public CKey(string? keyValue = null, string ? prefix = null)
         {
             //Autogenerate key
             if (keyValue == null)
             {
-                keyValue = GenerateKey(prefix);
+                if(prefix != null)
+                    keyValue = GenerateKey(prefix);
             }
             Value = keyValue;
             //Signature can be empty, game doesn't care (presumably until you start managing different l5id accounts, which we won't do)

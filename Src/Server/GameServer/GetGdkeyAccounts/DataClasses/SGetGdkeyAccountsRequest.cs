@@ -13,13 +13,11 @@ namespace Puniemu.Src.Server.GameServer.GetGdkeyAccounts.DataClasses
         public string DeviceID { get; set; }
 
         /* List of gdkeys in this format:
-
-        [
-            {
-                "gdkey" : "g-bvt9d702uuja2ipvlxepica4muohkxp2lf05hg9l8jnf0sg7fci2yrss7q2lho"
-            }
-        ]
-
+            [
+                {
+                    "gdkey" : "g-bvt9d702uuja2ipvlxepica4muohkxp2lf05hg9l8jnf0sg7fci2yrss7q2lho"
+                }
+            ]
         */
         [JsonProperty("gdkeys")]
         public List<Dictionary<string, string>> GDKeys { get; set; }
