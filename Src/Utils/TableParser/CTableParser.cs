@@ -105,7 +105,7 @@ namespace Puniemu.Src.Utils.TableParser
                 
                 if(candidates.Count == 1)
                 {
-                    return candidates[0];
+                    return candidates.FirstOrDefault();
                 }
 
             }
