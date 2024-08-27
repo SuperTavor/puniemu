@@ -20,7 +20,8 @@ namespace Puniemu.Src.Server.GameServer.UpdateProfile
             // Unlocked Icons and Ttiles
             var userPlayerIcon = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_player_icon");
             var userPlayerTitle = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_player_title");
-            
+
+            // Change current Icons/Titles ID by the Icons/Titles ID inside the requests data
             if (deserialized.IconID > 0)
             {
                 userData.IconID=deserialized.IconID;
