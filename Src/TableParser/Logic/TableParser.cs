@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Text;
 
 namespace Puniemu.Src.TableParser.Logic
@@ -92,6 +92,8 @@ namespace Puniemu.Src.TableParser.Logic
                     }
                 }
             }
+            // Unifnished function (the return is just here to ensure project building)
+            return new();
         }
 
         public int FindIndex(string[] identifiers)

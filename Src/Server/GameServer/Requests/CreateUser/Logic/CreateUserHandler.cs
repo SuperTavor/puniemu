@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Puniemu.Src.Server.GameServer.Requests.CreateUser.DataClasses;
 using Puniemu.Src.Server.GameServer.DataClasses;
 using System.Text;
@@ -19,6 +19,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
             var generatedUserData = new YwpUserData((PlayerIcon)deserialized.IconID, (PlayerTitle)deserialized.IconID, deserialized.Level5UserID, deserialized.PlayerName);
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_data", generatedUserData);
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_tutorial_list", ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["DefaultTutorialList"]);
+            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_player_icon", Consts.DEFAULT_OBTAINED_ICONS_AND_TITLES);
+            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_player_title", Consts.DEFAULT_OBTAINED_ICONS_AND_TITLES);
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "start_date", DateTimeOffset.Now.ToUnixTimeSeconds());
             var createUserResponse = new CreateUserResponse(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["DefaultTutorialList"], generatedUserData);
             var marshalledResponse = JsonConvert.SerializeObject(createUserResponse);
