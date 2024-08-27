@@ -31,8 +31,8 @@ namespace Puniemu.Src.Server.GameServer.UpdateProfile
                 userData.CharacterTitleID = deserialized.TitleID;
             }
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_data", userData);
-            var createUserResponse = new UpdateProfileResponse(userPlayerIcon, userPlayerTitle, userData);
-            var marshalledResponse = JsonConvert.SerializeObject(createUserResponse);
+            var updateProfileResponse = new UpdateProfileResponse(userPlayerIcon, userPlayerTitle, userData);
+            var marshalledResponse = JsonConvert.SerializeObject(updateProfileResponse);
             var encryptedResponse = NHNCrypt.Logic.NHNCrypt.EncryptResponse(marshalledResponse);
             await ctx.Response.WriteAsync(encryptedResponse);
         }
