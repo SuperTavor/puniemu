@@ -7,6 +7,7 @@ using Puniemu.Src.Server.GameServer.Requests.GetMaster.Logic;
 using Puniemu.Src.Server.L5ID.Requests.Active.Logic;
 using Puniemu.Src.Server.L5ID.Requests.CreateGDKey.Logic;
 using Puniemu.Src.ConfigManager.Logic;
+using Puniemu.Src.Server.GameServer.UpdateProfile;
 
 namespace Puniemu.Src;
 class Program
@@ -62,6 +63,10 @@ class Program
             await CreateUserHandler.HandleAsync(ctx);
         });
         app.MapPost("/getL5idStatus.nhn", GetL5IDStatusHandler.Handle);
+        app.MapPost("/updateProfile.nhn", async ctx =>
+        {
+            await UpdateProfileHandler.HandleAsync(ctx);
+        });
     }
 
     //Assigns all other, unknown request paths
