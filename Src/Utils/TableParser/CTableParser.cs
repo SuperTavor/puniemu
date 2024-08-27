@@ -11,8 +11,12 @@ namespace Puniemu.Src.Utils.TableParser
         */
         private List<string[]> _table;
 
-        public CTableParser(string src)
+        public CTableParser(string src,bool hasPrefix,string prefix = "")
         {
+            if(hasPrefix)
+            {
+                src = src.Substring(prefix.Length+1); //+1 for the colon
+            }
             _table = Load(src);
         }
 
