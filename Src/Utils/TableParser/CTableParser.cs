@@ -74,7 +74,7 @@ namespace Puniemu.Src.Utils.TableParser
             {
                 if (_identifierDictionary.ContainsKey(identifier))
                 {
-                    var indexes = _identifierDictionary[identifier];
+                    var indexes = _identifierDictionary[identifier].ToHashSet();
                     //if we don't have candidates it means we have nothing to filter out, so we first need to have our initial candidates
                     if (candidates.Count == 0)
                     {
