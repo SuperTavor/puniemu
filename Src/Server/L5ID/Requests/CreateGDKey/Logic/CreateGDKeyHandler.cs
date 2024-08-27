@@ -1,4 +1,4 @@
-﻿using Puniemu.Src.Server.L5ID.API.V1.CreateGDKey.DataClasses;
+using Puniemu.Src.Server.L5ID.Requests.CreateGDKey.DataClasses;
 using Puniemu.Src.Server.L5ID.DataClasses;
 
 namespace Puniemu.Src.Server.L5ID.Requests.CreateGDKey.Logic
