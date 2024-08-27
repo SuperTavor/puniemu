@@ -1,13 +1,12 @@
-using Puniemu.src.Utils.UserDataManager;
-using Puniemu.Src.ConfigManager;
-using Puniemu.Src.Server.GameServer;
-using Puniemu.Src.Server.GameServer.Init;
-using Puniemu.Src.Server.L5ID.API.V1.Active;
 using Microsoft.AspNetCore.Rewrite;
-using Puniemu.Src.Server.GameServer.GetL5IDStatus;
-using Puniemu.Src.Server.GameServer.GetMaster;
-using Puniemu.Src.Server.GameServer.CreateUser;
-using Puniemu.Src.Server.L5ID.API.V1.CreateGDKey;
+using Puniemu.Src.Server.GameServer.Requests.DefaultHandler.Logic;
+using Puniemu.Src.Server.GameServer.Requests.GetL5IDStatus.Logic;
+using Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic;
+using Puniemu.Src.Server.GameServer.Requests.Init.Logic;
+using Puniemu.Src.Server.GameServer.Requests.GetMaster.Logic;
+using Puniemu.Src.Server.L5ID.Requests.Active.Logic;
+using Puniemu.Src.Server.L5ID.Requests.CreateGDKey.Logic;
+using Puniemu.Src.ConfigManager.Logic;
 
 namespace Puniemu.Src;
 class Program
@@ -22,10 +21,10 @@ class Program
             .AddRewrite(@"(.*\..*)$", "$1/", skipRemainingRules: true);
         app.UseRewriter(rewriteOptions);
 
-        CConfigManager.Initialize();
+        ConfigManager.Logic.ConfigManager.Initialize();
 
         //Init database connection
-        CUserDataManager.Initialize();
+        UserDataManager.Logic.UserDataManager.Initialize();
 
         app.UseHttpsRedirection();
         //Assign handlers
@@ -40,11 +39,11 @@ class Program
         const string L5ID_BASE = "/l5id/api/v1/";
         app.MapGet(L5ID_BASE+"active/", async ctx =>
         {
-            await CActiveHandler.HandleAsync(ctx);
+            await ActiveHandler.HandleAsync(ctx);
         });
         app.MapGet(L5ID_BASE + "create_gdkey/", async ctx =>
         {
-            await CCreateGDKeyHandler.HandleAsync(ctx);
+            await CreateGDKeyHandler.HandleAsync(ctx);
         });
     }
 
@@ -52,17 +51,17 @@ class Program
     {
         app.MapPost("/init.nhn", async ctx =>
         {
-            await CInitHandler.HandleAsync(ctx);
+            await InitHandler.HandleAsync(ctx);
         });
         app.MapPost("/getMaster.nhn", async ctx =>
         {
-            await CGetMasterHandler.HandleAsync(ctx);
+            await GetMasterHandler.HandleAsync(ctx);
         });
         app.MapPost("/createUser.nhn", async ctx =>
         {
-            await CCreateUserHandler.HandleAsync(ctx);
+            await CreateUserHandler.HandleAsync(ctx);
         });
-        app.MapPost("/getL5idStatus.nhn", CGetL5IDStatusHandler.Handle);
+        app.MapPost("/getL5idStatus.nhn", GetL5IDStatusHandler.Handle);
     }
 
     //Assigns all other, unknown request paths
@@ -70,7 +69,7 @@ class Program
     {
         app.MapFallback(async context =>
         {
-            await CDefaultHandler.HandleAsync(context);
+            await DefaultHandler.HandleAsync(context);
         });
     }
 

@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using Puniemu.Src.ConfigManager;
+using Puniemu.Src.ConfigManager.Logic;
 
 namespace Puniemu.Src.Utils.GeneralUtils
 {
@@ -14,7 +14,7 @@ namespace Puniemu.Src.Utils.GeneralUtils
 
         public static T DeserializeGameDataToTypeAndCheckValidity<T>(string gamedataName)
         {
-            T? output = JsonConvert.DeserializeObject<T>(CConfigManager.GameDataManager.GamedataCache[gamedataName]);
+            T? output = JsonConvert.DeserializeObject<T>(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache[gamedataName]);
             if (output == null) throw new FormatException($"{gamedataName} static gamedata should be a(n) {typeof(T).FullName}");
             return output;
         }

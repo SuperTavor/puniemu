@@ -398,3 +398,6 @@ FodyWeavers.xsd
 *.sln.iml
 
 Resources
+Tools/DataDownload
+Tools/db.json
+Tools/sharedLogic/__pycache__

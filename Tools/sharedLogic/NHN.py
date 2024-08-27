@@ -5,7 +5,16 @@ from Cryptodome.Util.Padding import unpad, pad
 from Cryptodome.Cipher import AES
 
 KEY = bytes([0xa8, 0x65, 0xd7, 0xe5, 0xe2, 0x45, 0x8f, 0x8c, 0xe1, 0xb5, 0xec, 0xd0, 0x87, 0xe5, 0x45, 0x94])
-SERVER = "https://gameserver.yw-p.com/"
+GAMESERVER = "https://gameserver.yw-p.com/"
+
+headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "Accept-Encoding": "identity",
+    "Connection": "Keep-Alive",
+    "User-Agent": "Dalvik/2.1.0 (Linux; U; Android 9; SM-G965N Build/QP1A.190711.020)"
+}
+
 def decrypt_res(input_text: str) -> str:
     input_text = input_text.strip().replace('-', '+').replace('_', '/')
     input_text += "==" if not input_text.endswith("==") else ""

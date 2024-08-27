@@ -10,17 +10,11 @@ appver = input("Game version to spoof (latest version only): ").strip()
 initReqPayload = ("OjJL5BoedRXqPuM3gCOvqR1imLmeSFYvVwDvp3u5KVuVhkzAxCdFdeHf4xdqLUuJ7bevsNj18QnbXTHiCCimnLZxZb6gOi1QuY2nD2DhIygns07zJf9FiQ3A_cWtZbtrYY6EqNWtHPr3Vysb2vJfsiishJR-JHGSyvkfwrnY9PbjNYslfOD-lEn05-vNnTvDFBHhFz4kMfg0k28jezdMmPz44ahgztDmZu6AwBY_CjZaD-_9qmb4Kxz-F0CcV5R-yFP9HyovAZ3FNaTERHZPHnWDHkPSzE4x65xWGfkkirzgpeEhX6JOvtFIshBXxstJsBw00RenzLMbKt85OQ8lGw==")
 masterReqPayload = "PJcD6ige4Dp1qV80AOgjJjD83KLZniAgDTGQf38bRb6VhkzAxCdFdeHf4xdqLUuJ8P03_MeFYoFboqGwJ-F4024nCZVS-E8OPqK-oyk8M2Xh07cRowreRRv04u3rXByye1ORHocH4xtuUsIYT4-dVFPFBsmh5AfbwnMFd9kq7OhibdOrM0bpbgl7yyDjLe8WyycoJrFk6pu6BRSr9qrPzXPXLx6v6_Nv-jJ2E7Qc97ciBSdvtMtlLJjOrLcZZERUO2MoXQn3_IPhdM4UK5lHFsOvGeep_xcgDb36cFC4lfI="
 loginReqPayload = "JEAFqqNeQ9vdvJOMnycvcPrkxTCQnk4XQQdLGy1S6mclIwFDGphL91UBB42Va_dne2H9YrVt3suUOi3ZlhvTfZq9oJgq-W6m5M4thjsIGghBCNJqiwIdGOGLhTetGv83UWi34qM6i5Tiuf4V7jw5vFRhSd2AcA26vfKPmt3fUhGDc1WCcMxZbvkvCsiWYWQYqMbJXNO09E_fIR7cltBBdY4g57YXgWS__FiiKizgnwhJazZDMR7sl-q6rDBN93DmWj7mwmL3dBB7O6DlX2GaNutZMnZEyYQLTFKGQc_WKZnoI11_Q0PcRhDlCRNiGfMMRwm_nyPErSW8UF_vljkHuz6_Gy87GIEoxTWxz1I8BnKDZ9rtVRjraD5prb-kAZBcHToJ65rsumH1yQK7jVATedhkpmZ37TgYAcwXlvzRhXL-ZQ2KDnpEdaJHEVJelqkCbH85ZVjk8y-TTe0AMyjzo5HVOwJG1AdnaQqxbcJYJl2TbHKk4o96pS4EBW-Q4OWGUy6RRXXlsq3LS0v18XzSGgsAd3KLptYZeuhMzx0IfveE5GkjTGH_DtIx9YTWxTPOlZmRDAIYOgZeqX6RY8ENPvimKxyY7OsenA3IdBkcfT9Q2Nu8kU8RvUmbSfTimEAOiTylK1K66ZT4SHgx0fs1apG73eetZLPZ2C1J7CoNyVHm5b5bxN5o-WxmaRkusapNdqqDlw9BmS1q4-e3mVB-L-BzNWFLu765c842uNCShv7WcIUQXONeNbQl0o1VKG-cpINdtdHbcSeESPLo-GRiQhRlgNC_0JHkrTaKaSOZ79seAQSqjwPrBQSSOto-vXVY8IIKwXrSxOErZy4d0dYwewKVg3Y-JMARKkd7N4WRZzdHuH2Nxcg2okeyuHweIxeU2fO_cqUVX27cwjzm8YJSiLZlv-yYznX4pZS_WubNSVb97nWFIARj8HuENEFcXas3jJgNyruSMTQO6AWwtx8vu-HKN4GwCZ8MRvT2ffiOCNGbyNm65tFCBOBcXMxniUXsf3M5AaUWThy_cEI-xawom-RqcLl_59ovshLIxLP5rIBa2vjx0M5KjZZU5ExZyErJSAy7NDnjvdzPp_9k_jopu-hIa4hl9d5NivTxMv0UnoFDmQSbRWvrJWCXSARjMCa1kEPThqwzfFChfTAPU9c15siPS5zPoNAivKDm-rkZyYY4XtJYpVBnaQXncfJym17oqB3dbGGagn9LWB68qlxnrmzcJiar4CV3Pzcws9XCjV1RhUrCefEVGR75RURIHN7rKiJUAGvTair-vXBB46upQw=="
-headers = {
-    "Content-Type": "application/json",
-    "Accept": "application/json",
-    "Accept-Encoding": "identity",
-    "Connection": "Keep-Alive",
-    "User-Agent": "Dalvik/2.1.0 (Linux; U; Android 9; SM-G965N Build/QP1A.190711.020)"
-}
+
 
 try:
     #Send message to init.nhn
-    encryptedInitRes = requests.post(SERVER+"init.nhn", headers=headers, data=initReqPayload)
+    encryptedInitRes = requests.post(GAMESERVER+"init.nhn", headers=headers, data=initReqPayload)
     init_dict = json.loads(decrypt_res(encryptedInitRes.text))
 
     files = {
@@ -33,13 +27,13 @@ try:
     }
 
     #Send message to getMaster
-    encryptedMasterRes = requests.post(SERVER+"getMaster.nhn",headers=headers,data=masterReqPayload)
+    encryptedMasterRes = requests.post(GAMESERVER+"getMaster.nhn",headers=headers,data=masterReqPayload)
     master_dict = json.loads(decrypt_res(encryptedMasterRes.text))
     for tbl in ALL_TABLE.split("|"):
         files[tbl] = json.dumps(master_dict[tbl])
     os.makedirs(output_folder, exist_ok=True)
 
-    encryptedLoginRes = requests.post(SERVER+"login.nhn",headers=headers,data=loginReqPayload)
+    encryptedLoginRes = requests.post(GAMESERVER+"login.nhn",headers=headers,data=loginReqPayload)
     login_dict = json.loads(decrypt_res(encryptedLoginRes.text))
     files["DefaultTutorialList"] = login_dict["ywp_user_tutorial_list"]
     for key, value in files.items():
