@@ -125,9 +125,9 @@ namespace Puniemu.Src.UserDataManager.Logic
             List<string> registeredGdKeys = new();
             if (!deviceSnap.Exists)
             {
-                registeredGdKeys = deviceSnap.ConvertTo<List<string>>();
+                registeredGdKeys = new();
             }
-
+            else registeredGdKeys = deviceSnap.ConvertTo<List<string>>(); 
             registeredGdKeys.Add(gdkey);
 
             await deviceRef.SetAsync(registeredGdKeys);
