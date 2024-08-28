@@ -35,17 +35,17 @@ namespace Puniemu.Src.UserDataManager.Logic
         {
             //Store that this path was registered
             var registeredDatasForUser = await _client.GetAsync($"UserData/{gdkey}/RegisteredTables");
-            Dictionary<string, List<string>> registeredTables = new();
+            List<string> registeredTables = new();
             if(registeredDatasForUser.Body != "null")
             {
-                registeredTables = registeredDatasForUser.ResultAs<Dictionary<string, List<string>>>();
+                registeredTables = registeredDatasForUser.ResultAs<List<string>>();
             }
             else
             {
-                registeredTables["registeredTables"] = new();
+                registeredTables = new();
             }
             var tableKey = $"UserData/{gdkey}/Tables/{tableId}";
-            registeredTables["registeredTables"].Add(tableKey);
+            registeredTables.Add(tableKey);
             await _client.SetAsync($"UserData/{gdkey}/RegisteredTables", registeredTables);
             //Set table data
             await _client.SetAsync(tableKey, data);
@@ -54,7 +54,7 @@ namespace Puniemu.Src.UserDataManager.Logic
         public static async Task DeleteUser(string udkey, string gdkey)
         {
             var registeredDatasForUser = await _client.GetAsync($"UserData/{gdkey}/RegisteredTables");
-            Dictionary<string,List<string>> registeredTables = new();   
+            List<string> registeredTables = new();   
             //This shouldn't happen but we should check anyway
             if(registeredDatasForUser.Body == "null")
             {
@@ -62,11 +62,11 @@ namespace Puniemu.Src.UserDataManager.Logic
             }
             else
             {
-                registeredTables = registeredDatasForUser.ResultAs<Dictionary<string, List<string>>>();
+                registeredTables = registeredDatasForUser.ResultAs<List<string>>();
             }
 
             //Delete every path related to the gdkey
-            foreach(var path in registeredTables["registeredTables"])
+            foreach(var path in registeredTables)
             {
                 await _client.DeleteAsync(path);
             }
@@ -84,16 +84,17 @@ namespace Puniemu.Src.UserDataManager.Logic
             }
             else
             {
-                var dict = deviceGdkeys.ResultAs<Dictionary<string, List<string>>>();
-                dict["gdkeys"].Remove(gdkey);
-                await _client.SetAsync(accountsPath, dict);
+                var list = deviceGdkeys.ResultAs<List<string>>();
+                list.Remove(gdkey);
+                await _client.SetAsync(accountsPath, list);
             }
         }
         //Sets user data for specific account
         public static async Task<T?> GetYwpUserAsync<T>(string gdkey, string tableId)
         {
             var res = await _client.GetAsync($"UserData/{gdkey}/Tables/{tableId}");
-            return res.ResultAs<T>();
+            var converted = res.ResultAs<T>();
+            return converted;
         }
 
         //Gets all corresponding GDKeys from under a specified UDKey.
@@ -107,7 +108,7 @@ namespace Puniemu.Src.UserDataManager.Logic
             }
             else
             {
-                return deviceGdkeys.ResultAs<Dictionary<string, List<string>>>()["gdkeys"];
+                return deviceGdkeys.ResultAs<List<string>>();
             }
         }
         //Add a gdkey association to a udkey
@@ -115,16 +116,12 @@ namespace Puniemu.Src.UserDataManager.Logic
         {
             var accountsPath = $"Devices/{udkey}/Accounts";
             var deviceGdkeys = await _client.GetAsync(accountsPath);
-            Dictionary<string, List<string>> gdkeys = new();
+            List<string> gdkeys = new();
             if (deviceGdkeys.Body != "null")
             {
-                gdkeys = deviceGdkeys.ResultAs<Dictionary<string, List<string>>>();
+                gdkeys = deviceGdkeys.ResultAs<List<string>>();
             }
-            else
-            {
-                gdkeys["gdkeys"] = new();
-            }
-            gdkeys["gdkeys"].Add(gdkey);
+            gdkeys.Add(gdkey);
 
             await _client.SetAsync(accountsPath, gdkeys);
         }
