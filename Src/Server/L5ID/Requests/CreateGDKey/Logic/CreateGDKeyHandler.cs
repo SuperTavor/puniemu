@@ -1,5 +1,6 @@
 using Puniemu.Src.Server.L5ID.Requests.CreateGDKey.DataClasses;
 using Puniemu.Src.Server.L5ID.DataClasses;
+using Newtonsoft.Json;
 
 namespace Puniemu.Src.Server.L5ID.Requests.CreateGDKey.Logic
 {
@@ -12,14 +13,16 @@ namespace Puniemu.Src.Server.L5ID.Requests.CreateGDKey.Logic
             if (!query.ContainsKey("udkey"))
             {
                 var badResponse = new BadL5IDResponse(L5IDErr.UNKNOWN_UDKEY, "Unknown UDKey");
-                await ctx.Response.WriteAsJsonAsync(badResponse);
+                var json = JsonConvert.SerializeObject(badResponse);
+                await ctx.Response.WriteAsync(json);
             }
             else
             {
                 var gdkey = Key.GenerateKey("g-");
                 await UserDataManager.Logic.UserDataManager.RegisterGdKeyInUdKeyAsync(query["udkey"]!, gdkey);
                 var res = new CreateGDKeyGoodResponse(gdkey);
-                await ctx.Response.WriteAsJsonAsync(res);
+                var json = JsonConvert.SerializeObject(res);
+                await ctx.Response.WriteAsync(json);
             }
         }
     }

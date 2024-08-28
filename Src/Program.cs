@@ -8,6 +8,7 @@ using Puniemu.Src.Server.L5ID.Requests.Active.Logic;
 using Puniemu.Src.Server.L5ID.Requests.CreateGDKey.Logic;
 using Puniemu.Src.ConfigManager.Logic;
 using Puniemu.Src.Server.GameServer.UpdateProfile;
+using Puniemu.Src.Server.GameServer.Requests.GetGdkeyAccounts.Logic;
 
 namespace Puniemu.Src;
 class Program
@@ -61,6 +62,10 @@ class Program
         app.MapPost("/createUser.nhn", async ctx =>
         {
             await CreateUserHandler.HandleAsync(ctx);
+        });
+        app.MapPost("/getGdkeyAccounts.nhn", async ctx =>
+        {
+            await GetGdkeyAccountsHandler.HandleAsync(ctx);
         });
         app.MapPost("/getL5idStatus.nhn", GetL5IDStatusHandler.Handle);
         app.MapPost("/updateProfile.nhn", async ctx =>

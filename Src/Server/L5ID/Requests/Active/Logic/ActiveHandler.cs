@@ -20,7 +20,8 @@ namespace Puniemu.Src.Server.L5ID.Requests.Active.Logic
                 udkey = queryParams["udkey"]!;
             }
             var res = await ActiveResponse.CreateAsync(udkey);
-            await ctx.Response.WriteAsJsonAsync(res);
+            var json = JsonConvert.SerializeObject(res);
+            await ctx.Response.WriteAsync(json);
         }
     }
 }

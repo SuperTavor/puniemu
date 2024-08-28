@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Text;
 
 namespace Puniemu.Src.ConfigManager.Logic
 {
@@ -23,13 +24,13 @@ namespace Puniemu.Src.ConfigManager.Logic
                 {
                     if (stream != null)
                     {
-                        using (StreamReader reader = new StreamReader(stream))
+                        using (StreamReader reader = new StreamReader(stream,encoding:Encoding.UTF8))
                         {
                             string content = reader.ReadToEnd();
-                            GamedataCache[resourceName
+                            var filteredName = resourceName
                                 .Replace($"{rootNamespace}.Resources.", "")
-                                .Replace(".txt", "")
-                                                    ] = content;
+                                .Replace(".txt", "");
+                            GamedataCache[filteredName] = content;
                         }
                     }
                 }

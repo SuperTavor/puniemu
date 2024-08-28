@@ -30,14 +30,14 @@ try:
     encryptedMasterRes = requests.post(GAMESERVER+"getMaster.nhn",headers=headers,data=masterReqPayload)
     master_dict = json.loads(decrypt_res(encryptedMasterRes.text))
     for tbl in ALL_TABLE.split("|"):
-        files[tbl] = json.dumps(master_dict[tbl])
+        files[tbl] = json.dumps(master_dict[tbl],ensure_ascii=False)
     os.makedirs(output_folder, exist_ok=True)
 
     encryptedLoginRes = requests.post(GAMESERVER+"login.nhn",headers=headers,data=loginReqPayload)
     login_dict = json.loads(decrypt_res(encryptedLoginRes.text))
     files["DefaultTutorialList"] = login_dict["ywp_user_tutorial_list"]
     for key, value in files.items():
-        with open(os.path.join(output_folder, f"{key}.txt"), "w") as f:
+        with open(os.path.join(output_folder, f"{key}.txt"), "w",encoding="utf-8") as f:
             f.write(value.replace("'", "\""))
 
     print("Finished")

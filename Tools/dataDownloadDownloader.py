@@ -8,7 +8,7 @@ async def download_file(session, url, folder, filename, use_server_structure):
         folder_path = os.path.join(download_directory, folder)
     else:
         folder_path = os.path.join(download_directory, os.path.basename(url))
-    
+    print(os.path.basename(url))
     os.makedirs(folder_path, exist_ok=True)
     file_path = os.path.join(folder_path, filename)
     

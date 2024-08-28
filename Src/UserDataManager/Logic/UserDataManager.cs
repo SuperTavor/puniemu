@@ -1,5 +1,7 @@
 ﻿using Google.Cloud.Firestore;
 using Puniemu.Src.ConfigManager.Logic;
+using Puniemu.Src.Server.GameServer.DataClasses;
+using System.Text;
 namespace Puniemu.Src.UserDataManager.Logic
 {
     public static class UserDataManager
