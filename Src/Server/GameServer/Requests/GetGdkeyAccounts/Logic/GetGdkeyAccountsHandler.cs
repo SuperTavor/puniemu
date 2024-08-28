@@ -10,7 +10,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetGdkeyAccounts.Logic
     {
         public static async Task HandleAsync(HttpContext ctx)
         {
-            var encRequest = Encoding.UTF8.GetString(ctx.Request.BodyReader.ReadAsync().Result.Buffer);
+            ctx.Request.EnableBuffering();
+            var readResult = await ctx.Request.BodyReader.ReadAsync();
+            var encRequest = Encoding.UTF8.GetString(readResult.Buffer.ToArray());
+            ctx.Request.BodyReader.AdvanceTo(readResult.Buffer.End);
             var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             var deserialized = JsonConvert.DeserializeObject<GetGdkeyAccountsRequest>(requestJsonString!);
             //Convert gdkey map to gdkey list

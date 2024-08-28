@@ -21,7 +21,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.Init.Logic
                 return;
             }
             //read and decrypt request
-            var requestBuf = ctx.Request.BodyReader.ReadAsync().Result.Buffer;
+            ctx.Request.EnableBuffering();
+            var readResult = await ctx.Request.BodyReader.ReadAsync();
+            var requestBuf = readResult.Buffer.ToArray();
+            ctx.Request.BodyReader.AdvanceTo(readResult.Buffer.End);
             string requestStr;
             try
             {

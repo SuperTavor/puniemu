@@ -11,7 +11,10 @@ namespace Puniemu.Src.Server.GameServer.UpdateProfile
     {
         public static async Task HandleAsync(HttpContext ctx)
         {
-            var encRequest = Encoding.UTF8.GetString(ctx.Request.BodyReader.ReadAsync().Result.Buffer);
+            ctx.Request.EnableBuffering();
+            var readResult = await ctx.Request.BodyReader.ReadAsync();
+            var encRequest = Encoding.UTF8.GetString(readResult.Buffer.ToArray());
+            ctx.Request.BodyReader.AdvanceTo(readResult.Buffer.End);
             var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             var deserialized = JsonConvert.DeserializeObject<UpdateProfileRequest>(requestJsonString!);
             ctx.Response.ContentType = "application/json";
