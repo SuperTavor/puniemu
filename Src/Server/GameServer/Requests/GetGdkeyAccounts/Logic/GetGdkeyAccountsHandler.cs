@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using Puniemu.Src.NHNCrypt.Logic;
+using System.Buffers;
 using Puniemu.Src.Server.GameServer.DataClasses;
 using Puniemu.Src.Server.GameServer.Requests.GetGdkeyAccounts.DataClasses;
 using System.Text;

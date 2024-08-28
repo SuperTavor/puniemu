@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 using Puniemu.Src.Server.GameServer.Requests.CreateUser.DataClasses;
 using Puniemu.Src.Server.GameServer.DataClasses;
 using System.Text;
-using Puniemu.Src.ConfigManager.Logic;
+using System.Buffers;
 
 namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
 {

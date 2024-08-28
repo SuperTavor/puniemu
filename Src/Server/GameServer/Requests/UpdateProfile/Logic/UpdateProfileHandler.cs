@@ -1,11 +1,10 @@
 using Newtonsoft.Json;
-using Puniemu.Src.UserDataManager;
-using Puniemu.Src.ConfigManager;
+using System.Buffers;
 using Puniemu.Src.Server.GameServer.UpdateProfile.DataClasses;
 using Puniemu.Src.Server.GameServer.DataClasses;
 using System.Text;
 
-namespace Puniemu.Src.Server.GameServer.UpdateProfile
+namespace Puniemu.Src.Server.GameServer.UpdateProfile.Logic
 {
     public class UpdateProfileHandler
     {
