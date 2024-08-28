@@ -1,4 +1,6 @@
 ﻿using Newtonsoft.Json;
+using Puniemu.Src.NHNCrypt.Logic;
+using Puniemu.Src.Server.GameServer.DataClasses;
 using Puniemu.Src.Server.GameServer.Requests.GetGdkeyAccounts.DataClasses;
 using System.Text;
 
@@ -20,17 +22,14 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetGdkeyAccounts.Logic
                     gdkeys.Add(kvp.Value);
                 }
             }
-            GetGdkeyAccountsResponse res = new();
-            try
-            {
-                res = await GetGdkeyAccountsResponse.ConstructAsync(gdkeys);
-            }
-            catch
-            {
-                ctx.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                return;
-            }
             ctx.Response.ContentType = "application/json";
+            GetGdkeyAccountsResponse? res = await GetGdkeyAccountsResponse.ConstructAsync(deserialized.DeviceID, gdkeys);
+            if(res == null)
+            {
+                var response = new MsgAndGoBackToTitle("this error should almost NEVER happen\ncontact zura and darkcraft", "what");
+                var encrypted = NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(response));
+                await ctx.Response.WriteAsync(encrypted);
+            }
             await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(res)));
         }
     }

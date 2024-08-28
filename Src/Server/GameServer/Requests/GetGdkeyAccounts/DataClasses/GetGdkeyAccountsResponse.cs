@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Puniemu.Src.ConfigManager.Logic;
+using Puniemu.Src.UserDataManager.Logic;
 
 namespace Puniemu.Src.Server.GameServer.Requests.GetGdkeyAccounts.DataClasses
 {
@@ -27,23 +28,27 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetGdkeyAccounts.DataClasses
         public int ResultType { get; set; } // 0 here
 
         //Cause async constructors are not allowed
-        public static async Task<GetGdkeyAccountsResponse> ConstructAsync(List<string> gdkeys)
+        public static async Task<GetGdkeyAccountsResponse?> ConstructAsync(string udkey,List<string> gdkeys)
         {
             List<UdkeyPlayerItem> playerItems = new();
-            foreach (var gdkey in gdkeys)
+            if(!gdkeys.SequenceEqual(new List<string>()))
             {
-                var item = await UdkeyPlayerItem.ConstructAsync(gdkey);
-                if (item == null)
+                foreach (var gdkey in gdkeys)
                 {
-                    throw new Exception();
+                    var item = await UdkeyPlayerItem.ConstructAsync(gdkey);
+                    if (item == null)
+                    {
+                        await UserDataManager.Logic.UserDataManager.DeleteUser(udkey, gdkey);
+                        return null;
+                    }
+                    playerItems.Add(item.Value);
                 }
-                playerItems.Add(item.Value);
             }
             GetGdkeyAccountsResponse res = new();
             res.ServerDt = DateTimeOffset.Now.ToUnixTimeSeconds();
             res.YWPToken = string.Empty;
             res.UDKeyPlayerList = playerItems;
-            res.MstVersionVer = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["MstVersionMaster"]);
+            res.MstVersionVer = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["mstVersionMaster"]);
             res.ResultCode = 0;
             res.ResultType = 0;
 

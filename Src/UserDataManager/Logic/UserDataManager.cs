@@ -43,15 +43,45 @@ namespace Puniemu.Src.UserDataManager.Logic
 
             await dataRef.SetAsync(data);
         }
+
+        public static async Task DeleteUser(string udkey, string gdkey)
+        {
+            var gdkeyRef = _db!.Collection("users")
+                                .Document(gdkey);
+            await gdkeyRef.DeleteAsync();
+            await RemoveGdkeyFromUdkey(udkey,gdkey);
+        }
+
+        private static async Task RemoveGdkeyFromUdkey(string udkey, string gdkey)
+        {
+            var deviceRef = _db!.Collection("devices")
+                                .Document(udkey);
+            var snap = await deviceRef.GetSnapshotAsync();
+            if(!snap.Exists)
+            {
+                //This should absolutely never happen but who knows
+                return;
+            }
+            var gdkeys = snap.ConvertTo<List<string>>();
+            var removed = gdkeys.Remove(gdkey);
+            if(!removed)
+            {
+                return;
+            }
+            else
+            {
+                await deviceRef.SetAsync(gdkeys);
+            }
+        }
         //Sets user data for specific account
         public static async Task<T?> GetYwpUserAsync<T>(string gdkey, string tableId)
         {
-            var deviceRef = _db!.Collection("users")
+            var dataRef = _db!.Collection("users")
                            .Document(gdkey)
                            .Collection("data")
                            .Document(tableId);
 
-            var snap = await deviceRef.GetSnapshotAsync();
+            var snap = await dataRef.GetSnapshotAsync();
 
             if (!snap.Exists)
             {
