@@ -12,6 +12,7 @@ using Puniemu.Src.Server.GameServer.Requests.UpdateProfile.Logic;
 using Puniemu.Src.Server.GameServer.Requests.DeleteUser.Logic;
 using Puniemu.Src.Server.GameServer.Requests.UserInfoRefresh.Logic;
 using Puniemu.Src.Server.GameServer.Requests.UserStageRanking.Logic;
+using Puniemu.Src.Server.GameServer.Requests.Login.Logic;
 
 namespace Puniemu.Src;
 class Program
@@ -86,6 +87,10 @@ class Program
         app.MapPost("/userStageRanking.nhn", async ctx =>
         {
             await UserStageRankingHandler.HandleAsync(ctx);
+        });
+        app.MapPost("/login.nhn", async ctx =>
+        {
+            await LoginHandler.HandleAsync(ctx);
         });
     }
 

@@ -20,6 +20,12 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.Logic
             //Construct response
             var res = new LoginResponse()
             {
+<<<<<<< Updated upstream
+=======
+                ResultType = 0,
+                UserData = userdata,
+
+>>>>>>> Stashed changes
                 ServerDate = DateTimeOffset.Now.ToUnixTimeMilliseconds(),
 
                 YwpUserMedalPointTrade = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<List<object>>(deserialized.Gdkey, "ywp_user_medal_point_trade"),
@@ -38,7 +44,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.Logic
 
                 OpeningTutorialFlag = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<int>(deserialized.Gdkey, "do_opening_tuto"),
 
-                YwpTutorialList = ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["ywp_user_tutorial_list"],
+                YwpTutorialList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_tutorial_list"),
 
                 YwpUserRaidBoss = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<List<object>>(deserialized.Gdkey, "ywp_user_raid_boss"),
 
@@ -118,6 +124,13 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.Logic
 
                 YwpUserEventRankingReward = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<List<object>>(deserialized.Gdkey, "ywp_user_event_ranking_reward")
             };
+<<<<<<< Updated upstream
+=======
+            //await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "do_opening_tuto", 1);
+            var marshalledResponse = JsonConvert.SerializeObject(res);
+            var encryptedResponse = NHNCrypt.Logic.NHNCrypt.EncryptResponse(marshalledResponse);
+            await ctx.Response.WriteAsync(encryptedResponse);
+>>>>>>> Stashed changes
 
         }
     }

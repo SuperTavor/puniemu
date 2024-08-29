@@ -88,6 +88,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.DataClasses
         [JsonProperty("resultCode")]
         public int ResultCode { get; set; }
 
+        //0 here
+        [JsonProperty("resultType")]
+        public int ResultType { get; set; }
+
         // 0 here
         [JsonProperty("nextScreenType")]
         public int NextScreenType { get; set; }
