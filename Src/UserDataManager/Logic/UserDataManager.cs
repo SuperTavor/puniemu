@@ -91,14 +91,10 @@ namespace Puniemu.Src.UserDataManager.Logic
             }
         }
         //Sets user data for specific account
-        public static async Task<dynamic?> GetYwpUserAsync<T>(string gdkey, string tableId)
+        public static async Task<T> GetYwpUserAsync<T>(string gdkey, string tableId)
         {
             var res = await _client.GetAsync($"UserData/{gdkey}/Tables/{tableId}");
             var converted = res.ResultAs<T>();
-            if (converted == null)
-            {
-                return new List<object>();
-            }
             return converted;
         }
         //Gets all corresponding GDKeys from under a specified UDKey.
