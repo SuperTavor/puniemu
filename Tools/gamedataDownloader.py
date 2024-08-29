@@ -7,14 +7,14 @@ ALL_TABLE = "ywp_mst_youkai_skill_group|ywp_mst_shop_hitodama_list|ywp_mst_dash_
 output_folder = input("Output folder: ")
 appver = input("Game version to spoof (latest version only): ").strip()
 
-initReqPayload = ("OjJL5BoedRXqPuM3gCOvqR1imLmeSFYvVwDvp3u5KVuVhkzAxCdFdeHf4xdqLUuJ7bevsNj18QnbXTHiCCimnLZxZb6gOi1QuY2nD2DhIygns07zJf9FiQ3A_cWtZbtrYY6EqNWtHPr3Vysb2vJfsiishJR-JHGSyvkfwrnY9PbjNYslfOD-lEn05-vNnTvDFBHhFz4kMfg0k28jezdMmPz44ahgztDmZu6AwBY_CjZaD-_9qmb4Kxz-F0CcV5R-yFP9HyovAZ3FNaTERHZPHnWDHkPSzE4x65xWGfkkirzgpeEhX6JOvtFIshBXxstJsBw00RenzLMbKt85OQ8lGw==")
-masterReqPayload = "PJcD6ige4Dp1qV80AOgjJjD83KLZniAgDTGQf38bRb6VhkzAxCdFdeHf4xdqLUuJ8P03_MeFYoFboqGwJ-F4024nCZVS-E8OPqK-oyk8M2Xh07cRowreRRv04u3rXByye1ORHocH4xtuUsIYT4-dVFPFBsmh5AfbwnMFd9kq7OhibdOrM0bpbgl7yyDjLe8WyycoJrFk6pu6BRSr9qrPzXPXLx6v6_Nv-jJ2E7Qc97ciBSdvtMtlLJjOrLcZZERUO2MoXQn3_IPhdM4UK5lHFsOvGeep_xcgDb36cFC4lfI="
-loginReqPayload = "JEAFqqNeQ9vdvJOMnycvcPrkxTCQnk4XQQdLGy1S6mclIwFDGphL91UBB42Va_dne2H9YrVt3suUOi3ZlhvTfZq9oJgq-W6m5M4thjsIGghBCNJqiwIdGOGLhTetGv83UWi34qM6i5Tiuf4V7jw5vFRhSd2AcA26vfKPmt3fUhGDc1WCcMxZbvkvCsiWYWQYqMbJXNO09E_fIR7cltBBdY4g57YXgWS__FiiKizgnwhJazZDMR7sl-q6rDBN93DmWj7mwmL3dBB7O6DlX2GaNutZMnZEyYQLTFKGQc_WKZnoI11_Q0PcRhDlCRNiGfMMRwm_nyPErSW8UF_vljkHuz6_Gy87GIEoxTWxz1I8BnKDZ9rtVRjraD5prb-kAZBcHToJ65rsumH1yQK7jVATedhkpmZ37TgYAcwXlvzRhXL-ZQ2KDnpEdaJHEVJelqkCbH85ZVjk8y-TTe0AMyjzo5HVOwJG1AdnaQqxbcJYJl2TbHKk4o96pS4EBW-Q4OWGUy6RRXXlsq3LS0v18XzSGgsAd3KLptYZeuhMzx0IfveE5GkjTGH_DtIx9YTWxTPOlZmRDAIYOgZeqX6RY8ENPvimKxyY7OsenA3IdBkcfT9Q2Nu8kU8RvUmbSfTimEAOiTylK1K66ZT4SHgx0fs1apG73eetZLPZ2C1J7CoNyVHm5b5bxN5o-WxmaRkusapNdqqDlw9BmS1q4-e3mVB-L-BzNWFLu765c842uNCShv7WcIUQXONeNbQl0o1VKG-cpINdtdHbcSeESPLo-GRiQhRlgNC_0JHkrTaKaSOZ79seAQSqjwPrBQSSOto-vXVY8IIKwXrSxOErZy4d0dYwewKVg3Y-JMARKkd7N4WRZzdHuH2Nxcg2okeyuHweIxeU2fO_cqUVX27cwjzm8YJSiLZlv-yYznX4pZS_WubNSVb97nWFIARj8HuENEFcXas3jJgNyruSMTQO6AWwtx8vu-HKN4GwCZ8MRvT2ffiOCNGbyNm65tFCBOBcXMxniUXsf3M5AaUWThy_cEI-xawom-RqcLl_59ovshLIxLP5rIBa2vjx0M5KjZZU5ExZyErJSAy7NDnjvdzPp_9k_jopu-hIa4hl9d5NivTxMv0UnoFDmQSbRWvrJWCXSARjMCa1kEPThqwzfFChfTAPU9c15siPS5zPoNAivKDm-rkZyYY4XtJYpVBnaQXncfJym17oqB3dbGGagn9LWB68qlxnrmzcJiar4CV3Pzcws9XCjV1RhUrCefEVGR75RURIHN7rKiJUAGvTair-vXBB46upQw=="
+initReqPayload = f'{{"appVer":"{appver}","deviceId":"0","level5UserId":"0","mstVersionVer":0,"osType":2,"signature":"s4X9CoyxGma3kGuAp5woThgvBX3dCi77Slh5RcOo6ybmMTt0J4CGiZwyiCsil7P3MVgjiVt+kGE1MqvttCXLB+hlOpyTkJp5a78TXthBNVw=","userId":"0","ywpToken":"0"}}'
+masterReqPayload = f'{{"appVer":"{appver}","deviceId":"d-50a6781418815598cb80657362959a0943684146efb6da8358870bef8c34d3e0","level5UserId":"0","mstVersionVer":0,"osType":2,"tableNames":"all","userId":"0","ywpToken":"0"}}'
+loginReqPayload = f'{{"appVer":"{appver}","batteryInfo":{{"level":85,"state":2,"technology":"Li-ion","temperature":328,"voltage":3500}},"deviceId":"d-k3l6lh7d0jtafxq3ez5twlf5t1c4mcbwx905t6y8qwg50siubxj2yrkriq2lhf","deviceName":"z3q","gdkeySignature":"4c794e61006327c2baa5c6945439b2797a052ce923c75132ad6264a5a16c93f5","gdkeyValue":"g-h7wm3eepmnyr1pnb2w1cz9zmzpqtyls1qr02ot6hkygz0siuct92yr792q2lhq","isL5IDLinked":0,"level5UserId":"g-h7wm3eepmnyr1pnb2w1cz9zmzpqtyls1qr02ot6hkygz0siuct92yr792q2lhq","modelName":"SM-G988N","mstVersionVer":16464,"osType":2,"osVersion":"9","signNonce":"74decdf4-e86d-4228-951e-b11ccd342a4d","signTimestamp":"1724703138","signature":"s4X9CoyxGma3kGuAp5woThgvBX3dCi77Slh5RcOo6ybmMTt0J4CGiZwyiCsil7P3MVgjiVt+kGE1MqvttCXLB+hlOpyTkJp5a78TXthBNVw=","udkeySignature":"6801fe8fde40145938be564c0a79c7d45b996d4da3ac7b03fdf9b2c3e4901bd9","udkeyValue":"d-k3l6lh7d0jtafxq3ez5twlf5t1c4mcbwx905t6y8qwg50siubxj2yrkriq2lhf","userId":"3347321526146","ywpToken":"0"}}'
 
 
 try:
     #Send message to init.nhn
-    encryptedInitRes = requests.post(GAMESERVER+"init.nhn", headers=headers, data=initReqPayload)
+    encryptedInitRes = requests.post(GAMESERVER+"init.nhn", headers=headers, data=encrypt_req(initReqPayload))
     init_dict = json.loads(decrypt_res(encryptedInitRes.text))
 
     files = {
@@ -27,13 +27,13 @@ try:
     }
 
     #Send message to getMaster
-    encryptedMasterRes = requests.post(GAMESERVER+"getMaster.nhn",headers=headers,data=masterReqPayload)
+    encryptedMasterRes = requests.post(GAMESERVER+"getMaster.nhn",headers=headers,data=encrypt_req(masterReqPayload))
     master_dict = json.loads(decrypt_res(encryptedMasterRes.text))
     for tbl in ALL_TABLE.split("|"):
         files[tbl] = json.dumps(master_dict[tbl],ensure_ascii=False)
     os.makedirs(output_folder, exist_ok=True)
 
-    encryptedLoginRes = requests.post(GAMESERVER+"login.nhn",headers=headers,data=loginReqPayload)
+    encryptedLoginRes = requests.post(GAMESERVER+"login.nhn",headers=headers,data=encrypt_req(loginReqPayload))
     login_dict = json.loads(decrypt_res(encryptedLoginRes.text))
     files["DefaultTutorialList"] = login_dict["ywp_user_tutorial_list"]
     for key, value in files.items():

@@ -2,48 +2,51 @@ import json
 import os
 import aiohttp
 import asyncio
+import requests
+from urllib.parse import urlparse
+from sharedLogic import NHN
 
-async def download_file(session, url, folder, filename, use_server_structure):
-    if use_server_structure:
-        folder_path = os.path.join(download_directory, folder)
-    else:
-        folder_path = os.path.join(download_directory, os.path.basename(url))
-    print(os.path.basename(url))
-    os.makedirs(folder_path, exist_ok=True)
-    file_path = os.path.join(folder_path, filename)
+DL_SRV = "https://ywp-down.hangame.co.jp/eal"
+use_game_structure = False
+async def download_file(session, data, download_directory):
+    if use_game_structure:
+        path = data["folder"] + '/' + data['fname']
+    else: path = urlparse(data["url"]).path.lstrip('/')
+    file_path = os.path.join(download_directory, path)
     
-    try:
-        async with session.get(url) as response:
-            if response.status == 200:
-                with open(file_path, 'wb') as f:
-                    f.write(await response.read())
-                print(f"Downloaded: {file_path}")
-            else:
-                print(f"Failed to download {url}: Status {response.status}")
-    except Exception as e:
-        print(f"Error downloading {url}: {e}")
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    
+    async with session.get(data["url"]) as response:
+        if response.status == 200:
+            with open(file_path, 'wb') as f:
+                f.write(await response.read())
+            print(f"Downloaded: {file_path}")
 
-async def download_files(json_file_path, download_directory, use_server_structure):
-    with open(json_file_path, 'r', encoding='utf-8') as f:
-        data = json.load(f)
-
-    urls = data.get("urls", [])
-
+async def download_files(download_directory, urls):
     async with aiohttp.ClientSession() as session:
-        tasks = []
-        for file_info in urls:
-            folder = file_info["Folder"]
-            filename = file_info["Filename"]
-            url = file_info["url"]
-            tasks.append(download_file(session, url, folder, filename, use_server_structure))
-
+        tasks = [download_file(session, url, download_directory) for url in urls]
         await asyncio.gather(*tasks)
 
+def get_installation_data(data, url):
+    return [{"folder": x[2], "fname": x[1], "url": f"{url}/{x[5]}/{x[3]}/{x[1]}"} 
+            for x in [item.split('|') for item in data.split("*")]]
+def gather_urls():
+    data = NHN.encrypt_req(f'''{{
+        "appVer": "{input("Enter latest game version: ")}",
+        "deviceId": "d-822a61c56b60d03dd373aab9826210e1",
+        "level5UserId": "0",
+        "osType": 2,
+        "tableNames": "ywp_mst_version_resource",
+        "userId": "0",
+        "ywpToken": "0"
+        }}''')
+    md = requests.post(NHN.GAMESERVER+"getMaster.nhn", headers=NHN.headers, data=data).text
+    data = json.loads(NHN.decrypt_res(md))["ywp_mst_version_resource"]
+    idata = get_installation_data(data["tableData"],DL_SRV)
+    return idata
+    
 if __name__ == "__main__":
-    use_server_structure_input = input("Use server structure (y/n): ").strip().lower()
-    use_server_structure = use_server_structure_input == 'y'
+    use_game_structure = input("Use game file structure? ") == 'y'
 
-    json_file_path = input("Path to data download db: ").strip()
     download_directory = input("Output directory: ").strip()
-
-    asyncio.run(download_files(json_file_path, download_directory, use_server_structure))
+    asyncio.run(download_files(download_directory, gather_urls()))

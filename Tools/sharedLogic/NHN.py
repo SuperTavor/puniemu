@@ -1,5 +1,5 @@
 import hashlib
-from base64 import b64encode, b64decode
+from base64 import urlsafe_b64encode, b64decode
 from gzip import decompress
 from Cryptodome.Util.Padding import unpad, pad
 from Cryptodome.Cipher import AES
@@ -26,13 +26,14 @@ def encrypt_req(to_encrypt: str) -> str:
     digest = calc_digest(to_encrypt_bytes)
     padded = pad(digest + to_encrypt_bytes, AES.block_size)
     encrypted = AES.new(KEY, AES.MODE_ECB).encrypt(padded)
-    return b64encode(encrypted).decode().replace('+', '-').replace('/', '_')
+    return urlsafe_b64encode(encrypted)
 
 def calc_digest(payload: bytes) -> bytes:
     SALT = b"0bk2kvtFE2"
     sha1 = hashlib.sha1()
     sha1.update(SALT + b' ' + payload)
     digest = sha1.digest()
-    sha1.update(SALT + digest)
-    return sha1.digest()
+    secondSha1 = hashlib.sha1()
+    secondSha1.update(SALT + digest)
+    return secondSha1.digest()
 
