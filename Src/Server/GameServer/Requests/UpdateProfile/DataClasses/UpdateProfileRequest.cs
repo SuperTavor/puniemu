@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace Puniemu.Src.Server.GameServer.UpdateProfile.DataClasses
+namespace Puniemu.Src.Server.GameServer.Requests.UpdateProfile.DataClasses
 {
     public struct UpdateProfileRequest
     {

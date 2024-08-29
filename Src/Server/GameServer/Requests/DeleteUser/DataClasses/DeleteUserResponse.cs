@@ -2,7 +2,7 @@
 using Puniemu.Src.Server.GameServer.DataClasses;
 using Puniemu.Src.Utils.GeneralUtils;
 using Puniemu.Src.ConfigManager;
-namespace Puniemu.Src.Server.GameServer.DeleteUser.DataClasses
+namespace Puniemu.Src.Server.GameServer.Requests.DeleteUser.DataClasses
 {
     public struct DeleteUserResponse
     {
@@ -38,6 +38,25 @@ namespace Puniemu.Src.Server.GameServer.DeleteUser.DataClasses
         [JsonProperty("nextScreenType")]
         public int NextScreenType { get; set; }
 
+        // null here.
+        [JsonProperty("token")]
+        public string?  Token { get; set; }
+        // null here.
+        
+        [JsonProperty("dialogMsg")]
+        public string DialogMsg { get; set; }
+        // null here.
+        
+        [JsonProperty("webServerIp")]
+        public string WebServerIp { get; set; }
+        // null here.
+        
+        [JsonProperty("storeUrl")]
+        public string StoreUrl { get; set; }
+
+        [JsonProperty("dialogTitle")]
+        public string DialogTitle { get; set; }
+
         // Constant.
         [JsonProperty("hitodamaShopSaleList")]
         public List<int> HitodamaShopSaleList { get; set; }
@@ -52,9 +71,14 @@ namespace Puniemu.Src.Server.GameServer.DeleteUser.DataClasses
             this.ShopSaleList = CGeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("shopSaleList");
             this.ServerDate = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             this.YwpToken = "";
+            this.Token = "hello_dummy";
             this.YMoneyShopSaleList = CGeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("ymoneyShopSaleList");
             this.MstVersionMaster = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["mstVersionMaster"]);
             this.ResultCode = 0;
+            this.DialogTitle = "";
+            this.StoreUrl = "";
+            this.DialogMsg = "";
+            this.WebServerIp = "";
             this.ResponseCode = RespCode;
             this.NextScreenType = 0;
             this.HitodamaShopSaleList = CGeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("hitodamaShopSaleList");

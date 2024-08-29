@@ -1,10 +1,10 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Puniemu.Src.Server.GameServer.DataClasses;
 using Puniemu.Src.Utils.GeneralUtils;
 using Puniemu.Src.ConfigManager;
-namespace Puniemu.Src.Server.GameServer.Requests.UpdateProfile.DataClasses
+namespace Puniemu.Src.Server.GameServer.Requests.UserStageRanking.DataClasses
 {
-    public struct UpdateProfileResponse
+    public struct UserStageRankingResponse
     {
         // Constant.
         [JsonProperty("shopSaleList")]
@@ -30,14 +30,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.UpdateProfile.DataClasses
         [JsonProperty("resultCode")]
         public int ResultCode { get; set; }
 
-        // Table that dictates which icon that the user has unlocked.
-        [JsonProperty("ywp_user_player_icon")]
-        public string UserPlayerIcon { get; set; }
-
-        // Table that dictates which title that the user has unlocked.
-        [JsonProperty("ywp_user_player_title")]
-        public string UserPlayerTitle { get; set; }
-
         // 0 here.
         [JsonProperty("nextScreenType")]
         public int NextScreenType { get; set; }
@@ -47,14 +39,26 @@ namespace Puniemu.Src.Server.GameServer.Requests.UpdateProfile.DataClasses
         public List<int> HitodamaShopSaleList { get; set; }
 
         // Basic user data.
-        [JsonProperty("ywp_user_data")]
-        public YwpUserData UserData { get; set; }
+        [JsonProperty("ywp_user_stage_rank")]
+        public List<object> StageRankData { get; set; }
 
         // 0 here.
         [JsonProperty("resultType")]
         public int ResultType { get; set; }
+        
+        // empty
+        [JsonProperty("dialogMsg")]
+        public string DialogMsg { get; set; }
 
-        public UpdateProfileResponse(string userPlayerIcon, string userPlayerTitle, YwpUserData userData)
+        [JsonProperty("webServerIp")]
+        public string WebServerIp { get; set; }
+
+        [JsonProperty("storeUrl")]
+        public string StoreUrl { get; set; }
+
+        [JsonProperty("dialogTitle")]
+        public string DialogTitle { get; set; }
+        public UserStageRankingResponse(List<object> newListData)
         {
             this.ShopSaleList = CGeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("shopSaleList");
             this.ServerDate = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
@@ -62,11 +66,13 @@ namespace Puniemu.Src.Server.GameServer.Requests.UpdateProfile.DataClasses
             this.YMoneyShopSaleList = CGeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("ymoneyShopSaleList");
             this.MstVersionMaster = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["mstVersionMaster"]);
             this.ResultCode = 0;
-            this.UserPlayerIcon = userPlayerIcon;
-            this.UserPlayerTitle = userPlayerTitle;
+            this.DialogMsg = "";
+            this.WebServerIp = "";
+            this.StoreUrl = "";
+            this.DialogTitle = "";
             this.NextScreenType = 0;
             this.HitodamaShopSaleList = CGeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("hitodamaShopSaleList");
-            this.UserData = userData;
+            this.StageRankData = newListData;
             this.ResultType = 0;
         }
     }
