@@ -20,8 +20,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.UserStageRanking.Logic
             var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             var deserialized = JsonConvert.DeserializeObject<UserStageRankingRequest>(requestJsonString!);
             ctx.Response.ContentType = "application/json";
+            // get all ywp_user_stage_rank data
             var userStageRankingData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<List<dynamic>>(deserialized.Level5UserID, "ywp_user_stage_rank");
             List<object> newList = new List<object>();
+            // try to get requested stage id data in ywp_user_stage_rank
             if (userStageRankingData != null) {
                 foreach (var element in userStageRankingData)
                 {
@@ -31,8 +33,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.UserStageRanking.Logic
                     }
                 }
             } else {
+                // if ywp_user_stage_rank is empty we assign it as a empty list
                 userStageRankingData = new List<object>();
             }
+            // if requested stage id wasn't found we add it to ywp_user_stage_rank
             if (newList.Count == 0)
             {
                 Dictionary<string,object> newDict = new Dictionary<string,object>();
