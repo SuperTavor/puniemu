@@ -2,7 +2,11 @@
 using Puniemu.Src.Server.GameServer.Requests.UserInfoRefresh.DataClasses;
 using Puniemu.Src.Server.GameServer.DataClasses;
 using System.Text;
-using Puniemu.Src.Server.GameServer.UserInfoRefresh.DataClasses;
+using Puniemu.Src.ConfigManager.Logic;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Text.Json.Nodes;
 using System.Buffers;
 
 namespace Puniemu.Src.Server.GameServer.Requests.UserInfoRefresh.Logic
@@ -32,12 +36,13 @@ namespace Puniemu.Src.Server.GameServer.Requests.UserInfoRefresh.Logic
                 {
                     try
                     {
-                        var tempTable = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<Dictionary<string, object>>(deserialized.Level5UserID, item);
+                        var tempTable = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<object>(deserialized.Level5UserID, item);
                         userInfoRefreshDict.Add(item, tempTable);
                     }
-                    catch
+                    catch (Exception ex)
                     {
                         Console.WriteLine(item);
+                        Console.WriteLine(ex);
                     }
                 }
                 var marshalledResponse = JsonConvert.SerializeObject(userInfoRefreshDict);

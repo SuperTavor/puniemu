@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Puniemu.Src.Server.GameServer.UserInfoRefresh.DataClasses
+namespace Puniemu.Src.Server.GameServer.Requests.UserInfoRefresh.DataClasses
 {
     public struct UserInfoRefreshRequest
     {

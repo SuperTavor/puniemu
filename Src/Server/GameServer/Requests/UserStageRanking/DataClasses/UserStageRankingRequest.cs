@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
 
-namespace Puniemu.Src.Server.GameServer.Requests.DeleteUser.DataClasses
+namespace Puniemu.Src.Server.GameServer.Requests.UserStageRanking.DataClasses
 {
-    public struct DeleteUserRequest
+    public struct UserStageRankingRequest
     {
         // Client version
         [JsonProperty("appVer")]
@@ -12,13 +12,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.DeleteUser.DataClasses
         [JsonProperty("deviceID")]
         public string DeviceID { get; set; }
 
-        // ID of the character (current account)
-        [JsonProperty("characterID")]
-        public string CharacterID { get; set; }
-
-        // AreYouSureToDeleteAccountFlag
-        [JsonProperty("finalAnswerFlg")]
-        public int FinalAnswerFlag { get; set; }
+        // ID of the stage
+        [JsonProperty("stageID")]
+        public int StageID { get; set; }
 
         // Interchangeable with gdkey
         [JsonProperty("level5UserID")]
