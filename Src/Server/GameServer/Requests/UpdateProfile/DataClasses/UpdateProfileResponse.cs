@@ -56,16 +56,16 @@ namespace Puniemu.Src.Server.GameServer.Requests.UpdateProfile.DataClasses
 
         public UpdateProfileResponse(string userPlayerIcon, string userPlayerTitle, YwpUserData userData)
         {
-            this.ShopSaleList = CGeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("shopSaleList");
+            this.ShopSaleList = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("shopSaleList");
             this.ServerDate = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             this.YwpToken = "";
-            this.YMoneyShopSaleList = CGeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("ymoneyShopSaleList");
+            this.YMoneyShopSaleList = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("ymoneyShopSaleList");
             this.MstVersionMaster = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["mstVersionMaster"]);
             this.ResultCode = 0;
             this.UserPlayerIcon = userPlayerIcon;
             this.UserPlayerTitle = userPlayerTitle;
             this.NextScreenType = 0;
-            this.HitodamaShopSaleList = CGeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("hitodamaShopSaleList");
+            this.HitodamaShopSaleList = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("hitodamaShopSaleList");
             this.UserData = userData;
             this.ResultType = 0;
         }

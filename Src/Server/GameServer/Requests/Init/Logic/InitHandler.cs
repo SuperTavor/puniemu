@@ -32,7 +32,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Init.Logic
             }
             catch
             {
-                await CGeneralUtils.SendBadRequest(ctx);
+                await GeneralUtils.SendBadRequest(ctx);
                 return;
             }
             string? decrypted;
@@ -42,7 +42,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Init.Logic
             }
             catch
             {
-                await CGeneralUtils.SendBadRequest(ctx);
+                await GeneralUtils.SendBadRequest(ctx);
                 return;
             }
 
@@ -50,7 +50,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Init.Logic
             var dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(decrypted);
             if (dict == null)
             {
-                await CGeneralUtils.SendBadRequest(ctx);
+                await GeneralUtils.SendBadRequest(ctx);
                 return;
             }
             if (dict.ContainsKey("appVer"))
@@ -74,7 +74,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Init.Logic
             }
             else
             {
-                await CGeneralUtils.SendBadRequest(ctx);
+                await GeneralUtils.SendBadRequest(ctx);
                 return;
             }
         }

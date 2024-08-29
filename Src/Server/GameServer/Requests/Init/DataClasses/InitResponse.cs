@@ -13,7 +13,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Init.DataClasses
             ResultCode = 0;
             NextScreenType = 0;
             YwpMstVersionMaster = ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["ywp_mst_version_master"];
-            HitodamaShopSaleList = CGeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("hitodamaShopSaleList");
+            HitodamaShopSaleList = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("hitodamaShopSaleList");
             GameServerURL = Consts.OG_GAMESERVER_URL;
             StoreURL = "";
             IsEnableSerialCode = 1;
@@ -21,10 +21,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.Init.DataClasses
             ImgServer = ConfigManager.Logic.ConfigManager.Cfg!.Value.BaseDataDownloadURL;
             ResultType = 0;
             DispNoticeFlag = 2;
-            ShopSaleList = CGeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("shopSaleList");
+            ShopSaleList = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("shopSaleList");
             YwpToken = "";
-            YMoneyShopSaleList = CGeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("ymoneyShopSaleList");
-            NoticePageList = CGeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<Dictionary<string, int>>>("noticePageList");
+            YMoneyShopSaleList = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("ymoneyShopSaleList");
+            NoticePageList = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<Dictionary<string, int>>>("noticePageList");
             IsEnableFriendInvite = 1;
             MasterReacquisitionHour = 2;
             IsEnableYokaiMedal = 1;

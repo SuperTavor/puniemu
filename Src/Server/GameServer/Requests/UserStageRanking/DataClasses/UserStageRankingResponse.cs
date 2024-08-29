@@ -60,10 +60,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.UserStageRanking.DataClasses
         public string DialogTitle { get; set; }
         public UserStageRankingResponse(List<object> newListData)
         {
-            this.ShopSaleList = CGeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("shopSaleList");
+            this.ShopSaleList = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("shopSaleList");
             this.ServerDate = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             this.YwpToken = "";
-            this.YMoneyShopSaleList = CGeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("ymoneyShopSaleList");
+            this.YMoneyShopSaleList = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("ymoneyShopSaleList");
             this.MstVersionMaster = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["mstVersionMaster"]);
             this.ResultCode = 0;
             this.DialogMsg = "";
@@ -71,7 +71,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.UserStageRanking.DataClasses
             this.StoreUrl = "";
             this.DialogTitle = "";
             this.NextScreenType = 0;
-            this.HitodamaShopSaleList = CGeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("hitodamaShopSaleList");
+            this.HitodamaShopSaleList = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("hitodamaShopSaleList");
             this.StageRankData = newListData;
             this.ResultType = 0;
         }

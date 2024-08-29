@@ -56,16 +56,16 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.DataClasses
 
         public CreateUserResponse(string userTutorialList, YwpUserData userData)
         {
-            ShopSaleList = CGeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("shopSaleList");
+            ShopSaleList = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("shopSaleList");
             ServerDate = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             YwpToken = "";
-            YMoneyShopSaleList = CGeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("ymoneyShopSaleList");
+            YMoneyShopSaleList = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("ymoneyShopSaleList");
             MstVersionMaster = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["mstVersionMaster"]);
             RewardList = new List<object>();
             ResultCode = 0;
             UserTutorialList = userTutorialList;
             NextScreenType = 0;
-            HitodamaShopSaleList = CGeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("hitodamaShopSaleList");
+            HitodamaShopSaleList = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("hitodamaShopSaleList");
             UserData = userData;
             ResultType = 0;
         }

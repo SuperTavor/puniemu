@@ -14,17 +14,17 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetMaster.DataClasses
             {
                 ["serverDt"] = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                 ["resultType"] = 0,
-                ["shopSaleList"] = CGeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("shopSaleList"),
+                ["shopSaleList"] = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("shopSaleList"),
                 ["dialogTitle"] = "",
                 ["resultCode"] = 0,
-                ["hitodamaShopSaleList"] = CGeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("hitodamaShopSaleList"),
+                ["hitodamaShopSaleList"] = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("hitodamaShopSaleList"),
                 ["ywpToken"] = "",
                 ["token"] = null,
                 ["storeUrl"] = "",
                 ["webServerIp"] = "",
                 ["mstVersionMaster"] = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["mstVersionMaster"]),
                 ["nextScreenType"] = 0,
-                ["ymoneyShopSaleList"] = CGeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("ymoneyShopSaleList"),
+                ["ymoneyShopSaleList"] = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("ymoneyShopSaleList"),
                 ["dialogMsg"] = ""
             };
 

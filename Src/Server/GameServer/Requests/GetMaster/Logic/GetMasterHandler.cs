@@ -44,7 +44,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetMaster.Logic
             string[] tables;
             if (!requestJson.ContainsKey("tableNames"))
             {
-                await CGeneralUtils.SendBadRequest(ctx);
+                await GeneralUtils.SendBadRequest(ctx);
                 return;
             }
             else

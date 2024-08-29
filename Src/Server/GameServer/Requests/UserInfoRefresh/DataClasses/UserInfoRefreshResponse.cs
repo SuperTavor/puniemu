@@ -49,14 +49,14 @@ namespace Puniemu.Src.Server.GameServer.Requests.UserInfoRefresh.DataClasses
 
         public UserInfoRefreshResponse(YwpUserData userData)
         {
-            ShopSaleList = CGeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("shopSaleList");
+            ShopSaleList = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("shopSaleList");
             ServerDate = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             YwpToken = "";
-            YMoneyShopSaleList = CGeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("ymoneyShopSaleList");
+            YMoneyShopSaleList = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("ymoneyShopSaleList");
             MstVersionMaster = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["mstVersionMaster"]);
             ResultCode = 0;
             NextScreenType = 0;
-            HitodamaShopSaleList = CGeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("hitodamaShopSaleList");
+            HitodamaShopSaleList = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("hitodamaShopSaleList");
             UserData = userData;
             ResultType = 0;
         }
