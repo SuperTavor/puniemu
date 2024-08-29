@@ -44,7 +44,7 @@ namespace Puniemu.Src.Server.L5ID.Requests.Active.DataClasses
             var udkey = new Key(udkeyValue);
             foreach (var key in await UserDataManager.Logic.UserDataManager.GetGdkeysFromUdkeyAsync(udkeyValue))
             {
-                gdkeys.Add(udkey);
+                gdkeys.Add(new Key(key));
             }
 
             var wrappedKeySet = new KeySet[]
