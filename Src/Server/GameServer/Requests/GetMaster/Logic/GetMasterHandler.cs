@@ -9,22 +9,24 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetMaster.Logic
     public class GetMasterHandler
     {
         // To not unmarshal every time and improve performance, we store the unmarshalled versions of previously unmarshalled jsons
-        private static Dictionary<string, Dictionary<string, object?>> UnmarshalCache = new();
+        private static Dictionary<string, object> UnmarshalCache = new();
         //Tables sometimes requested by the server that are never delivered, even on the official servers.
-        private static Dictionary<string, object?> UnmarshalOrGetFromCache(string jsonName, string jsonStr)
+        private static object UnmarshalOrGetFromCache(string jsonName, string jsonStr)
         {
             if (!UnmarshalCache.ContainsKey(jsonName))
             {
+                object? unmarshalledJson = null!;
                 try
                 {
-                    Dictionary<string, object?> unmarshalledJson = new();
-                    unmarshalledJson = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonStr);
-                    UnmarshalCache[jsonName] = unmarshalledJson!;
+                    unmarshalledJson = JsonConvert.DeserializeObject<object>(jsonStr);
                 }
+                //if can't deserialize it means we need to serve a table so it's a string
                 catch
                 {
-                    Console.WriteLine(jsonName);
+                    unmarshalledJson = jsonStr;
                 }
+
+                UnmarshalCache[jsonName] = unmarshalledJson!;
             }
             return UnmarshalCache[jsonName];
         }

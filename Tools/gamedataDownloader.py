@@ -38,6 +38,7 @@ try:
     for key in login_dict.keys():
         if "ywp_mst" in key or key == "leaderYoukaiBGM" or key == "noticePageListFlg":
             files[key] = str(login_dict[key])
+            if key == "ywp_mst_event": files[key] = files[key].replace("None","null")
         elif "ywp_user" in key:
             files[key + "_def"] = str(login_dict[key])
     for key, value in files.items():

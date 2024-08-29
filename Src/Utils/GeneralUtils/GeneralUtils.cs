@@ -3,7 +3,7 @@ using Puniemu.Src.ConfigManager.Logic;
 
 namespace Puniemu.Src.Utils.GeneralUtils
 {
-    public class CGeneralUtils
+    public class GeneralUtils
     {
         public static async Task SendBadRequest(HttpContext ctx)
         {
