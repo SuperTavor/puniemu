@@ -50,7 +50,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.UserStageRanking.DataClasses
         [JsonProperty("dialogMsg")]
         public string DialogMsg { get; set; }
 
-        [JsonProperty("WebServerIp")]
+        [JsonProperty("webServerIp")]
         public string WebServerIp { get; set; }
 
         [JsonProperty("storeUrl")]
