@@ -10,7 +10,7 @@ namespace Puniemu.Src.TableParser.Logic
          The table format is essentially a 2D array.
          Each "row" can have multiple items inside, seperated by pipes, and the rows themselves are seperated by asterisks.
         */
-        private List<string[]> _table;
+        public List<string[]> Table;
         private Dictionary<string, List<int>> _identifierDictionary = new();
         private string? _prefix = null;
         public TableParser(string src, string prefix = "")
@@ -20,7 +20,7 @@ namespace Puniemu.Src.TableParser.Logic
                 src = src.Substring(prefix.Length + 1); //+1 for the colon
                 _prefix = prefix;
             }
-            _table = Load(src);
+            Table = Load(src);
             LoadIdentifierTable();
         }
         private List<string[]> Load(string src)
@@ -36,7 +36,7 @@ namespace Puniemu.Src.TableParser.Logic
 
         public void AddRow(string[] row)
         {
-            _table.Add(row);
+            Table.Add(row);
             LoadIdentifierTable(row);
         }
         private void LoadRowIntoIdentifierTable(string[] row, int i)
@@ -57,43 +57,17 @@ namespace Puniemu.Src.TableParser.Logic
 
             if (addedRow == null)
             {
-                for (int i = 0; i < _table.Count; i++)
+                for (int i = 0; i < Table.Count; i++)
                 {
-                    var row = _table[i];
+                    var row = Table[i];
                     LoadRowIntoIdentifierTable(row, i);
                 }
             }
             else
             {
-                LoadRowIntoIdentifierTable(addedRow, _table.Count - 1);
+                LoadRowIntoIdentifierTable(addedRow, Table.Count - 1);
             }
 
-        }
-
-        public List<T> Deserialize<T>()
-        {
-            var instance = new List<T>();
-            var type = typeof(T);
-            foreach (var row in _table)
-            {
-                foreach (var prop in type.GetProperties())
-                {
-                    foreach (var field in type.GetFields(BindingFlags.Public | BindingFlags.Instance))
-                    {
-                        var fieldType = field.GetType();
-                        if (fieldType != typeof(string))
-                        {
-                            throw new TypeAccessException("Only string members are supported.");
-                        }
-                        else
-                        {
-                            //Set 
-                        }
-                    }
-                }
-            }
-            // Unifnished function (the return is just here to ensure project building)
-            return new();
         }
 
         public int FindIndex(string[] identifiers)
@@ -148,10 +122,10 @@ namespace Puniemu.Src.TableParser.Logic
             {
                 sb.Append(_prefix + ":");
             }
-            for (int i = 0; i < _table.Count; i++)
+            for (int i = 0; i < Table.Count; i++)
             {
-                sb.Append(string.Join("|", _table[i]));
-                if (i < _table.Count - 1)
+                sb.Append(string.Join("|", Table[i]));
+                if (i < Table.Count - 1)
                 {
                     sb.Append('*');
                 }
