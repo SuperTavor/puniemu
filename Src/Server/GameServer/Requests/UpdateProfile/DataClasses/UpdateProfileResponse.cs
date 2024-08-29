@@ -57,7 +57,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.UpdateProfile.DataClasses
         public UpdateProfileResponse(string userPlayerIcon, string userPlayerTitle, YwpUserData userData)
         {
             this.ShopSaleList = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("shopSaleList");
-            this.ServerDate = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            this.ServerDate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             this.YwpToken = "";
             this.YMoneyShopSaleList = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("ymoneyShopSaleList");
             this.MstVersionMaster = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["mstVersionMaster"]);

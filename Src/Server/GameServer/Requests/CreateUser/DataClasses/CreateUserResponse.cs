@@ -57,7 +57,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.DataClasses
         public CreateUserResponse(string userTutorialList, YwpUserData userData)
         {
             ShopSaleList = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("shopSaleList");
-            ServerDate = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            ServerDate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             YwpToken = "";
             YMoneyShopSaleList = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("ymoneyShopSaleList");
             MstVersionMaster = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["mstVersionMaster"]);

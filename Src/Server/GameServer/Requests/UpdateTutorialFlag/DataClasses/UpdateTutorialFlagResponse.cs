@@ -36,7 +36,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.UpdateTutorialFlag.DataClasses
 
         public UpdateTutorialFlagResponse(string tutorialList,YwpUserData userData)
         {
-            this.ServerDt = DateTimeOffset.Now.ToUnixTimeSeconds();
+            this.ServerDt = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             this.MstVersionMaster = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["mstVersionMaster"]);
             this.ResultCode = 0;
             this.TutorialList = tutorialList;

@@ -12,7 +12,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetMaster.DataClasses
         {
             var result = new Dictionary<string, object?>
             {
-                ["serverDt"] = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                ["serverDt"] = DateTimeOffset.Now.ToUnixTimeMilliseconds(),
                 ["resultType"] = 0,
                 ["shopSaleList"] = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("shopSaleList"),
                 ["dialogTitle"] = "",

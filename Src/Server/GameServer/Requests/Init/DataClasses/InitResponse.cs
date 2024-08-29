@@ -8,7 +8,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Init.DataClasses
     {
         public InitResponse()
         {
-            ServerDt = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            ServerDt = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             MstVersionMaster = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["mstVersionMaster"]);
             ResultCode = 0;
             NextScreenType = 0;

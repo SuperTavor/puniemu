@@ -20,7 +20,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.Logic
             //Construct response
             var res = new LoginResponse()
             {
-                ServerDate = DateTimeOffset.Now.ToUnixTimeSeconds(),
+                ServerDate = DateTimeOffset.Now.ToUnixTimeMilliseconds(),
 
                 YwpUserMedalPointTrade = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<List<object>>(deserialized.Gdkey, "ywp_user_medal_point_trade"),
 

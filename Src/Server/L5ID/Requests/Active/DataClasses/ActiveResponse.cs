@@ -65,7 +65,7 @@ namespace Puniemu.Src.Server.L5ID.Requests.Active.DataClasses
                 IsLinked = false,
                 MaxGDKeys = 3,
                 RCClientVersion = new RcClientVersion(),
-                SignTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                SignTimestamp = DateTimeOffset.Now.ToUnixTimeMilliseconds(),
                 SignNonce = "123"
             };
 

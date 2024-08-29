@@ -21,7 +21,7 @@ namespace Puniemu.Src.Server.L5ID.Requests.CreateGDKey.DataClasses
             Result = true;
             GDKey = new(gdkey);
             SignNonce = "123";
-            SignTimestamp = DateTimeOffset.Now.ToUnixTimeSeconds();
+            SignTimestamp = DateTimeOffset.Now.ToUnixTimeMilliseconds();
         }
     }
 }

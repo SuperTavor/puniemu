@@ -68,11 +68,11 @@ namespace Puniemu.Src.Server.GameServer.Requests.DeleteUser.DataClasses
 
         public DeleteUserResponse(int RespCode)
         {
-            this.ShopSaleList = CGeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("shopSaleList");
-            this.ServerDate = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            this.ShopSaleList = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("shopSaleList");
+            this.ServerDate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             this.YwpToken = "";
             this.Token = "hello_dummy";
-            this.YMoneyShopSaleList = CGeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("ymoneyShopSaleList");
+            this.YMoneyShopSaleList = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("ymoneyShopSaleList");
             this.MstVersionMaster = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["mstVersionMaster"]);
             this.ResultCode = 0;
             this.DialogTitle = "";
@@ -81,7 +81,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.DeleteUser.DataClasses
             this.WebServerIp = "";
             this.ResponseCode = RespCode;
             this.NextScreenType = 0;
-            this.HitodamaShopSaleList = CGeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("hitodamaShopSaleList");
+            this.HitodamaShopSaleList = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("hitodamaShopSaleList");
             this.ResultType = 0;
         }
     }

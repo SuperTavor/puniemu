@@ -45,7 +45,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetGdkeyAccounts.DataClasses
                 }
             }
             GetGdkeyAccountsResponse res = new();
-            res.ServerDt = DateTimeOffset.Now.ToUnixTimeSeconds();
+            res.ServerDt = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             res.YWPToken = string.Empty;
             res.UDKeyPlayerList = playerItems;
             res.MstVersionVer = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["mstVersionMaster"]);

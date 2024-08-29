@@ -23,7 +23,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_tutorial_list", ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["ywp_user_tutorial_list_def"]);
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_player_icon", Consts.DEFAULT_OBTAINED_ICONS_AND_TITLES);
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_player_title", Consts.DEFAULT_OBTAINED_ICONS_AND_TITLES);
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "start_date", DateTimeOffset.Now.ToUnixTimeSeconds());
+            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "start_date", DateTimeOffset.Now.ToUnixTimeMilliseconds());
+            
             var createUserResponse = new CreateUserResponse(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["ywp_user_tutorial_list_def"], generatedUserData);
             var marshalledResponse = JsonConvert.SerializeObject(createUserResponse);
             var encryptedResponse = NHNCrypt.Logic.NHNCrypt.EncryptResponse(marshalledResponse);
