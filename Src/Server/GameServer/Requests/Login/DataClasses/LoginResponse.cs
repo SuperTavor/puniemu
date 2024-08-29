@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace Puniemu.Src.Server.GameServer.Requests.Login.DataClasses
 {
@@ -58,7 +58,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.DataClasses
 
         // ywp_mst property detailing the dialogues for the event. Constant (obviously).
         [JsonProperty("ywp_mst_event_tutorial_message")]
-        public Dictionary<string, object> YwpMstEventTxt { get; set; }
+        public List<object> YwpMstEventTxt { get; set; }
 
         // ywp_user property probably detailing the items the user obtained from the shop. Initialized as empty string.
         [JsonProperty("ywp_user_shop_item_unlock")]
@@ -67,6 +67,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.DataClasses
         // ywp_user property represented as a table, detailing the obtained player titles (e.g. chan, kun).
         [JsonProperty("ywp_user_player_title")]
         public string YwpUserPlayerTitle { get; set; }
+
+        // ywp_user property represented as a table, detailing the obtained player titles (e.g. chan, kun).
+        [JsonProperty("ywp_user_player_icon")]
+        public string YwpUserPlayerIcon { get; set; }
 
         // ywp_user property probably detailing the ad config. Default is constant.
         [JsonProperty("ywp_user_ads_play")]
@@ -103,6 +107,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.DataClasses
         // ywp_user property. Idk. Initialized to list.
         [JsonProperty("ywp_user_drive_progress")]
         public List<object> YwpUserDriveProgress { get; set; }
+
+        [JsonProperty("ywp_user_data")]
+        public Dictionary<string,object> UserData { get; set; }
 
         // Constant.
         [JsonProperty("hitodamaShopSaleList")]
@@ -201,4 +208,3 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.DataClasses
         public List<object> YwpUserEventRankingReward { get; set; }
     }
 }
-
