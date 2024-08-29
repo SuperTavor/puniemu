@@ -8,9 +8,10 @@ using Puniemu.Src.Server.L5ID.Requests.Active.Logic;
 using Puniemu.Src.Server.L5ID.Requests.CreateGDKey.Logic;
 using Puniemu.Src.ConfigManager.Logic;
 using Puniemu.Src.Server.GameServer.Requests.GetGdkeyAccounts.Logic;
-using Puniemu.Src.Server.GameServer.UpdateProfile.Logic;
-using Puniemu.Src.Server.GameServer.DeleteUser.Logic;
+using Puniemu.Src.Server.GameServer.Requests.UpdateProfile.Logic;
+using Puniemu.Src.Server.GameServer.Requests.DeleteUser.Logic;
 using Puniemu.Src.Server.GameServer.Requests.UserInfoRefresh.Logic;
+using Puniemu.Src.Server.GameServer.Requests.UserStageRanking.Logic;
 
 namespace Puniemu.Src;
 class Program
@@ -82,7 +83,11 @@ class Program
         {
             await UserInfoRefreshHandler.HandleAsync(ctx);
         });
-        }
+        app.MapPost("/userStageRanking.nhn", async ctx =>
+        {
+            await UserStageRankingHandler.HandleAsync(ctx);
+        });
+    }
 
     //Assigns all other, unknown request paths
     static void AssignDefault(WebApplication app)
