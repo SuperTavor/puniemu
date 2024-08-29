@@ -1,5 +1,6 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Puniemu.Src.Server.GameServer.Requests.Login.DataClasses;
+using Puniemu.Src.Server.GameServer.Requests.UpdateProfile.DataClasses;
 using Puniemu.Src.UserDataManager.Logic;
 using Puniemu.Src.Utils.GeneralUtils;
 using System.Buffers;
@@ -17,10 +18,17 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.Logic
             ctx.Request.BodyReader.AdvanceTo(readResult.Buffer.End);
             var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             var deserialized = JsonConvert.DeserializeObject<LoginRequest>(requestJsonString!);
+            var userdata = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<Dictionary<string, object>>(deserialized.Gdkey, "ywp_user_data");
+            userdata["usingItemList"] = new List<object>();
+
             //Construct response
             var res = new LoginResponse()
             {
+                UserData = userdata,
+
                 ServerDate = DateTimeOffset.Now.ToUnixTimeMilliseconds(),
+
+                YwpUserPlayerIcon = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_player_icon"),
 
                 YwpUserMedalPointTrade = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<List<object>>(deserialized.Gdkey, "ywp_user_medal_point_trade"),
 
@@ -46,7 +54,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.Logic
 
                 YwpUserItem = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_item"),
 
-                YwpMstEventTxt = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<Dictionary<string, object>>("ywp_mst_event_tutorial_message"),
+                YwpMstEventTxt = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<object>>("ywp_mst_event_tutorial_message"),
 
                 YwpUserShopItemUnlock = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_shop_item_unlock"),
 
@@ -78,15 +86,15 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.Logic
 
                 YwpUserMiniGameMapFriend = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<List<object>>(deserialized.Gdkey, "ywp_user_mini_game_map_friend"),
 
-                YwpUserMenuFunc = ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["ywp_user_menufunc"],
+                YwpUserMenuFunc = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_menufunc"),
 
-                YwpUserDict = ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["ywp_user_dictionary"],
+                YwpUserDict = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_dictionary"),
 
                 YwpUserEventGroupAssistDisp = ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["ywp_mst_event_group_assist_disp"],
 
-                YwpUserHistTotal = ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["ywp_user_hist_total"],
+                YwpUserHistTotal = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_hist_total"),
 
-                YwpUserHistPuzzleDaily = ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["ywp_user_hist_puzzle_daily"],
+                YwpUserHistPuzzleDaily = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_hist_puzzle_daily"),
 
                 YMoneyShopSaleList = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<object>>("ymoneyShopSaleList"),
 
@@ -108,7 +116,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.Logic
 
                 YwpMstEventCondition = ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["ywp_mst_event_condition"],
 
-                YwpUserYoukaiDeck = ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["ywp_user_youkai_deck"],
+                YwpUserYoukaiDeck = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_youkai_deck"),
 
                 YwpUserScoreAttackPointTrade = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<Dictionary<string, object>>(deserialized.Gdkey, "ywp_user_score_attack_point_trade"),
 
@@ -118,6 +126,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.Logic
 
                 YwpUserEventRankingReward = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<List<object>>(deserialized.Gdkey, "ywp_user_event_ranking_reward")
             };
+            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "do_opening_tuto", 1);
+            var marshalledResponse = JsonConvert.SerializeObject(res);
+            var encryptedResponse = NHNCrypt.Logic.NHNCrypt.EncryptResponse(marshalledResponse);
+            await ctx.Response.WriteAsync(encryptedResponse);
 
         }
     }
