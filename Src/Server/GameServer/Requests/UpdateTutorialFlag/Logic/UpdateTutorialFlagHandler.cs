@@ -1,8 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Puniemu.Src.Server.GameServer.DataClasses;
 using Puniemu.Src.Server.GameServer.Requests.UpdateTutorialFlag.DataClasses;
-using Puniemu.Src.Server.GameServer.UpdateProfile.DataClasses;
-using Puniemu.Src.UserDataManager.Logic;
 using System.Buffers;
 using System.Text;
 

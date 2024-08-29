@@ -32,10 +32,14 @@ try:
     for tbl in ALL_TABLE.split("|"):
         files[tbl] = json.dumps(master_dict[tbl],ensure_ascii=False)
     os.makedirs(output_folder, exist_ok=True)
-
+    #send message to login
     encryptedLoginRes = requests.post(GAMESERVER+"login.nhn",headers=headers,data=encrypt_req(loginReqPayload))
     login_dict = json.loads(decrypt_res(encryptedLoginRes.text))
-    files["DefaultTutorialList"] = login_dict["ywp_user_tutorial_list"]
+    for key in login_dict.keys():
+        if "ywp_mst" in key or key == "leaderYoukaiBGM" or key == "noticePageListFlg":
+            files[key] = str(login_dict[key])
+        elif "ywp_user" in key:
+            files[key + "_def"] = str(login_dict[key])
     for key, value in files.items():
         with open(os.path.join(output_folder, f"{key}.txt"), "w",encoding="utf-8") as f:
             f.write(value.replace("'", "\""))
