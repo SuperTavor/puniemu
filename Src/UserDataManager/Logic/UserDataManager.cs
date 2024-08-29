@@ -72,6 +72,7 @@ namespace Puniemu.Src.UserDataManager.Logic
             }
             //Also delete the path that stores these paths
             await _client.DeleteAsync($"UserData/{gdkey}/RegisteredTables");
+            await RemoveGdkeyFromUdkey(udkey, gdkey);
         }
 
         private static async Task RemoveGdkeyFromUdkey(string udkey, string gdkey)
