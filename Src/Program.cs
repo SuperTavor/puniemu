@@ -23,8 +23,12 @@ class Program
 
         var app = builder.Build();
         //Rewrite to redirect mainly all .NHN requests to .NHN/, as ASP.NET Core thinks it's static serving otherwise or something
+        //second rewrite is in case it's for example /////////////////////init.nhn it makes it /init.nhn
         var rewriteOptions = new RewriteOptions()
-            .AddRewrite(@"(.*\..*)$", "$1/", skipRemainingRules: true);
+              .AddRewrite(@"^/+(.+)$", "/$1", skipRemainingRules: false)
+              .AddRewrite(@"(.*\..*)$", "$1/", skipRemainingRules: true);
+
+
         app.UseRewriter(rewriteOptions);
 
         ConfigManager.Logic.ConfigManager.Initialize();
