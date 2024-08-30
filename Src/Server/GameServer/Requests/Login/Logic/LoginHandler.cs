@@ -22,6 +22,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.Logic
             //Construct response
             var res = new LoginResponse();
             var resdict = await res.ToDictionary();
+            
             foreach(var table in Consts.LOGIN_TABLES)
             {
                 string? tableText = null!;
