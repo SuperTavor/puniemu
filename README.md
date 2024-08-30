@@ -1,9 +1,9 @@
 # puniemu
 
 A server emulator for Yo-kai Watch Puni Puni.
-
-<img src=https://i.imgur.com/XU9wuP2.png alt=logo width=640 height=640/>
-
+<p align="center">
+<img src=https://i.imgur.com/XU9wuP2.png alt=logo width=320 height=320/>
+</p>
 ## What is this?
 
 Essentially, this is a private server for Yo-kai Watch Puni Puni written in C#. It can be hosted by anyone, anywhere as a drop-in replacement for NHN's servers. This allows everyone to play even after the servers shut down. Additionally, you can have full control over your experience by modifying the code.
