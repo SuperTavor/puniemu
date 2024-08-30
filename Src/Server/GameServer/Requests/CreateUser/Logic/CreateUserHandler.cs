@@ -49,9 +49,11 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
                     await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, userTable, deserializedDefaultUserTable); 
                 }
            }
-            //Set ywpuser data
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_data", generatedUserData);
+           //Set ywpuser data
+           await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_data", generatedUserData);
+           //Set start date
            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID,"start_date",DateTimeOffset.Now.ToUnixTimeMilliseconds());
+          
         }
     }
 }

@@ -52,7 +52,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetGdkeyAccounts.DataClasses
             var startTimestampString = DateTimeOffset.FromUnixTimeMilliseconds(startTimestamp).DateTime.ToString("yyyy-MM-dd HH:mm:ss");
             playerItem.StartDate = startTimestampString;
             //Placeholder as this can only be implemented when we're done with login.nhn
-            playerItem.LastUpdateDate = "1970-01-01 00:00:00";
+            playerItem.LastUpdateDate = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(gdkey, "lgn_date");
             playerItem.TitleID = (PlayerTitle)userData.CharacterTitleID;
             playerItem.GDKey = gdkey;
             playerItem.UserID = "0";
