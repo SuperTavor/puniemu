@@ -49,7 +49,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetGdkeyAccounts.DataClasses
             //2235000 until we have access to this property
             playerItem.PartnerYokaiID = 2235000;
             var startTimestamp = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<long>(gdkey, "start_date");
-            var startTimestampString = DateTimeOffset.FromUnixTimeSeconds(startTimestamp).DateTime.ToString("yyyy-MM-dd HH:mm:ss");
+            var startTimestampString = DateTimeOffset.FromUnixTimeMilliseconds(startTimestamp).DateTime.ToString("yyyy-MM-dd HH:mm:ss");
             playerItem.StartDate = startTimestampString;
             //Placeholder as this can only be implemented when we're done with login.nhn
             playerItem.LastUpdateDate = "1970-01-01 00:00:00";
