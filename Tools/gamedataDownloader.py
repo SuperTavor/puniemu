@@ -19,11 +19,11 @@ try:
 
     files = {
         "ywp_mst_version_master": init_dict["ywp_mst_version_master"],
-        "hitodamaShopSaleList": str(init_dict["hitodamaShopSaleList"]),
-        "shopSaleList": str(init_dict["shopSaleList"]),
-        "ymoneyShopSaleList": str(init_dict["ymoneyShopSaleList"]),
-        "noticePageList": str(init_dict["noticePageList"]),
-        "mstVersionMaster": str(init_dict["mstVersionMaster"])
+        "hitodamaShopSaleList": json.dumps(init_dict["hitodamaShopSaleList"]),
+        "shopSaleList": json.dumps(init_dict["shopSaleList"]),
+        "ymoneyShopSaleList": json.dumps(init_dict["ymoneyShopSaleList"]),
+        "noticePageList": json.dumps(init_dict["noticePageList"]),
+        "mstVersionMaster": json.dumps(init_dict["mstVersionMaster"])
     }
 
     #Send message to getMaster
@@ -37,10 +37,10 @@ try:
     login_dict = json.loads(decrypt_res(encryptedLoginRes.text))
     for key in login_dict.keys():
         if "ywp_mst" in key or key == "leaderYoukaiBGM" or key == "noticePageListFlg":
-            files[key] = str(login_dict[key])
+            files[key] = json.dumps(login_dict[key])
             if key == "ywp_mst_event": files[key] = files[key].replace("None","null")
         elif "ywp_user" in key:
-            files[key + "_def"] = str(login_dict[key])
+            files[key + "_def"] = json.dumps(login_dict[key])
     for key, value in files.items():
         with open(os.path.join(output_folder, f"{key}.txt"), "w",encoding="utf-8") as f:
             f.write(value.replace("'", "\""))
