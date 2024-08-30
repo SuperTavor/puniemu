@@ -22,19 +22,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.Logic
             //Construct response
             var res = new LoginResponse();
             var resdict = await res.ToDictionary();
-
-            //Test
-            resdict["openingTutorialFlg"] = 1;
-            resdict["storeUrl"] = "";
-            resdict["teamEventButtonHiddenFlg"] = 1;
-            resdict["shopSaleList"] = new List<object>();
-            resdict["noticePageList"] = new List<object> { new Dictionary<string, object> { { "pageNo", 2 } }, new Dictionary<string, object> { { "pageNo", 6 } } };
-            resdict["mstMapMobPeriodNoList"] = new List<object> { 0, 1 };
-            resdict["hitodamaShopSaleList"] = new List<object>();
-            resdict["webServerIp"] = "";
-            resdict["dialogTitle"] = "";
-            resdict["responseCodeTeamEvent"] = 0;
-            resdict["requireAgeConfirm"] = true;
             
             foreach(var table in Consts.LOGIN_TABLES)
             {
