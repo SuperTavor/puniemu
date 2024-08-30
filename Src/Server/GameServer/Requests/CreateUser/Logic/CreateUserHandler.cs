@@ -31,7 +31,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
 
         private static async Task RegisterDefaultTables(CreateUserRequest deserialized,YwpUserData generatedUserData)
         {
-           foreach(var userTable in Consts.LOGIN_TABLES.Where(x => x.StartsWith("ywp_user")))
+           foreach(var userTable in Consts.LOGIN_TABLES.Where(x => x.StartsWith("ywp_user") && x != "ywp_user_data"))
            {
                 //initialize with default if exists, else 
                 if(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache.TryGetValue(userTable+"_def", out var data))
@@ -45,9 +45,12 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
                     {
                         deserializedDefaultUserTable = data;
                     }
+
                     await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, userTable, deserializedDefaultUserTable); 
                 }
            }
+            //Set ywpuser data
+            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_data", generatedUserData);
            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID,"start_date",DateTimeOffset.Now.ToUnixTimeMilliseconds());
         }
     }
