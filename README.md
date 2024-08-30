@@ -2,7 +2,7 @@
 
 A server emulator for Yo-kai Watch Puni Puni.
 
-<img src=https://i.imgur.com/XU9wuP2.png alt=logo width=854/>
+<img src=https://i.imgur.com/XU9wuP2.png alt=logo width=640 height=640/>
 
 ## What is this?
 
@@ -10,4 +10,6 @@ Essentially, this is a private server for Yo-kai Watch Puni Puni written in C#. 
 
 ## Credits
 
-Developed by Zura and DarkCraft, with reverse engineering help from onepiecefreak3 and kuronosuFear. Logo by picky_x_keizen on Discord.
+Developed by Zura and DarkCraft.
+Reverse engineering help from onepiecefreak3 and kuronosuFear.
+Logo by picky_x_keizen on Discord.
