@@ -77,6 +77,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.Logic
                 }
                 resdict[table] = tableObj;
             }
+            //Set last login time to now
+            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "lgn_date", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             var encryptedRes = NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(resdict));
             ctx.Response.Headers.ContentType = "application/json";
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "opening_tutorial_flg", 0);
