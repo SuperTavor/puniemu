@@ -51,7 +51,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.UserInfoRefresh.Logic
             }
             catch
             {
-                var errorResponse = new MsgAndGoBackToTitle("This account doesn't exist", "Authentication Error");
+                var errorResponse = new MsgBoxResponse("This account doesn't exist", "Authentication Error");
                 var marshalledErrorResponse = JsonConvert.SerializeObject(errorResponse);
                 var encryptedErrorResponse = NHNCrypt.Logic.NHNCrypt.EncryptResponse(marshalledErrorResponse);
                 await ctx.Response.WriteAsync(encryptedErrorResponse);

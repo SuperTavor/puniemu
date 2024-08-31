@@ -29,7 +29,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetGdkeyAccounts.Logic
             GetGdkeyAccountsResponse? res = await GetGdkeyAccountsResponse.ConstructAsync(deserialized.DeviceID, gdkeys);
             if(res == null)
             {
-                var response = new MsgAndGoBackToTitle("this error should almost NEVER happen\ncontact zura and darkcraft", "what");
+                var response = new MsgBoxResponse("this error should almost NEVER happen\ncontact zura and darkcraft", "what");
                 var encrypted = NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(response));
                 await ctx.Response.WriteAsync(encrypted);
             }

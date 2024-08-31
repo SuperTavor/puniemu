@@ -2,17 +2,17 @@
 
 namespace Puniemu.Src.Server.GameServer.DataClasses
 {
-    public struct MsgAndGoBackToTitle
+    public class MsgBoxResponse
     {
-        public MsgAndGoBackToTitle(string dialogMsg, string dialogTitle)
+        public MsgBoxResponse(string dialogMsg, string dialogTitle)
         {
             this.DialogMessage = dialogMsg;
             this.DialogTitle = dialogTitle;
             this.GameServerURL = Consts.OG_GAMESERVER_URL;
-            this.ResultCode = 1;
+            this.ResultCode = 0;
             this.StoreURL = "";
-            this.ResultType = 1;
-            this.NextScreenType = 3;
+            this.ResultType = 2;
+            this.NextScreenType = 1;
         }
         // The dialog message to be displayed
         [JsonProperty("dialogMsg")]
@@ -22,7 +22,6 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
         [JsonProperty("gameServerUrl")]
         public string GameServerURL { get; set; }
 
-        // always 1 when returning to title
         [JsonProperty("resultCode")]
         public int ResultCode { get; set; }
 
@@ -34,11 +33,9 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
         [JsonProperty("dialogTitle")]
         public string DialogTitle { get; set; }
 
-        // always 1 when returning to title
         [JsonProperty("resultType")]
         public int ResultType { get; set; }
 
-        // Should be 3 when returning to title
         [JsonProperty("nextScreenType")]
         public int NextScreenType { get; set; }
     }

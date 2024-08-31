@@ -3,7 +3,7 @@
     "http": {
       "commandName": "Project",
       "workingDirectory": "C:\\Users\\yehon\\source\\repos\\Puniemu\\bin\\Debug\\net8.0",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
