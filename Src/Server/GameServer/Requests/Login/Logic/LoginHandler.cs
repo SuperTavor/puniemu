@@ -1,12 +1,8 @@
-using FireSharp.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Puniemu.Src.Server.GameServer.DataClasses;
 using Puniemu.Src.Server.GameServer.Requests.Login.DataClasses;
-using Puniemu.Src.UserDataManager.Logic;
-using Puniemu.Src.Utils.GeneralUtils;
 using System.Buffers;
-using System.Security.Cryptography.Xml;
 using System.Text;
 
 namespace Puniemu.Src.Server.GameServer.Requests.Login.Logic
