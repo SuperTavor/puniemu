@@ -8,23 +8,33 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.DataClasses
 
         // Flag for if the news page should be opened immediately after logging in. Constant.
         [JsonProperty("noticePageListFlg")]
-        public int NoticePageListFlag { get; set; }
-
+        public int NoticePageListFlag = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["noticePageListFlg"]);
 
         // Idk, should be good as 0.
         [JsonProperty("monthlyPurchasableLeft")]
         public long MonthlyPurchasableLeft { get; set; }
 
+        [JsonProperty("teamEventButtonHiddenFlg")]
+        public int TeamEventButtonHiddenFlag = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["teamEventButtonHiddenFlg"]);
+
+        [JsonProperty("noticePageList")]
+        public List<object> NoticePageList = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<object>>("noticePageList");
+
+        [JsonProperty("mstMapMobPeriodNoList")]
+        public List<object> MstMapMobPeriodNoList = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<object>>("mstMapMobPeriodNoList");
+
+        [JsonProperty("responseCodeTeamEvent")]
+        public int ResponseCodeTeamEvent = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["responseCodeTeamEvent"]);
+
 
         public LoginResponse()
         {
-            NoticePageListFlag = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["noticePageListFlg"]);
             ResultCode = 0;
             ResultType = 0;
             NextScreenType = 0;
             MonthlyPurchasableLeft = 0;
         }
-        public async Task<Dictionary<string, object>> ToDictionary()
+        public async Task<Dictionary<string, object>> ToDictionary(string gdkey)
         {
             return new()
             {
@@ -38,7 +48,20 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.DataClasses
                 { "ymoneyShopSaleList", YMoneyShopSaleList },
                 { "ywpToken", YwpToken },
                 { "token", Token },
-                { "dialogMsg", DialogMsg }
+                { "dialogMsg", DialogMsg },
+                { "storeUrl", StoreUrl },
+                {"teamEventButtonHiddenFlg",TeamEventButtonHiddenFlag },
+                {"shopSaleList",this.ShopSaleList },
+                {"noticePageList",NoticePageList},
+                {"mstMapMobPeriodNoList", MstMapMobPeriodNoList},
+                {"hitodamaShopSaleList",this.HitodamaShopSaleList },
+                {"webServerIp",this.WebServerIp },
+                {"dialogTitle",this.DialogTitle },
+                {"responseCodeTeamEvent",ResponseCodeTeamEvent},
+                //Had to do it directly as a value and not as a property first because it's async
+                {"openingTutorialFlg", await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<int>(gdkey, "opening_tutorial_flg")},
+                {"requireAgeConfirm",true }
+
             };
         }
 

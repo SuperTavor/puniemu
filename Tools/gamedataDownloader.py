@@ -43,7 +43,7 @@ try:
     encryptedLoginRes = requests.post(GAMESERVER+"login.nhn",headers=headers,data=encrypt_req(loginReqPayload))
     login_dict = json.loads(decrypt_res(encryptedLoginRes.text))
     for key,value in login_dict.items():
-        if "ywp_mst" in key or key == "leaderYoukaiBGM" or key == "noticePageListFlg":
+        if "ywp_mst" in key or key == "leaderYoukaiBGM" or key == "noticePageListFlg" or key == "teamEventButtonHiddenFlg" or key == "mstMapMobPeriodNoList" or key == "responseCodeTeamEvent":
             if key not in table_trigger:
                 table_trigger.append(key)
                 json.dump(value,open(os.path.join(output_folder, f"{key}.txt"), "w",encoding="utf-8"),ensure_ascii=False)
