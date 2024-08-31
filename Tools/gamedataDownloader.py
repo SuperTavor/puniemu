@@ -15,7 +15,7 @@ try:
     #Send message to init.nhn
     encryptedInitRes = requests.post(GAMESERVER+"init.nhn", headers=headers, data=encrypt_req(initReqPayload))
     init_dict = json.loads(decrypt_res(encryptedInitRes.text))
-
+    os.makedirs(output_folder, exist_ok=True)
     files = {
         "ywp_mst_version_master": init_dict["ywp_mst_version_master"],
         "hitodamaShopSaleList": json.dumps(init_dict["hitodamaShopSaleList"],ensure_ascii=False),
@@ -32,7 +32,6 @@ try:
             open(os.path.join(output_folder, f"{key}.txt"), "w",encoding="utf-8").write(value)
     table_trigger=[]
     #Send message to getMaster
-    os.makedirs(output_folder, exist_ok=True)
     encryptedMasterRes = requests.post(GAMESERVER+"getMaster.nhn",headers=headers,data=encrypt_req(masterReqPayload))
     master_dict = json.loads(decrypt_res(encryptedMasterRes.text))
     for key,value in master_dict.items():
