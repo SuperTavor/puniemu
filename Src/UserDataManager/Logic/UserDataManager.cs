@@ -33,45 +33,14 @@ namespace Puniemu.Src.UserDataManager.Logic
         //Gets user data from specific account
         public static async Task SetYwpUserAsync<T>(string gdkey, string tableId, T data)
         {
-            //Store that this path was registered
-            var registeredDatasForUser = await _client.GetAsync($"UserData/{gdkey}/RegisteredTables");
-            List<string> registeredTables = new();
-            if(registeredDatasForUser.Body != "null")
-            {
-                registeredTables = registeredDatasForUser.ResultAs<List<string>>();
-            }
-            else
-            {
-                registeredTables = new();
-            }
             var tableKey = $"UserData/{gdkey}/Tables/{tableId}";
-            registeredTables.Add(tableKey);
-            await _client.SetAsync($"UserData/{gdkey}/RegisteredTables", registeredTables);
             //Set table data
             await _client.SetAsync(tableKey, data);
         }
 
         public static async Task DeleteUser(string udkey, string gdkey)
         {
-            var registeredDatasForUser = await _client.GetAsync($"UserData/{gdkey}/RegisteredTables");
-            List<string> registeredTables = new();   
-            //This shouldn't happen but we should check anyway
-            if(registeredDatasForUser.Body == "null")
-            {
-                return;
-            }
-            else
-            {
-                registeredTables = registeredDatasForUser.ResultAs<List<string>>();
-            }
-
-            //Delete every path related to the gdkey
-            foreach(var path in registeredTables)
-            {
-                await _client.DeleteAsync(path);
-            }
-            //Also delete the path that stores these paths
-            await _client.DeleteAsync($"UserData/{gdkey}/RegisteredTables");
+            await _client.DeleteAsync($"UserData/{gdkey}");
             await RemoveGdkeyFromUdkey(udkey, gdkey);
         }
 
