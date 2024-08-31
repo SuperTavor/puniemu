@@ -4,31 +4,8 @@ using Puniemu.Src.Utils.GeneralUtils;
 using Puniemu.Src.ConfigManager;
 namespace Puniemu.Src.Server.GameServer.Requests.UpdateProfile.DataClasses
 {
-    public struct UpdateProfileResponse
+    public class UpdateProfileResponse : PuniemuResponseBase
     {
-        // Constant.
-        [JsonProperty("shopSaleList")]
-        public List<int> ShopSaleList { get; set; }
-
-        // The unix time when the response was sent.
-        [JsonProperty("serverDt")]
-        public long ServerDate { get; set; }
-
-        // Always empty.
-        [JsonProperty("ywpToken")]
-        public string YwpToken { get; set; }
-
-        // Constant.
-        [JsonProperty("ymoneyShopSaleList")]
-        public List<int> YMoneyShopSaleList { get; set; }
-
-        // Version of assets/data on the server.
-        [JsonProperty("mstVersionMaster")]
-        public int MstVersionMaster { get; set; }
-
-        // 0 here.
-        [JsonProperty("resultCode")]
-        public int ResultCode { get; set; }
 
         // Table that dictates which icon that the user has unlocked.
         [JsonProperty("ywp_user_player_icon")]
@@ -38,34 +15,16 @@ namespace Puniemu.Src.Server.GameServer.Requests.UpdateProfile.DataClasses
         [JsonProperty("ywp_user_player_title")]
         public string UserPlayerTitle { get; set; }
 
-        // 0 here.
-        [JsonProperty("nextScreenType")]
-        public int NextScreenType { get; set; }
-
-        // Constant.
-        [JsonProperty("hitodamaShopSaleList")]
-        public List<int> HitodamaShopSaleList { get; set; }
-
         // Basic user data.
         [JsonProperty("ywp_user_data")]
         public YwpUserData UserData { get; set; }
 
-        // 0 here.
-        [JsonProperty("resultType")]
-        public int ResultType { get; set; }
-
         public UpdateProfileResponse(string userPlayerIcon, string userPlayerTitle, YwpUserData userData)
         {
-            this.ShopSaleList = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("shopSaleList");
-            this.ServerDate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            this.YwpToken = "";
-            this.YMoneyShopSaleList = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("ymoneyShopSaleList");
-            this.MstVersionMaster = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["mstVersionMaster"]);
             this.ResultCode = 0;
             this.UserPlayerIcon = userPlayerIcon;
             this.UserPlayerTitle = userPlayerTitle;
             this.NextScreenType = 0;
-            this.HitodamaShopSaleList = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("hitodamaShopSaleList");
             this.UserData = userData;
             this.ResultType = 0;
         }

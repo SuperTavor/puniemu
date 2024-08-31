@@ -13,6 +13,7 @@ using Puniemu.Src.Server.GameServer.Requests.DeleteUser.Logic;
 using Puniemu.Src.Server.GameServer.Requests.UserInfoRefresh.Logic;
 using Puniemu.Src.Server.GameServer.Requests.UserStageRanking.Logic;
 using Puniemu.Src.Server.GameServer.Requests.Login.Logic;
+using Puniemu.Src.Server.GameServer.Requests.BuyHitodama.Logic;
 
 namespace Puniemu.Src;
 class Program
@@ -95,6 +96,10 @@ class Program
         app.MapPost("/login.nhn", async ctx =>
         {
             await LoginHandler.HandleAsync(ctx);
+        });
+        app.MapPost("/buyHitodama.nhn", async ctx =>
+        {
+            await BuyHitodamaHandler.HandleAsync(ctx);
         });
     }
 
