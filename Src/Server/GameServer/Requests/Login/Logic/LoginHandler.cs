@@ -1,8 +1,7 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Puniemu.Src.Server.GameServer.DataClasses;
 using Puniemu.Src.Server.GameServer.Requests.Login.DataClasses;
-using Puniemu.Src.UserDataManager.Logic;
-using Puniemu.Src.Utils.GeneralUtils;
 using System.Buffers;
 using System.Text;
 
@@ -19,14 +18,15 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.Logic
             ctx.Request.BodyReader.AdvanceTo(readResult.Buffer.End);
             var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             var deserialized = JsonConvert.DeserializeObject<LoginRequest>(requestJsonString!);
+            
             //Construct response
             var res = new LoginResponse();
-            var resdict = await res.ToDictionary();
-            
-            foreach(var table in Consts.LOGIN_TABLES)
+            var resdict = await res.ToDictionary(deserialized.Gdkey);            
+
+            foreach (var table in Consts.LOGIN_TABLES)
             {
                 string? tableText = null!;
-                if(table.StartsWith("ywp_user"))
+                if (table.StartsWith("ywp_user"))
                 {
                     var gotten = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<object>(deserialized.Gdkey, table);
                     tableText = JsonConvert.SerializeObject(gotten);
@@ -36,13 +36,26 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.Logic
                 object tableObj = new();
                 try
                 {
+                    // If was cud structure, only send the data
                     tableObj = JsonConvert.DeserializeObject<object>(tableText);
+                    if (tableObj is JObject) {
+                        var jObject_temp = (JObject)tableObj;
+                        if (jObject_temp.ContainsKey("data"))
+                        {
+                            tableObj = jObject_temp["data"];
+                        } else if (jObject_temp.ContainsKey("tableData"))
+                        {
+                            tableObj = jObject_temp["tableData"];
+                        }
+
+                    }
+
                 }
                 catch
                 {
                     tableObj = tableText;
                 }
-                if(tableObj == null)
+                if (tableObj == null)
                 {
                     tableObj = new List<object>();
                 }

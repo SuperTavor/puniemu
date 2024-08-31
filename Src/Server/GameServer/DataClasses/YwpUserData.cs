@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Runtime.Intrinsics.Arm;
 using System.Security.Cryptography;
 
 namespace Puniemu.Src.Server.GameServer.DataClasses
@@ -138,7 +139,7 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
             this.TodaysRemainSec = GetRemainingSecondsInDay();
             this.WeeklyFreeFlag = 0;
             this.Hitodama = 0;
-            this.UserID = "0";
+            this.UserID = System.IO.Hashing.Crc32.HashToUInt32(System.Text.Encoding.UTF8.GetBytes(this.CharacterID)).ToString();
             this.UsingItemList = new List<object>();
             this.HitodamaRecoverSec = 0;
             this.LimitTimeSaleEndDt = "";

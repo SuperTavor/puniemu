@@ -2,7 +2,6 @@ import requests
 import json
 import os
 from sharedLogic.NHN import *
-ALL_TABLE = "ywp_mst_youkai_skill_group|ywp_mst_shop_hitodama_list|ywp_mst_dash_gear|ywp_mst_event_stage_assist|ywp_mst_event_youkai_assist|ywp_mst_gacha_youkai_choice|ywp_mst_treasure_series_reward|ywp_mst_youkai_limit|ywp_mst_game_shoot_gimmick_param|ywp_mst_youkai_group|ywp_mst_game_rule_group|ywp_mst_event_match|ywp_mst_youkai_logo|ywp_mst_youkai_boss_gimmick|ywp_mst_exchange_reward|ywp_mst_sound|ywp_mst_l5id_status_reward|ywp_mst_youkai_transform|ywp_mst_youkai_bonus_effect|ywp_mst_youkai_boss_block|ywp_mst_score_attack_point_trade|ywp_mst_rob_skill_effect|ywp_mst_steal_compatibility_bonus|ywp_mst_deck|ywp_mst_coin_purchase_age_limit|ywp_mst_stage|ywp_mst_youkai_enemy_set|ywp_mst_youkai_deck_effect|ywp_mst_crystal_effect|ywp_mst_medal_point_battle|ywp_mst_loading_message|ywp_mst_event_watch_assist|ywp_mst_event_quest|ywp_mst_event_block|ywp_mst_youkai_skill|ywp_mst_bonus_block_lot|ywp_mst_youkai_compatibility|ywp_mst_youkai_boss|ywp_mst_medal_point_trade|ywp_mst_youkai_level_open|ywp_mst_treasure|ywp_mst_steal_point|ywp_mst_event_point_buff_lv|ywp_mst_key_value|ywp_mst_event_group_assist_disp|ywp_mst_youkai_enemy_gimmick|ywp_mst_youkai_legend_release|ywp_mst_drive_point|ywp_mst_map|ywp_mst_event_youkai_assist_disp|ywp_mst_youkai_bonus_effect_level|ywp_mst_event_watch_assist_effect|ywp_mst_steal_skill_bonus|ywp_mst_event_group_assist|ywp_mst_watch_manufact|ywp_mst_production_material|ywp_mst_nyantos_block_param|ywp_mst_conflate|ywp_mst_steal_reward_set|ywp_mst_dash_gimmick|ywp_mst_group_manage|ywp_mst_shop_item_list|ywp_mst_version_resource|ywp_mst_event_friend_bonus|ywp_mst_youkai_bonus_effect_group|ywp_mst_game_rule_param|ywp_mst_ads_play|ywp_mst_mission|ywp_mst_event_quest_sub|ywp_mst_production|ywp_mst_box_reward|ywp_mst_box_reward_lot|ywp_mst_treasure_series|ywp_mst_stage_condition|ywp_mst_game_block|ywp_mst_tutorial_message|ywp_mst_steal_time_rank|ywp_mst_event_point_trade_release|ywp_mst_login_stamp_reward|ywp_mst_watch|ywp_mst_youkai_skill_group_disp|ywp_mst_coin_purchase_master|ywp_mst_youkai_enemy_torituki|ywp_mst_event_point_trade|ywp_mst_gacha|ywp_mst_item|ywp_mst_event_level|ywp_mst_youkai_skill_level|ywp_mst_youkai_level|ywp_mst_tutorial|ywp_mst_youkai_strong_skill|ywp_mst_nyantos_block|ywp_mst_shock_wave|ywp_mst_goku_effect|ywp_mst_map_mob|ywp_mst_player_title|ywp_mst_youkai_enemy_param|ywp_mst_serial_code_event|ywp_mst_tournament_continuous_win|ywp_mst_youkai|ywp_mst_player_icon|ywp_mst_youkai_transform_level|ywp_mst_event_enemy_youkai_assist|ywp_mst_event_point_buff|ywp_mst_bonus_block|ywp_mst_youkai_bonus_effect_group_disp|ywp_mst_map_group|ywp_mst_watch_effect|ywp_mst_youkai_strong_skill_level|ywp_mst_login_stamp|ywp_mst_youkai_bonus_effect_exclude"
 
 output_folder = input("Output folder: ")
 appver = input("Game version to spoof (latest version only): ").strip()
@@ -16,34 +15,43 @@ try:
     #Send message to init.nhn
     encryptedInitRes = requests.post(GAMESERVER+"init.nhn", headers=headers, data=encrypt_req(initReqPayload))
     init_dict = json.loads(decrypt_res(encryptedInitRes.text))
-
+    os.makedirs(output_folder, exist_ok=True)
     files = {
         "ywp_mst_version_master": init_dict["ywp_mst_version_master"],
-        "hitodamaShopSaleList": json.dumps(init_dict["hitodamaShopSaleList"]),
-        "shopSaleList": json.dumps(init_dict["shopSaleList"]),
-        "ymoneyShopSaleList": json.dumps(init_dict["ymoneyShopSaleList"]),
-        "noticePageList": json.dumps(init_dict["noticePageList"]),
-        "mstVersionMaster": json.dumps(init_dict["mstVersionMaster"])
+        "hitodamaShopSaleList": json.dumps(init_dict["hitodamaShopSaleList"],ensure_ascii=False),
+        "shopSaleList": json.dumps(init_dict["shopSaleList"],ensure_ascii=False),
+        "ymoneyShopSaleList": json.dumps(init_dict["ymoneyShopSaleList"],ensure_ascii=False),
+        "noticePageList": json.dumps(init_dict["noticePageList"],ensure_ascii=False),
+        "mstVersionMaster": json.dumps(init_dict["mstVersionMaster"],ensure_ascii=False)
     }
-
+    for key,value in files.items():
+    
+        if key != "ywp_mst_version_master":
+            json.dump(json.loads(value),open(os.path.join(output_folder, f"{key}.txt"), "w",encoding="utf-8"),ensure_ascii=False)
+        else:
+            open(os.path.join(output_folder, f"{key}.txt"), "w",encoding="utf-8").write(value)
+    table_trigger=[]
     #Send message to getMaster
     encryptedMasterRes = requests.post(GAMESERVER+"getMaster.nhn",headers=headers,data=encrypt_req(masterReqPayload))
     master_dict = json.loads(decrypt_res(encryptedMasterRes.text))
-    for tbl in ALL_TABLE.split("|"):
-        files[tbl] = json.dumps(master_dict[tbl],ensure_ascii=False)
-    os.makedirs(output_folder, exist_ok=True)
+    for key,value in master_dict.items():
+        if "ywp_mst" in key:
+            table_trigger.append(key)
+            json.dump(value,open(os.path.join(output_folder, f"{key}.txt"), "w",encoding="utf-8"),ensure_ascii=False)
+    
     #send message to login
     encryptedLoginRes = requests.post(GAMESERVER+"login.nhn",headers=headers,data=encrypt_req(loginReqPayload))
     login_dict = json.loads(decrypt_res(encryptedLoginRes.text))
-    for key in login_dict.keys():
-        if "ywp_mst" in key or key == "leaderYoukaiBGM" or key == "noticePageListFlg":
-            files[key] = json.dumps(login_dict[key])
-            if key == "ywp_mst_event": files[key] = files[key].replace("None","null")
+    for key,value in login_dict.items():
+        if "ywp_mst" in key or key == "leaderYoukaiBGM" or key == "noticePageListFlg" or key == "teamEventButtonHiddenFlg" or key == "mstMapMobPeriodNoList" or key == "responseCodeTeamEvent":
+            if key not in table_trigger:
+                table_trigger.append(key)
+                json.dump(value,open(os.path.join(output_folder, f"{key}.txt"), "w",encoding="utf-8"),ensure_ascii=False)
         elif "ywp_user" in key:
-            files[key + "_def"] = json.dumps(login_dict[key])
-    for key, value in files.items():
+            json.dump(value,open(os.path.join(output_folder, f"{key}_def.txt"), "w",encoding="utf-8"),ensure_ascii=False)
+    """for key, value in files.items():
         with open(os.path.join(output_folder, f"{key}.txt"), "w",encoding="utf-8") as f:
-            f.write(value.replace("'", "\""))
+            f.write(value.replace("'", "\""))"""
 
     print("Finished")
 except Exception as e:

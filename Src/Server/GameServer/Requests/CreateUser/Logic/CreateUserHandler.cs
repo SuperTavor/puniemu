@@ -49,6 +49,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
                     await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, userTable, deserializedDefaultUserTable); 
                 }
            }
+           //Set openingTutorialFlg
+           await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "opening_tutorial_flg", 1);
            //Set ywpuser data
            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_data", generatedUserData);
            //Set start date
