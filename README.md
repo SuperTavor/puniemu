@@ -11,6 +11,8 @@ Essentially, this is a private server for Yo-kai Watch Puni Puni written in C#. 
 
 ## Credits
 
-Developed by Zura and DarkCraft.
-Reverse engineering help from onepiecefreak3 and kuronosuFear.
-Logo by picky_x_keizen on Discord.
+- Zura - Main dev
+- DarkCraft - Main dev
+- onepiecefreak3 - Reverse engineering help
+- kuronosuFear - Reverse engineering help
+- picky_x_keizen - Logo
