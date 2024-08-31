@@ -2,7 +2,7 @@
 
 A server emulator for Yo-kai Watch Puni Puni.
 <p align="center">
-<img src=https://i.imgur.com/dGvQqqV.png alt=logo width=320>
+<img src=https://i.imgur.com/zO49hMu.png alt=logo width=320>
 </p>
 
 ## What is this?
