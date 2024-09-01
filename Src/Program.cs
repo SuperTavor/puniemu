@@ -15,6 +15,8 @@ using Puniemu.Src.Server.GameServer.Requests.UserStageRanking.Logic;
 using Puniemu.Src.Server.GameServer.Requests.Login.Logic;
 using Puniemu.Src.Server.GameServer.Requests.BuyHitodama.Logic;
 using Puniemu.Src.Server.GameServer.Requests.InitBilling.Logic;
+using Puniemu.Src.Server.GameServer.Requests.GameStart.Logic;
+using Puniemu.Src.Server.GameServer.Requests.DeckEdit.Logic;
 
 namespace Puniemu.Src;
 class Program
@@ -105,6 +107,14 @@ class Program
         app.MapPost("/initBilling.nhn", async ctx =>
         {
             await InitBillingHandler.HandleAsync(ctx);
+        });
+        app.MapPost("/gameStart.nhn", async ctx =>
+        {
+            await GameStartHandler.HandleAsync(ctx);
+        });
+        app.MapPost("/deckEdit.nhn", async ctx =>
+        {
+            await DeckEditHandler.HandleAsync(ctx);
         });
     }
 
