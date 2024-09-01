@@ -63,5 +63,23 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
             "ywp_user_event_tutorial",
             "ywp_user_event_ranking_reward",
         };
+        public static readonly List<string> GAME_START_TABLES = new List<string>
+        {
+            "ywp_user_event_condition",
+            "ywp_user_event",
+            "ywp_user_item",
+            "ywp_mst_youkai_bonus_effect_exclude",
+            "ywp_user_dictionary",
+            "ywp_mst_event",
+            "ywp_mst_game_const",
+            "ywp_mst_event_condition",
+        };
+        public static readonly List<string> DECK_EDIT_TABLES = new List<string>
+        {
+            "ywp_user_data",
+            "ywp_mst_youkai_bonus_effect_exclude",
+            "ywp_mst_event_youkai_assist_disp",
+            "ywp_user_tutorial_list",
+        };
     }
 }
