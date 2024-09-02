@@ -1,7 +1,9 @@
 ﻿using FireSharp;
 using FireSharp.Config;
 using FireSharp.Interfaces;
+using Newtonsoft.Json;
 using Puniemu.Src.ConfigManager.Logic;
+using System.Collections;
 namespace Puniemu.Src.UserDataManager.Logic
 {
     public static class UserDataManager
@@ -35,7 +37,7 @@ namespace Puniemu.Src.UserDataManager.Logic
         {
             var tableKey = $"UserData/{gdkey}/Tables/{tableId}";
             //Set table data
-            await _client.SetAsync(tableKey, data);
+            await _client.SetAsync(tableKey, JsonConvert.SerializeObject(data));
         }
 
         public static async Task DeleteUser(string udkey, string gdkey)
@@ -63,10 +65,43 @@ namespace Puniemu.Src.UserDataManager.Logic
         public static async Task<T?> GetYwpUserAsync<T>(string gdkey, string tableId)
         {
             var res = await _client.GetAsync($"UserData/{gdkey}/Tables/{tableId}");
-            var converted = res.ResultAs<T>();
+            var converted = JsonConvert.DeserializeObject<T>(res.ResultAs<string>());
             return converted;
         }
 
+        public static async Task<Dictionary<string,object>> GetEntireUserData(string gdkey)
+        {
+            var tablesRef = await _client.GetAsync($"UserData/{gdkey}/Tables");
+            var tables = tablesRef.ResultAs<Dictionary<string, string>>();
+            var convertedTables = new Dictionary<string, object>();
+            foreach(var table in tables)
+            {
+                if(table.Value != null)
+                {
+                    try
+                    {
+                        convertedTables[table.Key] = JsonConvert.DeserializeObject<object>(table.Value);
+                    }
+                    catch
+                    {
+                        convertedTables[table.Key] = table.Value;
+                    }
+                }
+            }
+            return convertedTables;
+        }
+        public static async Task SetEntireUserData(string gdkey, Dictionary<string,object> data)
+        {
+            var jsonifiedData = new Dictionary<string, string>();
+            foreach(var item in data)
+            {
+                if(item.Value != null)
+                {
+                    jsonifiedData[item.Key] = JsonConvert.SerializeObject(item.Value);
+                }
+            }
+            await _client.SetAsync($"UserData/{gdkey}/Tables", jsonifiedData);
+        }
         //Gets all corresponding GDKeys from under a specified UDKey.
         public static async Task<List<string>> GetGdkeysFromUdkeyAsync(string udkey)
         {

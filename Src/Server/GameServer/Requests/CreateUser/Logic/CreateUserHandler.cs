@@ -20,18 +20,27 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
             var deserialized = JsonConvert.DeserializeObject<CreateUserRequest>(requestJsonString!);
             ctx.Response.ContentType = "application/json";
             var generatedUserData = new YwpUserData((PlayerIcon)deserialized.IconID, (PlayerTitle)deserialized.IconID, deserialized.Level5UserID, deserialized.PlayerName);
+            try
+            {
+                await RegisterDefaultTables(deserialized, generatedUserData);
+            }
+            catch
+            {
+                ctx.Response.StatusCode = 500;
+                await ctx.Response.WriteAsync("Internal server error");
+                return;
+            }
             var createUserResponse = new CreateUserResponse(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["ywp_user_tutorial_list_def"], generatedUserData);
             var marshalledResponse = JsonConvert.SerializeObject(createUserResponse);
             var encryptedResponse = NHNCrypt.Logic.NHNCrypt.EncryptResponse(marshalledResponse);
-            await ctx.Response.WriteAsync(encryptedResponse);
-            //Register the default tables on another thread and return from the handler, so createUser doesn't take too much time
-            _ = Task.Run(() => RegisterDefaultTables(deserialized, generatedUserData));
+            await ctx.Response.WriteAsync(encryptedResponse);            
             
         }
 
         private static async Task RegisterDefaultTables(CreateUserRequest deserialized,YwpUserData generatedUserData)
         {
-           foreach(var userTable in Consts.LOGIN_TABLES.Where(x => x.StartsWith("ywp_user") && x != "ywp_user_data"))
+           Dictionary<string,object> tables = new Dictionary<string,object>();
+           foreach(var userTable in Consts.LOGIN_TABLES.Where(x => x.Contains("ywp_user") && x != "ywp_user_data"))
            {
                 //initialize with default if exists, else 
                 if(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache.TryGetValue(userTable+"_def", out var data))
@@ -46,16 +55,21 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
                         deserializedDefaultUserTable = data;
                     }
 
-                    await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, userTable, deserializedDefaultUserTable); 
+                    tables.Add(userTable, deserializedDefaultUserTable);
+                }
+                else
+                {
+                    throw new Exception();
                 }
            }
-           //Set openingTutorialFlg
-           await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "opening_tutorial_flg", 1);
+            //Set openingTutorialFlg
+           tables.Add("opening_tutorial_flg", 1);
            //Set ywpuser data
-           await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_data", generatedUserData);
+           tables.Add("ywp_user_data", generatedUserData);
            //Set start date
-           await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID,"start_date",DateTimeOffset.Now.ToUnixTimeMilliseconds());
-          
+           tables.Add("start_date",DateTimeOffset.Now.ToUnixTimeMilliseconds());
+           
+           await UserDataManager.Logic.UserDataManager.SetEntireUserData(deserialized.Level5UserID,tables);
         }
     }
 }

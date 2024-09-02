@@ -21,44 +21,58 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.Logic
             
             //Construct response
             var res = new LoginResponse();
+            //Get the user tables
+            var userTables = await UserDataManager.Logic.UserDataManager.GetEntireUserData(deserialized.Gdkey);
             var resdict = await res.ToDictionary(deserialized.Gdkey);            
 
             foreach (var table in Consts.LOGIN_TABLES)
             {
                 string? tableText = null!;
+                object tableObj = new();
                 if (table.StartsWith("ywp_user"))
                 {
-                    var gotten = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<object>(deserialized.Gdkey, table);
-                    tableText = JsonConvert.SerializeObject(gotten);
+                    try
+                    {
+                        tableObj = userTables[table];
+                    }
+                    catch
+                    {
+                        ctx.Response.StatusCode = 500;
+                        await ctx.Response.WriteAsync("internal server error");
+                        return;
+                    }
                 }
+                //Meaning it's constant
                 else tableText = ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache[table];
-                //if we can't deserialize json it means it's not a json and we store it as is
-                object tableObj = new();
-                try
+
+                if (tableText != null)
                 {
-                    // If was cud structure, only send the data
-                    tableObj = JsonConvert.DeserializeObject<object>(tableText);
-                    if (tableObj is JObject) {
-                        var jObject_temp = (JObject)tableObj;
-                        if (jObject_temp.ContainsKey("data"))
+                    //if we can't deserialize json it means it's not a json and we store it as is
+                    try
+                    {
+                        // If was cud structure, only send the data
+                        tableObj = JsonConvert.DeserializeObject<object>(tableText);
+                        if (tableObj is JObject)
                         {
-                            tableObj = jObject_temp["data"];
-                        } else if (jObject_temp.ContainsKey("tableData"))
-                        {
-                            tableObj = jObject_temp["tableData"];
+                            var jObject_temp = (JObject)tableObj;
+                            if (jObject_temp.ContainsKey("data"))
+                            {
+                                tableObj = jObject_temp["data"];
+                            }
+                            else if (jObject_temp.ContainsKey("tableData"))
+                            {
+                                tableObj = jObject_temp["tableData"];
+                            }
+
                         }
 
                     }
-
+                    catch
+                    {
+                        tableObj = tableText;
+                    }
                 }
-                catch
-                {
-                    tableObj = tableText;
-                }
-                if (tableObj == null)
-                {
-                    tableObj = new List<object>();
-                }
+             
                 resdict[table] = tableObj;
             }
             //Set last login time to now

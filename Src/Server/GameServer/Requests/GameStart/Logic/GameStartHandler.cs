@@ -25,7 +25,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameStart.Logic
                 if (userData.FreeHitodama > 0)
                 {
                     userData.FreeHitodama -= 1;
-                } else
+                }
+                else
                 {
                     userData.Hitodama -= 1;
                 }
@@ -76,7 +77,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameStart.Logic
                 // Maybe need to inspect ywp_user_stage
 
                 // Enemy Info (we going to store some of these data for all stage)
-                resdict["stageType"] = LevelData["stageType"]; ;
+                resdict["stageType"] = LevelData["stageType"]; 
                 resdict["enemyYoukaiList"] = LevelData["enemyInfo"];
                 resdict["battleType"] = LevelData["battleType"];
 
@@ -139,7 +140,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameStart.Logic
             }
             else
             {
-                var res = new MsgBoxResponse("You don't have enough Spirit !", "Not Enough Spirit");
+                var res = new MsgBoxResponse("You don't have enough Hitodama.", "Not Enough Hitodama");
                 await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(res)));
             }
 
