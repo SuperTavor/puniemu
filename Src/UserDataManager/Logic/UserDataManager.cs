@@ -67,6 +67,17 @@ namespace Puniemu.Src.UserDataManager.Logic
             return converted;
         }
 
+        public static async Task<Dictionary<string,object>> GetEntireUserData(string gdkey)
+        {
+            var tablesRef = await _client.GetAsync($"UserData/{gdkey}/Tables");
+            var tables = tablesRef.ResultAs<Dictionary<string, object>>();
+            return tables;
+        }
+
+        public static async Task SetEntireUserData(string gdkey, Dictionary<string,object> data)
+        {
+            await _client.SetAsync($"UserData/{gdkey}/Tables", data);
+        }
         //Gets all corresponding GDKeys from under a specified UDKey.
         public static async Task<List<string>> GetGdkeysFromUdkeyAsync(string udkey)
         {
