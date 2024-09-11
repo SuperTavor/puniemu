@@ -30,6 +30,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.BuyHitodama.Logic
                 }
                 userData.YMoney -= good.Cost;
                 userData.Hitodama += good.RewardedHitodama;
+                //Update the userdata on the server
+                await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "ywp_user_data", userData);
                 var after = new HitodamaInformation(userData.Hitodama,userData.FreeHitodama);
                 var res = new BuyHitodamaResponse(before,after,userData);
                 var encryptedAndSerialized = NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(res));
