@@ -114,9 +114,13 @@ namespace Puniemu.Src.TableParser.Logic
             }
             return -1;
         }
-
+        public virtual void PrepareForToString()
+        {
+            //does nothing by default. Can be overriden by derived classes to for example convert any structs to members before the toString()
+        }
         public override string ToString()
         {
+            PrepareForToString();
             StringBuilder sb = new StringBuilder();
             if (_prefix != null)
             {

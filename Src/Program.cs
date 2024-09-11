@@ -6,7 +6,6 @@ using Puniemu.Src.Server.GameServer.Requests.Init.Logic;
 using Puniemu.Src.Server.GameServer.Requests.GetMaster.Logic;
 using Puniemu.Src.Server.L5ID.Requests.Active.Logic;
 using Puniemu.Src.Server.L5ID.Requests.CreateGDKey.Logic;
-using Puniemu.Src.ConfigManager.Logic;
 using Puniemu.Src.Server.GameServer.Requests.GetGdkeyAccounts.Logic;
 using Puniemu.Src.Server.GameServer.Requests.UpdateProfile.Logic;
 using Puniemu.Src.Server.GameServer.Requests.DeleteUser.Logic;

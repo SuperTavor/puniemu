@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Puniemu.Src.Server.GameServer.DataClasses;
 using Puniemu.Src.Server.GameServer.Requests.Login.DataClasses;
+using Puniemu.Src.Utils.GeneralUtils;
 using System.Buffers;
 using System.Text;
 
@@ -25,56 +26,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.Logic
             var userTables = await UserDataManager.Logic.UserDataManager.GetEntireUserData(deserialized.Gdkey);
             var resdict = await res.ToDictionary(deserialized.Gdkey);            
 
-            foreach (var table in Consts.LOGIN_TABLES)
-            {
-                string? tableText = null!;
-                object tableObj = new();
-                if (table.StartsWith("ywp_user"))
-                {
-                    try
-                    {
-                        tableObj = userTables[table];
-                    }
-                    catch
-                    {
-                        ctx.Response.StatusCode = 500;
-                        await ctx.Response.WriteAsync("internal server error");
-                        return;
-                    }
-                }
-                //Meaning it's constant
-                else tableText = ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache[table];
-
-                if (tableText != null)
-                {
-                    //if we can't deserialize json it means it's not a json and we store it as is
-                    try
-                    {
-                        // If was cud structure, only send the data
-                        tableObj = JsonConvert.DeserializeObject<object>(tableText);
-                        if (tableObj is JObject)
-                        {
-                            var jObject_temp = (JObject)tableObj;
-                            if (jObject_temp.ContainsKey("data"))
-                            {
-                                tableObj = jObject_temp["data"];
-                            }
-                            else if (jObject_temp.ContainsKey("tableData"))
-                            {
-                                tableObj = jObject_temp["tableData"];
-                            }
-
-                        }
-
-                    }
-                    catch
-                    {
-                        tableObj = tableText;
-                    }
-                }
-             
-                resdict[table] = tableObj;
-            }
+            await GeneralUtils.AddTablesToResponse(Consts.LOGIN_TABLES,resdict,true,deserialized.Gdkey);
             //Set last login time to now
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "lgn_date", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             var encryptedRes = NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(resdict));

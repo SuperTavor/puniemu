@@ -2,7 +2,9 @@
 using Newtonsoft.Json.Linq;
 using Puniemu.Src.Server.GameServer.DataClasses;
 using Puniemu.Src.Server.GameServer.Requests.GameStart.DataClasses;
+using Puniemu.Src.Utils.GeneralUtils;
 using System.Buffers;
+using System.Runtime.CompilerServices;
 using System.Text;
 namespace Puniemu.Src.Server.GameServer.Requests.GameStart.Logic
 {
@@ -21,126 +23,67 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameStart.Logic
 
             //Construct response
             var userData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized.Gdkey, "ywp_user_data");
-            if (userData.Hitodama > 0 || userData.FreeHitodama > 0) {
-                if (userData.FreeHitodama > 0)
-                {
-                    userData.FreeHitodama -= 1;
-                }
-                else
-                {
-                    userData.Hitodama -= 1;
-                }
+            if (userData.Hitodama > 0) 
+            {
+                userData.Hitodama -= 1;
                 var res = new GameStartResponse();
 
-                var resdict = await res.ToDictionary();
                 var LevelData = JsonConvert.DeserializeObject<Dictionary<int, Dictionary<string, object>>>(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["level_data"])[deserialized.StageId];
                 // Get deck and user_youkai to get : userYoukaiList info
-                string[] UserDeck = ((await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_youkai_deck"))!).Split('|');
+                string[] UserDeck = (await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_youkai_deck"))!.Split('|');
                 var YwpUserYoukaiTab = new TableParser.Logic.TableParser((await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_youkai"))!);
-                List<object> FinalUserYoukai = new List<object>();
                 for (int i = 1; i < 1 + 5; i++)
                 {
-                    Dictionary<string, object> tempDict = new Dictionary<string, object>();
-                    var index = YwpUserYoukaiTab.FindIndex([UserDeck[i]]);
-                    tempDict["youkaiId"] = int.Parse(UserDeck[i]);
-                    tempDict["skillLv"] = int.Parse(YwpUserYoukaiTab.Table[index][1]);
-                    tempDict["sSkillLv"] = int.Parse(YwpUserYoukaiTab.Table[index][2]); // I'm not sure for this
-                    tempDict["hp"] = int.Parse(YwpUserYoukaiTab.Table[index][3]);
-                    tempDict["atkPower"] = int.Parse(YwpUserYoukaiTab.Table[index][4]);
-                    FinalUserYoukai.Add(tempDict);
+                    //get index of yokai info in general ywpuseryokai table
+                    var yokaiInfoIndex = YwpUserYoukaiTab.FindIndex([UserDeck[i]]);
+                    var item = new UserYoukaiItem()
+                    {
+                        YoukaiId = int.Parse(UserDeck[i]),
+                        SkillLevel = int.Parse(YwpUserYoukaiTab.Table[yokaiInfoIndex][1]),
+                        SSkillLevel = int.Parse(YwpUserYoukaiTab.Table[yokaiInfoIndex][2]),
+                        Hp = int.Parse(YwpUserYoukaiTab.Table[yokaiInfoIndex][3]),
+                        AttackPower = int.Parse(YwpUserYoukaiTab.Table[yokaiInfoIndex][4])
+                    };
+                    res.UserYoukaiList.Add(item);
                 }
-                resdict["userYoukaiList"] = FinalUserYoukai;
 
                 // Determine if it's was first clear 
                 var UserStage = new TableParser.Logic.TableParser((await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_stage"))!);
                 var stageIdx = UserStage.FindIndex([deserialized.StageId.ToString()]);
-                if (int.Parse(UserStage.Table[stageIdx][1]) == 0)
+                if(stageIdx == -1)
                 {
-                    resdict["firstClearItemFlg"] = 1;
+                    await GeneralUtils.SendBadRequest(ctx);
+                    return;
+                }
+                
+                //user_stage status is true if completed, firstClear is the other way around
+                if(int.Parse(UserStage.Table[stageIdx][1]) == 0)
+                {
+                    res.IsFirstClear = 1;
                 }
                 else
                 {
-                    resdict["firstClearItemFlg"] = 0;
+                    res.IsFirstClear = 0;
                 }
 
-
-                // Idk or need to be stored (like ywp_mst)
-                resdict["themeList"] = new List<object>();
-                resdict["scoreLogSendFlg"] = 0;
-                resdict["themeScoreCoef"] = "";
-                resdict["chanceAddRateEventBlock"] = 0;
-                resdict["addHPByWatchEffect"] = 0;
-                resdict["eventPointUpItemId"] = 0;
-                
-                resdict["youkaiHP"] = 0;
-                resdict["responseCodeTeamEvent"] = 0;
-                // Maybe need to inspect ywp_user_stage
+                //always seemingly OK on 0
+                res.YoukaiHp = 0;
 
                 // Enemy Info (we going to store some of these data for all stage)
-                resdict["stageType"] = LevelData["stageType"]; 
-                resdict["enemyYoukaiList"] = LevelData["enemyInfo"];
-                resdict["battleType"] = LevelData["battleType"];
-
-
-
-                resdict["eventPointMaterial"] = "";
-                resdict["addHPByGokuEffect"] = 0;
-                resdict["eventFlg"] = 0;
-                resdict["addAtkByGokuEffect"] = 0;
-                resdict["eventStatus"] = 0;
-                resdict["requestId"] = "1725134219559";
-
-                // This data can be different even if it's the same StageId
-                resdict["itemDropMaxCnt"] = 2;
-                resdict["ywp_user_data"] = userData;
+                res.StageType = (long)LevelData["stageType"]; 
+                res.EnemyYoukaiList = ((JArray)LevelData["enemyInfo"]).ToObject<List<EnemyYoukai>>();
+                res.BattleType = (long)LevelData["battleType"];
+                res.UserData = userData;
+                var resdict = JsonConvert.DeserializeObject<Dictionary<string,object>>(JsonConvert.SerializeObject(res));
                 await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "ywp_user_data", userData);
-                foreach (var table in Consts.GAME_START_TABLES)
-                {
-                    string? tableText = null!;
-                    if (table.StartsWith("ywp_user"))
-                    {
-                        var gotten = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<object>(deserialized.Gdkey, table);
-                        tableText = JsonConvert.SerializeObject(gotten);
-                    }
-                    else tableText = ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache[table];
-                    //if we can't deserialize json it means it's not a json and we store it as is
-                    object tableObj = new();
-                    try
-                    {
-                        tableObj = JsonConvert.DeserializeObject<object>(tableText);
-                        if (tableObj is JObject)
-                        {
-                            var jObject_temp = (JObject)tableObj;
-                            if (jObject_temp.ContainsKey("data"))
-                            {
-                                tableObj = jObject_temp["data"];
-                            }
-                            else if (jObject_temp.ContainsKey("tableData"))
-                            {
-                                tableObj = jObject_temp["tableData"];
-                            }
-
-                        }
-
-                    }
-                    catch
-                    {
-                        tableObj = tableText;
-                    }
-                    if (tableObj == null)
-                    {
-                        tableObj = new List<object>();
-                    }
-                    resdict[table] = tableObj;
-
-                }
+                await GeneralUtils.AddTablesToResponse(Consts.GAME_START_TABLES, resdict!, true, deserialized.Gdkey);
                 var encryptedRes = NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(resdict));
                 ctx.Response.Headers.ContentType = "application/json";
                 await ctx.Response.WriteAsync(encryptedRes);
             }
             else
             {
-                var res = new MsgBoxResponse("You don't have enough Hitodama.", "Not Enough Hitodama");
+                var res = new MsgBoxResponse("You don't have enough spirit.", "Not Enough spirit");
                 await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(res)));
             }
 
