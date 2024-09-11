@@ -121,7 +121,7 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
             this.Birthday = "";
             this.IconID = (int)icon;
             this.CharacterTitleID = (int)title;
-            this.FreeHitodama = 0;
+            this.FreeHitodama = 5;
             this.FriendMaxCount = 0;
             this.MedalPoint = 0;
             this.CurrentStageID = 1001001;
@@ -138,7 +138,7 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
             this.EventPointUpItemRemainSec = 0;
             this.TodaysRemainSec = GetRemainingSecondsInDay();
             this.WeeklyFreeFlag = 0;
-            this.Hitodama = 5;
+            this.Hitodama = 0;
             this.UserID = System.IO.Hashing.Crc32.HashToUInt32(System.Text.Encoding.UTF8.GetBytes(this.CharacterID)).ToString();
             this.UsingItemList = new List<object>();
             this.HitodamaRecoverSec = 0;

@@ -23,9 +23,16 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameStart.Logic
 
             //Construct response
             var userData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized.Gdkey, "ywp_user_data");
-            if (userData.Hitodama > 0) 
+            if (userData.Hitodama > 0 || userData.FreeHitodama > 0) 
             {
-                userData.Hitodama -= 1;
+                if (userData.FreeHitodama > 0)
+                {
+                    userData.FreeHitodama -= 1;
+                }
+                else
+                {
+                    userData.Hitodama -= 1;
+                }
                 var res = new GameStartResponse();
 
                 var LevelData = JsonConvert.DeserializeObject<Dictionary<int, Dictionary<string, object>>>(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["level_data"])[deserialized.StageId];
