@@ -24,12 +24,11 @@ namespace Puniemu.Src.Server.GameServer.Requests.BuyHitodama.Logic
                 var before = new HitodamaInformation(userData.Hitodama, userData.FreeHitodama);
                 if(userData.YMoney < good.Cost)
                 {
-                    var response = JsonConvert.SerializeObject(new MsgBoxResponse("You don't have enough YMoney", "Too expensive"));
+                    var response = JsonConvert.SerializeObject(new MsgBoxResponse("You don't have enough Y Money", "Too expensive"));
                     await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(response));
                     return;
                 }
-                userData.YMoney -= good.Cost;
-                userData.Hitodama += good.RewardedHitodama;
+                userData.BuyHitodamaGood(good);
                 //Update the userdata on the server
                 await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "ywp_user_data", userData);
                 var after = new HitodamaInformation(userData.Hitodama,userData.FreeHitodama);

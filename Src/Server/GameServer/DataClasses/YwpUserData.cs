@@ -1,11 +1,12 @@
 ﻿using Newtonsoft.Json;
+using Puniemu.Src.Server.GameServer.Requests.BuyHitodama.DataClasses;
 using System;
 using System.Runtime.Intrinsics.Arm;
 using System.Security.Cryptography;
 
 namespace Puniemu.Src.Server.GameServer.DataClasses
 {
-    public struct YwpUserData
+    public class YwpUserData
     {
         // User's birthday. Empty unless set.
         [JsonProperty("birthday")]
@@ -169,6 +170,12 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
             int secondsPassed = now.Hour * 3600 + now.Minute * 60 + now.Second;
             const int SECONDS_IN_DAY = 86400;
             return SECONDS_IN_DAY - secondsPassed;
+        }
+
+        public void BuyHitodamaGood(Good good)
+        {
+            this.YMoney -= good.Cost;
+            this.Hitodama += good.RewardedHitodama;
         }
     }
 
