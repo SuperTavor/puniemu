@@ -31,7 +31,7 @@ namespace Puniemu.Src.Utils.GeneralUtils
             foreach(var table in tables)
             {
                 string? tableText = null!;
-                object tableObj = new();
+                object? tableObj = new();
                 if (table.StartsWith("ywp_user"))
                 {
                     if(isDownloadOnce && userTables != null)
@@ -52,24 +52,32 @@ namespace Puniemu.Src.Utils.GeneralUtils
                     try
                     {
                         // If was cud structure, only send the data
-                        tableObj = (JObject)JsonConvert.DeserializeObject<object>(tableText);
-                        var tableJobject = (JObject)tableObj;
-                        if (tableJobject.ContainsKey("data"))
+                        tableObj = JsonConvert.DeserializeObject<object>(tableText);
+                        try
                         {
-                            tableObj = tableJobject["data"];
-                        }
-                        else if (tableJobject.ContainsKey("tableData"))
-                        {
-                            tableObj = tableJobject["tableData"];
-                        }
+                            var dict = (Dictionary<string, object>)tableObj;
+                            if (dict!.ContainsKey("data"))
+                            {
+                                tableObj = dict["data"];
+                            }
+                            else if (dict.ContainsKey("tableData"))
+                            {
+                                tableObj = dict["tableData"];
+                            }
 
+                        }
+                        catch
+                        {
+                            //Just continue everything as normal if it's not a dict
+                        }
+                        
                     }
                     catch
                     {
                         tableObj = tableText;
                     }
                 }
-                resultDictionary[table] = tableObj;
+                resultDictionary[table] = tableObj!;
             }
         }
     }

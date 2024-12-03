@@ -63,7 +63,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
                 }
            }
             //Set openingTutorialFlg
-           tables.Add("opening_tutorial_flg", 1);
+           tables.Add("opening_tutorial_flg", 0);
            //Set ywpuser data
            tables.Add("ywp_user_data", generatedUserData);
            //Set start date

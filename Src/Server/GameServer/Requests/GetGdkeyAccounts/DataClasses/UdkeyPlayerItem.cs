@@ -32,7 +32,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetGdkeyAccounts.DataClasses
         //because constructors cant be async
         public static async Task<UdkeyPlayerItem?> ConstructAsync(string gdkey)
         {
-            YwpUserData userData = new();
+            YwpUserData userData;
             try
             {
                 userData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(gdkey, "ywp_user_data");
