@@ -16,6 +16,7 @@ using Puniemu.Src.Server.GameServer.Requests.BuyHitodama.Logic;
 using Puniemu.Src.Server.GameServer.Requests.InitBilling.Logic;
 using Puniemu.Src.Server.GameServer.Requests.GameStart.Logic;
 using Puniemu.Src.Server.GameServer.Requests.DeckEdit.Logic;
+using Puniemu.Src.Server.GameServer.Requests.UpdateTutorialFlag.Logic;
 
 namespace Puniemu.Src;
 class Program
@@ -77,6 +78,10 @@ class Program
         app.MapPost("/getGdkeyAccounts.nhn", async ctx =>
         {
             await GetGdkeyAccountsHandler.HandleAsync(ctx);
+        });
+        app.MapPost("/updateTutorialFlg.nhn", async ctx =>
+        {
+            await UpdateTutorialFlagHandler.HandleAsync(ctx);
         });
         app.MapPost("/getL5idStatus.nhn", GetL5IDStatusHandler.Handle);
         app.MapPost("/updateProfile.nhn", async ctx =>
