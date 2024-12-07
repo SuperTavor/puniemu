@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Puniemu.Src.Server.GameServer.DataClasses;
 using Puniemu.Src.Server.GameServer.Requests.GameStart.DataClasses;
@@ -25,13 +25,17 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameStart.Logic
             var userData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized.Gdkey, "ywp_user_data");
             if (userData.Hitodama > 0 || userData.FreeHitodama > 0) 
             {
-                if (userData.FreeHitodama > 0)
+                if (userData.Hitodama > 0)
                 {
-                    userData.FreeHitodama -= 1;
+                    userData.Hitodama -= 0;
                 }
                 else
                 {
-                    userData.Hitodama -= 1;
+                    if (userData.FreeHitodama == 5)
+                    {
+                        userData.HitodamaRecoverSec = 900;
+                    }
+                    userData.FreeHitodama -= 0;
                 }
                 var res = new GameStartResponse();
 

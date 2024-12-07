@@ -35,9 +35,15 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetMaster.Logic
         {
             ctx.Response.ContentType = "application/json";
             ctx.Request.EnableBuffering();
-            var readResult = await ctx.Request.BodyReader.ReadAsync();
-            var encRequest = Encoding.UTF8.GetString(readResult.Buffer.ToArray());
-            ctx.Request.BodyReader.AdvanceTo(readResult.Buffer.End);
+            var buffer = new MemoryStream();
+            await ctx.Request.Body.CopyToAsync(buffer);
+            buffer.Seek(0, SeekOrigin.Begin);
+            string? requestJsonString;
+            using (var reader = new StreamReader(buffer, Encoding.UTF8))
+            {
+                var readResult = await reader.ReadToEndAsync();
+                requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(readResult);
+            }
             var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             Dictionary<string, object> requestJson = JsonConvert.DeserializeObject<Dictionary<string, object>>(requestJsonString!)!;
             // Load base MasterData JSON. the base MasterData JSON contains data other than the requested tables that is shipped with the requested tables.

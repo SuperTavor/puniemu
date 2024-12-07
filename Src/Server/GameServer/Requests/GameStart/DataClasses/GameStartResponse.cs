@@ -19,7 +19,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameStart.DataClasses
         [JsonProperty("responseCodeTeamEvent")]
         public int ResponseCodeTeamEvent = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["responseCodeTeamEvent"]);
 
-        [JsonProperty("ywp_use_data")]
+        [JsonProperty("ywp_user_data")]
         public YwpUserData UserData;
 
         //idk
