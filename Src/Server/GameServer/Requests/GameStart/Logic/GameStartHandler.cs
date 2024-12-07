@@ -27,7 +27,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameStart.Logic
             {
                 if (userData.Hitodama > 0)
                 {
-                    userData.Hitodama -= 0;
+                    userData.Hitodama -= 1;
                 }
                 else
                 {
@@ -35,7 +35,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameStart.Logic
                     {
                         userData.HitodamaRecoverSec = 900;
                     }
-                    userData.FreeHitodama -= 0;
+                    userData.FreeHitodama -= 1;
                 }
                 var res = new GameStartResponse();
 
