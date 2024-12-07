@@ -1,13 +1,10 @@
 # Puniemu
 
-An incomplete server emulator for Yo-kai Watch Puni Puni.
+A WIP server emulator for Yo-kai Watch Puni Puni.
 
 <p align="center">
 <img src=https://i.imgur.com/zO49hMu.png alt=logo width=320>
 </p>
-
-## Why is this open source suddenly?
-We planned on releasing Puniemu when it was somewhat fully playable, however, we are simply too busy to work on it consistently, and thought it would be best to show what we have so far while we are slowly improving it.
 
 ## What is this? 👀
 
