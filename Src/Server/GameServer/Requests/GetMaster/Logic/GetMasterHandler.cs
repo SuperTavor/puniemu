@@ -44,7 +44,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetMaster.Logic
                 var readResult = await reader.ReadToEndAsync();
                 requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(readResult);
             }
-            var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             Dictionary<string, object> requestJson = JsonConvert.DeserializeObject<Dictionary<string, object>>(requestJsonString!)!;
             // Load base MasterData JSON. the base MasterData JSON contains data other than the requested tables that is shipped with the requested tables.
             var MasterDataJson = BaseMasterDataBuilder.Build();

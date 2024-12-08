@@ -39,7 +39,10 @@ namespace Puniemu.Src.UserDataManager.Logic
             //Set table data
             await _client.SetAsync(tableKey, JsonConvert.SerializeObject(data));
         }
-
+        public static async Task AssignGdkeyToCharacterID(string characterId, string gdkey)
+        {
+            await _client.SetAsync($"CharacterIdGdkeyAssignment/{characterId}", gdkey);
+        }
         public static async Task DeleteUser(string udkey, string gdkey)
         {
             await _client.DeleteAsync($"UserData/{gdkey}");

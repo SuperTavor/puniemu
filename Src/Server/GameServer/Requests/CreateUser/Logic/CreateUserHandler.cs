@@ -30,6 +30,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
                 await ctx.Response.WriteAsync("Internal server error");
                 return;
             }
+            //Add the new user to the characterID -> gdkey dict
+
+            await UserDataManager.Logic.UserDataManager.AssignGdkeyToCharacterID(generatedUserData.CharacterID, deserialized.Level5UserID);
             var createUserResponse = new CreateUserResponse(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["ywp_user_tutorial_list_def"], generatedUserData);
             var marshalledResponse = JsonConvert.SerializeObject(createUserResponse);
             var encryptedResponse = NHNCrypt.Logic.NHNCrypt.EncryptResponse(marshalledResponse);
