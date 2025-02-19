@@ -2,6 +2,7 @@
 
 namespace Puniemu.Src.Server.GameServer.DataClasses
 {
+    // Enemy youkai info for gamestart
     public class EnemyYoukai
     {
         //Seemingly ok as empty for now

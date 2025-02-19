@@ -20,6 +20,15 @@ namespace Puniemu.Src.Server.GameServer.Requests.UpdateProfile.DataClasses
         [JsonProperty("titleID")]
         public int TitleID { get; set; }
 
+        [JsonProperty("effectId")]
+        public int EffectID { get; set; }
+
+        [JsonProperty("plateId")]
+        public int PlateID { get; set; }
+
+        [JsonProperty("codenameId")]
+        public int CodenameID { get; set; }
+
         // Interchangeable with gdkey
         [JsonProperty("level5UserID")]
         public string Level5UserID { get; set; }

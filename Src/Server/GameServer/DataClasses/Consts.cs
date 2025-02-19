@@ -62,6 +62,10 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
             "ywp_user_watch",
             "ywp_user_event_tutorial",
             "ywp_user_event_ranking_reward",
+            "ywp_user_player_effect",
+            "ywp_user_player_codename",
+            "ywp_user_player_plate",
+
         };
         public static readonly List<string> GAME_START_TABLES = new List<string>
         {
@@ -80,6 +84,36 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
             "ywp_mst_youkai_bonus_effect_exclude",
             "ywp_mst_event_youkai_assist_disp",
             "ywp_user_tutorial_list",
+        };
+        public static readonly List<string> GAME_END_TABLES = new List<string>
+        {
+            "ywp_user_tutorial_list",
+            "ywp_user_raid_boss",
+            "ywp_user_event_condition",
+            "ywp_user_player_icon",
+            "ywp_user_event",
+            "ywp_user_item",
+            "ywp_user_hist_youkai_daily",
+            "ywp_user_hist_puzzle_weekly",
+            "ywp_user_map",
+            "ywp_user_icon_budge",
+            "ywp_user_steal_progress",
+            "ywp_user_mini_game_map",
+            "ywp_user_data",
+            "ywp_user_shop_item_unlock",
+            "ywp_user_player_title",
+            "ywp_user_friend_stage",
+            "ywp_user_hist_youkai_total",
+            "ywp_user_menufunc",
+            "ywp_user_hist_total",
+            "ywp_user_hist_puzzle_daily",
+            "ywp_user_stage_relation_progress",
+            "ywp_mst_event",
+            "ywp_user_stage",
+            "ywp_user_score_attack_reward",
+            "ywp_mst_event_condition",
+            "ywp_user_event_tutorial",
+            "ywp_user_event_ranking_reward",
         };
     }
 }

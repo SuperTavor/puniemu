@@ -12,7 +12,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.UserStageRanking.Logic
     {
         public static async Task HandleAsync(HttpContext ctx)
         {
-            Console.WriteLine("hello");
             ctx.Request.EnableBuffering();
             var readResult = await ctx.Request.BodyReader.ReadAsync();
             var encRequest = Encoding.UTF8.GetString(readResult.Buffer.ToArray());
