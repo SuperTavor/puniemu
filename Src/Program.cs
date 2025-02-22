@@ -84,7 +84,10 @@ class Program
         {
             await UpdateTutorialFlagHandler.HandleAsync(ctx);
         });
-        app.MapPost("/getL5idStatus.nhn", GetL5IDStatusHandler.Handle);
+        app.MapPost("/getL5idStatus.nhn", async ctx =>
+        {
+            await GetL5IDStatusHandler.HandleAsync(ctx);
+        });
         app.MapPost("/updateProfile.nhn", async ctx =>
         {
             await UpdateProfileHandler.HandleAsync(ctx);
