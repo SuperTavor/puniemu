@@ -68,6 +68,18 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
         [JsonProperty("iconId")]
         public int IconID { get; set; }
 
+        // ID of the user's plate. Initialized to 1.
+        [JsonProperty("plateId")]
+        public int PlateID { get; set; }
+
+        // ID of the user's codeName. Initialized to 1.
+        [JsonProperty("codenameId")]
+        public int CodeNameID { get; set; }
+
+        // ID of the user's effect. Initialized to 1.
+        [JsonProperty("effectId")]
+        public int EffectID { get; set; }
+
         // Have no idea. Initialized to 0.
         [JsonProperty("limitTimeSaleRemainSec")]
         public int LimitTimeSaleRemainSec { get; set; }
@@ -145,6 +157,8 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
             this.HitodamaRecoverSec = 0;
             this.LimitTimeSaleEndDt = "";
             this.EquipWatchID = 0;
+            this.PlateID = 1;
+            this.EffectID = 1;
         }
         private static string GenerateFriendCode()
         {
@@ -175,7 +189,7 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
         public void BuyHitodamaGood(Good good)
         {
             this.YMoney -= good.Cost;
-            this.Hitodama += good.RewardedHitodama;
+            this.Hitodama += (good.RewardedHitodama + good.BonusSalesHitodama);
         }
     }
 

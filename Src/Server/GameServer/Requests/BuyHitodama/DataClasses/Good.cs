@@ -4,12 +4,15 @@
     {
         //Price in ymoney
         public int Cost;
-        //Amount of energy that is given from this good
+        //Amount of energy that is given from this good (no sale)
         public int RewardedHitodama;
-        public Good(int cost, int hitodamaReward)
+        //Amount of energy that is given in addition that RewardedHitodama (sale)
+        public int BonusSalesHitodama;
+        public Good(int cost, int hitodamaReward, int hitodamaBonus)
         {
             Cost = cost;
             RewardedHitodama = hitodamaReward;
+            BonusSalesHitodama = hitodamaBonus;
         }
     }
 }

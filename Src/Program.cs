@@ -17,6 +17,7 @@ using Puniemu.Src.Server.GameServer.Requests.InitBilling.Logic;
 using Puniemu.Src.Server.GameServer.Requests.GameStart.Logic;
 using Puniemu.Src.Server.GameServer.Requests.DeckEdit.Logic;
 using Puniemu.Src.Server.GameServer.Requests.UpdateTutorialFlag.Logic;
+using Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic;
 
 namespace Puniemu.Src;
 class Program
@@ -119,6 +120,10 @@ class Program
         app.MapPost("/deckEdit.nhn", async ctx =>
         {
             await DeckEditHandler.HandleAsync(ctx);
+        });
+        app.MapPost("/gameEnd.nhn", async ctx =>
+        {
+            await GameEndHandler.HandleAsync(ctx);
         });
     }
 

@@ -74,7 +74,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameStart.DataClasses
         [JsonProperty("eventStatus")]
         public int EventStatus = 0;
 
-        //actually no idea. works as 0 i think
+        //actually no idea. works as 0 i think (probably timestamp)
         [JsonProperty("requestId")]
         public string RequestID = "0";
         //no idea
