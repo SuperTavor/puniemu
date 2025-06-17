@@ -71,7 +71,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetMaster.Logic
             {
                 //Not sending the stuff you don't have seemingly works? I may be shooting myself in the foot with this rn
                 //god knows, check back in like a month
-                if (ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache.ContainsKey(tblName))
+                if (ConfigManager.Logic.ConfigManager.GameDataManager!.GamedataCache.ContainsKey(tblName))
                 {
                     var selectedJsonUnmarshalled = UnmarshalOrGetFromCache(tblName, ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache[tblName]);
                     MasterDataJson[tblName] = selectedJsonUnmarshalled;

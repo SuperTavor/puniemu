@@ -6,7 +6,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.DataClasses
     {
         // item id
         [JsonProperty("itemId")]
-        public long DamageMax = 0L;
+        public long ItemId = 0L;
         // type of the item
         [JsonProperty("itemType")]
         public int ItemType = 0;

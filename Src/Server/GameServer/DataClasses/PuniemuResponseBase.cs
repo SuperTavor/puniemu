@@ -20,11 +20,11 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
 
         //Version of assets on the server.
         [JsonProperty("mstVersionMaster")]
-        public int MstVersionMaster = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["mstVersionMaster"]);
+        public int MstVersionMaster = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager!.GamedataCache["mstVersionMaster"]);
        
         // Constant.
         [JsonProperty("shopSaleList")]
-        public List<int> ShopSaleList { get; set; }
+        public List<int>? ShopSaleList { get; set; }
 
         // Constant.
         [JsonProperty("ymoneyShopSaleList")]
@@ -32,7 +32,7 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
 
         // Constant.
         [JsonProperty("hitodamaShopSaleList")]
-        public List<int> HitodamaShopSaleList { get; set; }
+        public List<int>? HitodamaShopSaleList { get; set; }
 
         // Always empty.
         [JsonProperty("ywpToken")]

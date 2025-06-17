@@ -20,8 +20,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.BuyHitodama.Logic
             ctx.Response.Headers.ContentType = "application/json";
             if (HitodamaGoods.Goods.TryGetValue(deserialized.GoodsId,out var good))
             {
-                var userData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized.Gdkey, "ywp_user_data");
-                var before = new HitodamaInformation(userData.Hitodama, userData.FreeHitodama);
+                var userData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized!.Gdkey!, "ywp_user_data");
+                var before = new HitodamaInformation(userData!.Hitodama, userData.FreeHitodama);
                 if(userData.YMoney < good.Cost)
                 {
                     var response = JsonConvert.SerializeObject(new MsgBoxResponse("You don't have enough Y Money", "Too expensive"));
@@ -30,7 +30,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.BuyHitodama.Logic
                 }
                 userData.BuyHitodamaGood(good);
                 //Update the userdata on the server
-                await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "ywp_user_data", userData);
+                await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_data", userData);
                 var after = new HitodamaInformation(userData.Hitodama,userData.FreeHitodama);
                 var res = new BuyHitodamaResponse(before,after,userData);
                 var encryptedAndSerialized = NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(res));

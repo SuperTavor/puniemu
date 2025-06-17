@@ -13,7 +13,7 @@ namespace Puniemu.Src.UserDataManager.Logic
             public TableNotFoundException() : base() { }
         }
 
-        private static IFirebaseClient _client;
+        private static IFirebaseClient? _client;
         //Check credentials and connect to the Firestore database.
         public static void Initialize()
         {
@@ -37,22 +37,22 @@ namespace Puniemu.Src.UserDataManager.Logic
         {
             var tableKey = $"UserData/{gdkey}/Tables/{tableId}";
             //Set table data
-            await _client.SetAsync(tableKey, JsonConvert.SerializeObject(data));
+            await _client!.SetAsync(tableKey, JsonConvert.SerializeObject(data));
         }
         public static async Task AssignGdkeyToCharacterID(string characterId, string gdkey)
         {
-            await _client.SetAsync($"CharacterIdGdkeyAssignment/{characterId}", gdkey);
+            await _client!.SetAsync($"CharacterIdGdkeyAssignment/{characterId}", gdkey);
         }
         public static async Task DeleteUser(string udkey, string gdkey)
         {
-            await _client.DeleteAsync($"UserData/{gdkey}");
+            await _client!.DeleteAsync($"UserData/{gdkey}");
             await RemoveGdkeyFromUdkey(udkey, gdkey);
         }
 
         private static async Task RemoveGdkeyFromUdkey(string udkey, string gdkey)
         {
             var accountsPath = $"Devices/{udkey}/Accounts";
-            var deviceGdkeys = await _client.GetAsync(accountsPath);
+            var deviceGdkeys = await _client!.GetAsync(accountsPath);
             if (deviceGdkeys.Body == "null")
             {
                 return;
@@ -67,14 +67,14 @@ namespace Puniemu.Src.UserDataManager.Logic
         //Sets user data for specific account
         public static async Task<T?> GetYwpUserAsync<T>(string gdkey, string tableId)
         {
-            var res = await _client.GetAsync($"UserData/{gdkey}/Tables/{tableId}");
+            var res = await _client!.GetAsync($"UserData/{gdkey}/Tables/{tableId}");
             var converted = JsonConvert.DeserializeObject<T>(res.ResultAs<string>());
             return converted;
         }
 
         public static async Task<Dictionary<string,object>> GetEntireUserData(string gdkey)
         {
-            var tablesRef = await _client.GetAsync($"UserData/{gdkey}/Tables");
+            var tablesRef = await _client!.GetAsync($"UserData/{gdkey}/Tables");
             var tables = tablesRef.ResultAs<Dictionary<string, string>>();
             var convertedTables = new Dictionary<string, object>();
             foreach(var table in tables)
@@ -83,7 +83,7 @@ namespace Puniemu.Src.UserDataManager.Logic
                 {
                     try
                     {
-                        convertedTables[table.Key] = JsonConvert.DeserializeObject<object>(table.Value);
+                        convertedTables[table.Key] = JsonConvert.DeserializeObject<object>(table.Value)!;
                     }
                     catch
                     {
@@ -103,13 +103,13 @@ namespace Puniemu.Src.UserDataManager.Logic
                     jsonifiedData[item.Key] = JsonConvert.SerializeObject(item.Value);
                 }
             }
-            await _client.SetAsync($"UserData/{gdkey}/Tables", jsonifiedData);
+            await _client!.SetAsync($"UserData/{gdkey}/Tables", jsonifiedData);
         }
         //Gets all corresponding GDKeys from under a specified UDKey.
         public static async Task<List<string>> GetGdkeysFromUdkeyAsync(string udkey)
         {
             var accountsPath = $"Devices/{udkey}/Accounts";
-            var deviceGdkeys = await _client.GetAsync(accountsPath);
+            var deviceGdkeys = await _client!.GetAsync(accountsPath);
             if(deviceGdkeys.Body == "null")
             {
                 return new List<string>();
@@ -123,7 +123,7 @@ namespace Puniemu.Src.UserDataManager.Logic
         public static async Task RegisterGdKeyInUdKeyAsync(string udkey, string gdkey)
         {
             var accountsPath = $"Devices/{udkey}/Accounts";
-            var deviceGdkeys = await _client.GetAsync(accountsPath);
+            var deviceGdkeys = await _client!.GetAsync(accountsPath);
             List<string> gdkeys = new();
             if (deviceGdkeys.Body != "null")
             {

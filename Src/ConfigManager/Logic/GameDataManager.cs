@@ -15,7 +15,7 @@ namespace Puniemu.Src.ConfigManager.Logic
         private void CacheGamedataFromResources()
         {
             var assembly = Assembly.GetExecutingAssembly();
-            string rootNamespace = assembly.GetName().Name;
+            string rootNamespace = assembly.GetName().Name!;
             string[] resourceNames = assembly.GetManifestResourceNames();
 
             foreach (var resourceName in resourceNames)

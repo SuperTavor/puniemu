@@ -15,7 +15,7 @@ namespace Puniemu.Src.Utils.GeneralUtils
 
         public static T DeserializeGameDataToTypeAndCheckValidity<T>(string gamedataName)
         {
-            T? output = JsonConvert.DeserializeObject<T>(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache[gamedataName]);
+            T? output = JsonConvert.DeserializeObject<T>(ConfigManager.Logic.ConfigManager.GameDataManager!.GamedataCache[gamedataName]);
             if (output == null) throw new FormatException($"{gamedataName} static gamedata should be a(n) {typeof(T).FullName}");
             return output;
         }
@@ -44,7 +44,7 @@ namespace Puniemu.Src.Utils.GeneralUtils
                     }
                 }
                 //Meaning it's constant
-                else tableText = ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache[table];
+                else tableText = ConfigManager.Logic.ConfigManager.GameDataManager!.GamedataCache[table];
 
                 if (tableText != null)
                 {
@@ -55,7 +55,7 @@ namespace Puniemu.Src.Utils.GeneralUtils
                         tableObj = JsonConvert.DeserializeObject<object>(tableText);
                         try
                         {
-                            var dict = (Dictionary<string, object>)tableObj;
+                            var dict = (Dictionary<string, object>)tableObj!;
                             if (dict!.ContainsKey("data"))
                             {
                                 tableObj = dict["data"];

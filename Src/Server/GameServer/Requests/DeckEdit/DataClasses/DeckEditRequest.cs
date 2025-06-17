@@ -6,12 +6,12 @@ namespace Puniemu.Src.Server.GameServer.Requests.DeckEdit.DataClasses
     {
         //Device ID
         [JsonProperty("deviceId")]
-        public string Udkey { get; set; }
+        public string? Udkey { get; set; }
         //Account ID
         [JsonProperty("level5UserId")]
-        public string Gdkey { get; set; }
+        public string? Gdkey { get; set; }
 
         [JsonProperty("youkaiIdList")]
-        public List<Dictionary<string,int>> YoukaiIdList { get; set; }
+        public List<Dictionary<string,int>>? YoukaiIdList { get; set; }
     }
 }
