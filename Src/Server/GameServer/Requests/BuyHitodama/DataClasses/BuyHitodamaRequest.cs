@@ -6,10 +6,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.BuyHitodama.DataClasses
     {
         //Device id
         [JsonProperty("deviceId")]
-        public string Udkey { get; set; }
+        public string? Udkey { get; set; }
         //Account ID
         [JsonProperty("level5UserId")]
-        public string Gdkey { get; set; }
+        public string? Gdkey { get; set; }
         //ID of hitodama shop item to buy
         [JsonProperty("goodsId")]
         public int GoodsId { get; set; }

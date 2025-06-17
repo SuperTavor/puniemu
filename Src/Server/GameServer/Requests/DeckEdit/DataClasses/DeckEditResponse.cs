@@ -12,9 +12,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.DeckEdit.DataClasses
             ResultType = 0;
             NextScreenType = 0;
         }
-        public async Task<Dictionary<string, object>> ToDictionary()
+        public Task<Dictionary<string, object>> ToDictionary()
         {
-            return new()
+            var dict = new Dictionary<string, object>
             {
                 { "serverDt", ServerDate },
                 { "mstVersionMaster", MstVersionMaster },
@@ -26,6 +26,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.DeckEdit.DataClasses
                 { "token", Token },
                 { "dialogMsg", DialogMsg }
             };
+            return Task.FromResult(dict);
         }
 
     }

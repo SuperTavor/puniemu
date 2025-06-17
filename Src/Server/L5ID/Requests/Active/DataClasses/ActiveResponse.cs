@@ -11,12 +11,12 @@ namespace Puniemu.Src.Server.L5ID.Requests.Active.DataClasses
         public bool Result { get; set; }
         //Contains some keys. Look in the Keyset struct for more infromation about them.
         [JsonProperty("keys")]
-        public KeySet[] UserKeys { get; set; }
+        public KeySet[]? UserKeys { get; set; }
         //These do the same thing as the UDKEY and gdkeys in the keyset, but they are placed directly in this struct, as sometimes the game requires it.
         [JsonProperty("udkey")]
-        public Key UnwrappedUDKey { get; set; }
+        public Key? UnwrappedUDKey { get; set; }
         [JsonProperty("gdkeys")]
-        public List<Key> UnwrappedGDKeys { get; set; }
+        public List<Key>? UnwrappedGDKeys { get; set; }
         //dictates if the udkey is connected to a L5ID account. We don't support those, so no.
         [JsonProperty("is_linked")]
         public bool IsLinked { get; set; }
@@ -31,7 +31,7 @@ namespace Puniemu.Src.Server.L5ID.Requests.Active.DataClasses
         public long SignTimestamp { get; set; }
         //Idk what this does, but setting it to anything but 0 works.
         [JsonProperty("sign_nonce")]
-        public string SignNonce { get; set; }
+        public string? SignNonce { get; set; }
 
 
         /*Using this instead of the constructors as constructors don't support async.

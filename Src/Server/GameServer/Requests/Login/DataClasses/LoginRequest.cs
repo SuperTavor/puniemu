@@ -6,9 +6,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.DataClasses
     {
         //Device ID
         [JsonProperty("deviceId")]
-        public string Udkey { get; set; }
+        public string? Udkey { get; set; }
         //Account ID
         [JsonProperty("gdkeyValue")]
-        public string Gdkey { get; set; }
+        public string? Gdkey { get; set; }
     }
 }

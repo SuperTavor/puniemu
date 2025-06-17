@@ -15,7 +15,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetGdkeyAccounts.DataClasses
         public int PartnerYokaiID { get; set; } // The center yokai in the party
 
         [JsonProperty("lastUpdateDate")]
-        public string LastUpdateDate { get; set; } // Last time the game was played
+        public string? LastUpdateDate { get; set; } // Last time the game was played
 
         [JsonProperty("titleId")]
         public PlayerTitle TitleID { get; set; } // Title of the character (kun, chan, etc...)
@@ -32,7 +32,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetGdkeyAccounts.DataClasses
         //because constructors cant be async
         public static async Task<UdkeyPlayerItem?> ConstructAsync(string gdkey)
         {
-            YwpUserData userData;
+            YwpUserData? userData;
             try
             {
                 userData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(gdkey, "ywp_user_data");
@@ -44,7 +44,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetGdkeyAccounts.DataClasses
 
             UdkeyPlayerItem playerItem = new();
 
-            playerItem.IconID = (PlayerIcon)userData.IconID;
+            playerItem.IconID = (PlayerIcon)userData!.IconID;
             playerItem.PlayerName = userData.PlayerName;
             var UserDeck = new TableParser.Logic.TableParser((await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(gdkey, "ywp_user_youkai_deck"))!);
             playerItem.PartnerYokaiID = int.Parse(UserDeck.Table[0][1]);

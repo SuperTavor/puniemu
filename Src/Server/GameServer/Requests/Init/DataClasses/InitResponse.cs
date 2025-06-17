@@ -8,7 +8,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Init.DataClasses
     {
         public InitResponse()
         {
-            MstVersionMaster = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["mstVersionMaster"]);
+            MstVersionMaster = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager!.GamedataCache["mstVersionMaster"]);
             ResultCode = 0;
             NextScreenType = 0;
             YwpMstVersionMaster = ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["ywp_mst_version_master"];

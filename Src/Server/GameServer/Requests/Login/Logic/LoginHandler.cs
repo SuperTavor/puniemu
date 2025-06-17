@@ -19,16 +19,17 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.Logic
             ctx.Request.BodyReader.AdvanceTo(readResult.Buffer.End);
             var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             var deserialized = JsonConvert.DeserializeObject<LoginRequest>(requestJsonString!);
-            
+
+
             //Construct response
             var res = new LoginResponse();
             //Get the user tables
-            var userTables = await UserDataManager.Logic.UserDataManager.GetEntireUserData(deserialized.Gdkey);
-            var resdict = await res.ToDictionary(deserialized.Gdkey);            
+            var userTables = await UserDataManager.Logic.UserDataManager.GetEntireUserData(deserialized!.Gdkey!);
+            var resdict = await res.ToDictionary(deserialized!.Gdkey!);            
 
-            await GeneralUtils.AddTablesToResponse(Consts.LOGIN_TABLES,resdict,true,deserialized.Gdkey);
+            await GeneralUtils.AddTablesToResponse(Consts.LOGIN_TABLES,resdict,true,deserialized!.Gdkey!);
             //Set last login time to now
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "lgn_date", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "lgn_date", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             var encryptedRes = NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(resdict));
             ctx.Response.Headers.ContentType = "application/json";
             await ctx.Response.WriteAsync(encryptedRes);
