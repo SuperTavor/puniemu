@@ -23,14 +23,14 @@ namespace Puniemu.Src.Server.GameServer.Requests.UserInfoRefresh.DataClasses
         {
             var dict = new Dictionary<string, object>
             {
-                    { nameof(ShopSaleList), ShopSaleList },
+                    { nameof(ShopSaleList), ShopSaleList! },
                     { nameof(ServerDate), ServerDate },
                     { nameof(YwpToken), YwpToken },
                     { nameof(YMoneyShopSaleList), YMoneyShopSaleList },
                     { nameof(MstVersionMaster), MstVersionMaster },
                     { nameof(ResultCode), ResultCode },
                     { nameof(NextScreenType), NextScreenType },
-                    { nameof(HitodamaShopSaleList), HitodamaShopSaleList },
+                    { nameof(HitodamaShopSaleList), HitodamaShopSaleList! },
                     { nameof(UserData), UserData },
                     { nameof(ResultType), ResultType }
                 

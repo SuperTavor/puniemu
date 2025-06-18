@@ -10,10 +10,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.DataClasses
         public string? RequestID { get; set; }
         //Device ID
         [JsonProperty("deviceId")]
-        public string Udkey { get; set; }
+        public string? Udkey { get; set; }
         //Account ID
         [JsonProperty("level5UserId")]
-        public string Gdkey { get; set; }
+        public string? Gdkey { get; set; }
         // type of the battle
         [JsonProperty("battleType")]
         public int BattleType { get; set; }
@@ -37,7 +37,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.DataClasses
         public int DamageTotal { get; set; }
         // enemy result list
         [JsonProperty("enemyYoukaiResultList")]
-        public List<EnemyYoukaiResultList> EnemyYoukaiResultList { get; set; }
+        public List<EnemyYoukaiResultList>? EnemyYoukaiResultList { get; set; }
         // maybe number total of punis clicked
         [JsonProperty("eraseNumTotal")]
         public int EraseNumTotal { get; set; }
@@ -79,7 +79,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.DataClasses
         public int Score { get; set; }
         //idk
         [JsonProperty("scoreLog")]
-        public string ScoreLog { get; set; }
+        public string? ScoreLog { get; set; }
         //idk
         [JsonProperty("spMissionIntValue1")]
         public int spMissionIntValue1 { get; set; }
@@ -88,16 +88,16 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.DataClasses
         public int StageId { get; set; }
         //idk
         [JsonProperty("themeResultList")]
-        public List<object> ThemeResultList { get; set; }
+        public List<object>? ThemeResultList { get; set; }
         //userid
         [JsonProperty("userId")]
-        public string UserId { get; set; }
+        public string? UserId { get; set; }
         // user youkai result list
         [JsonProperty("userYoukaiResultList")]
-        public List<UserYoukaiResultListReq> UserYoukaiResultList { get; set; }
+        public List<UserYoukaiResultListReq>? UserYoukaiResultList { get; set; }
         // ywp_mst
         [JsonProperty("ywp_mst_game_const")]
-        public List<Dictionary<string,object>> YwpMstGameConst { get; set; }
+        public List<Dictionary<string,object>>? YwpMstGameConst { get; set; }
 
 
     }

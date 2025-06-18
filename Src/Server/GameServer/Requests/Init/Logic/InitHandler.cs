@@ -47,7 +47,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Init.Logic
             }
 
             //Check game version
-            var dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(decrypted);
+            var dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(decrypted!);
             if (dict == null)
             {
                 await GeneralUtils.SendBadRequest(ctx);

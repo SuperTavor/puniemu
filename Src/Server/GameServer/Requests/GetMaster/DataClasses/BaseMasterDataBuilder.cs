@@ -22,7 +22,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetMaster.DataClasses
                 ["token"] = null,
                 ["storeUrl"] = "",
                 ["webServerIp"] = "",
-                ["mstVersionMaster"] = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["mstVersionMaster"]),
+                ["mstVersionMaster"] = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager!.GamedataCache["mstVersionMaster"]),
                 ["nextScreenType"] = 0,
                 ["ymoneyShopSaleList"] = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("ymoneyShopSaleList"),
                 ["dialogMsg"] = ""

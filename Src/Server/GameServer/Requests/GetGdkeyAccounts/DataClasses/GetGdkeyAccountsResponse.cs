@@ -8,7 +8,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetGdkeyAccounts.DataClasses
     public class GetGdkeyAccountsResponse: PuniResponse
     {
         [JsonProperty("udkeyPlayerList")]
-        public List<UdkeyPlayerItem> UDKeyPlayerList { get; set; } // List of UDKeyPlayerItem
+        public List<UdkeyPlayerItem>? UDKeyPlayerList { get; set; } // List of UDKeyPlayerItem
 
 
         //Cause async constructors are not allowed

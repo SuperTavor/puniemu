@@ -18,6 +18,8 @@ using Puniemu.Src.Server.GameServer.Requests.GameStart.Logic;
 using Puniemu.Src.Server.GameServer.Requests.DeckEdit.Logic;
 using Puniemu.Src.Server.GameServer.Requests.UpdateTutorialFlag.Logic;
 using Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic;
+using Puniemu.Src.Server.GameServer.Requests.Rename.Logic;
+using Puniemu.Src.Server.GameServer.Requests.GameUseItem.Logic;
 
 namespace Puniemu.Src;
 class Program
@@ -127,6 +129,14 @@ class Program
         app.MapPost("/gameEnd.nhn", async ctx =>
         {
             await GameEndHandler.HandleAsync(ctx);
+        });
+        app.MapPost("/rename.nhn", async ctx =>
+        {
+            await RenameHandler.HandleAsync(ctx);
+        });
+        app.MapPost("/gameUseItem.nhn", async ctx =>
+        {
+            await GameUseItemHandler.HandleAsync(ctx);
         });
     }
 

@@ -8,7 +8,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.DataClasses
 
         // Flag for if the news page should be opened immediately after logging in. Constant.
         [JsonProperty("noticePageListFlg")]
-        public int NoticePageListFlag = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["noticePageListFlg"]);
+        public int NoticePageListFlag = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager!.GamedataCache["noticePageListFlg"]);
 
         // Idk, should be good as 0.
         [JsonProperty("monthlyPurchasableLeft")]
@@ -51,10 +51,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.DataClasses
                 { "dialogMsg", DialogMsg },
                 { "storeUrl", StoreUrl },
                 {"teamEventButtonHiddenFlg",TeamEventButtonHiddenFlag },
-                {"shopSaleList",this.ShopSaleList },
+                {"shopSaleList",this.ShopSaleList! },
                 {"noticePageList",NoticePageList},
                 {"mstMapMobPeriodNoList", MstMapMobPeriodNoList},
-                {"hitodamaShopSaleList",this.HitodamaShopSaleList },
+                {"hitodamaShopSaleList",this.HitodamaShopSaleList! },
                 {"webServerIp",this.WebServerIp },
                 {"dialogTitle",this.DialogTitle },
                 {"responseCodeTeamEvent",ResponseCodeTeamEvent},

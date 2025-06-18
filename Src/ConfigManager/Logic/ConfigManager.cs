@@ -5,7 +5,7 @@ namespace Puniemu.Src.ConfigManager.Logic
     public static class ConfigManager
     {
 
-        public static GameDataManager GameDataManager;
+        public static GameDataManager? GameDataManager;
         public static ConfigStructure? Cfg;
         private const string CONFIG_PATH = "cfg.json";
 

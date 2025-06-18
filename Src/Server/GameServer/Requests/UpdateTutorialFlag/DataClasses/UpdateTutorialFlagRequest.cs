@@ -5,10 +5,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.UpdateTutorialFlag.DataClasses
     {
         //udkey
         [JsonProperty("deviceId")]
-        public string DeviceId { get; set; }
+        public string? DeviceId { get; set; }
         //gdkey
         [JsonProperty("level5UserId")]
-        public string Level5UserId { get; set; }
+        public string? Level5UserId { get; set; }
         //ID of the tutorial to be set 
         [JsonProperty("tutorialId")]
         public int TutorialId { get; set; }

@@ -33,7 +33,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
             //Add the new user to the characterID -> gdkey dict
 
             await UserDataManager.Logic.UserDataManager.AssignGdkeyToCharacterID(generatedUserData.CharacterID, deserialized.Level5UserID);
-            var createUserResponse = new CreateUserResponse(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["ywp_user_tutorial_list_def"], generatedUserData);
+            var createUserResponse = new CreateUserResponse(ConfigManager.Logic.ConfigManager.GameDataManager!.GamedataCache["ywp_user_tutorial_list_def"], generatedUserData);
             var marshalledResponse = JsonConvert.SerializeObject(createUserResponse);
             var encryptedResponse = NHNCrypt.Logic.NHNCrypt.EncryptResponse(marshalledResponse);
             await ctx.Response.WriteAsync(encryptedResponse);            
@@ -46,7 +46,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
            foreach(var userTable in Consts.LOGIN_TABLES.Where(x => x.Contains("ywp_user") && x != "ywp_user_data"))
            {
                 //initialize with default if exists, else 
-                if(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache.TryGetValue(userTable+"_def", out var data))
+                if(ConfigManager.Logic.ConfigManager.GameDataManager!.GamedataCache.TryGetValue(userTable+"_def", out var data))
                 {
                     object? deserializedDefaultUserTable = null!;
                     try
@@ -58,7 +58,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
                         deserializedDefaultUserTable = data;
                     }
 
-                    tables.Add(userTable, deserializedDefaultUserTable);
+                    tables.Add(userTable, deserializedDefaultUserTable!);
                 }
                 else
                 {

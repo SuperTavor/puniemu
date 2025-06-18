@@ -23,12 +23,12 @@ namespace Puniemu.Src.Server.GameServer.Requests.UserInfoRefresh.Logic
             var deserialized = JsonConvert.DeserializeObject<UserInfoRefreshRequest>(requestJsonString!);
             ctx.Response.ContentType = "application/json";
             // userdata is send by default
-            YwpUserData userData;
+            YwpUserData? userData;
             UserInfoRefreshResponse userInfoRefreshResponse;
             try
             {
                 userData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data");
-                userInfoRefreshResponse = new UserInfoRefreshResponse(userData);
+                userInfoRefreshResponse = new UserInfoRefreshResponse(userData!);
                 // Convert struct into dict (because the response can have different number of ywp_user table)
                 var userInfoRefreshDict = userInfoRefreshResponse.ToDictionary();
                 // add requested table in the response
@@ -37,7 +37,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.UserInfoRefresh.Logic
                     try
                     {
                         var tempTable = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<object>(deserialized.Level5UserID, item);
-                        userInfoRefreshDict.Add(item, tempTable);
+                        userInfoRefreshDict.Add(item, tempTable!);
                     }
                     catch (Exception ex)
                     {

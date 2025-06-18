@@ -29,7 +29,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameStart.Logic
                 return;
             }
             
-            var userData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized.Gdkey, "ywp_user_data");
+            var userData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized!.Gdkey!, "ywp_user_data");
 
             //send bad requests if getting userData fail
             if (userData == null)
@@ -39,7 +39,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameStart.Logic
             }
 
             // Check and remove hitodama
-            userData.Hitodama = 5;
+            //userData.Hitodama = 5;
             if (userData.Hitodama >= 0 || userData.FreeHitodama >= 0) 
             {
 
@@ -57,14 +57,14 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameStart.Logic
                 }
 
                 //Construct response
-                var res = new GameStartResponse();
+                var res = new GameStartResponse(userData);
 
                 // Get mst and user table
-                var stagesInfo = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["ywp_mst_stage"]!)!["tableData"]);
+                var stagesInfo = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(ConfigManager.Logic.ConfigManager.GameDataManager!.GamedataCache["ywp_mst_stage"]!)!["tableData"]);
                 var enemyParams = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["ywp_mst_youkai_enemy_param"]!)!["tableData"]);
-                var YwpUserYoukaiTab = new TableParser.Logic.TableParser((await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_youkai"))!);
-                string[] UserDeck = (await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_youkai_deck"))!.Split('|');
-                var tutorialList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_tutorial_list");
+                var YwpUserYoukaiTab = new TableParser.Logic.TableParser((await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai"))!);
+                string[] UserDeck = (await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai_deck"))!.Split('|');
+                var tutorialList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_tutorial_list");
 
                 //get current stage info
                 var jsonLevelData = JsonConvert.DeserializeObject<Dictionary<string, StageData>>(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["stage_data"]);
@@ -87,12 +87,12 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameStart.Logic
                 }
 
                 // Determine if it's was first clear 
-                var UserStage = new TableParser.Logic.TableParser((await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_stage"))!);
+                var UserStage = new TableParser.Logic.TableParser((await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_stage"))!);
                 var stageIdx = UserStage.FindIndex([deserialized.StageId.ToString()]);
                 if (stageIdx == -1)
                 {
                     UserStage.AddRow([deserialized.StageId.ToString(), "0", "0", "0", "0", "0", "0", "0"]);
-                    await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "ywp_user_stage", UserStage.ToString());
+                    await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_stage", UserStage.ToString());
                     res.IsFirstClear = 1;
                 }
                 else
@@ -151,8 +151,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameStart.Logic
                     var item = new UserYoukaiItem()
                     {
                         YoukaiId = int.Parse(UserDeck[i]),
-                        SkillLevel = int.Parse(YwpUserYoukaiTab.Table[yokaiInfoIndex][1]), // wrong [1] is level
-                        SSkillLevel = int.Parse(YwpUserYoukaiTab.Table[yokaiInfoIndex][2]), // wrong [2] is total exp
+                        SkillLevel = 1, // todo
+                        SSkillLevel = 0, // todo
                         Hp = int.Parse(YwpUserYoukaiTab.Table[yokaiInfoIndex][3]),
                         AttackPower = int.Parse(YwpUserYoukaiTab.Table[yokaiInfoIndex][4])
                     };
@@ -179,7 +179,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameStart.Logic
                         }
                     }
                 }
-                await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "ywp_user_tutorial_list", tutorialListTable.ToString());
+                await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_tutorial_list", tutorialListTable.ToString());
 
                 //always seemingly OK on 0
                 res.YoukaiHp = 0;
@@ -190,11 +190,14 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameStart.Logic
 
                 // save userdata and send response
                 res.RequestID = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
-                await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "ywp_user_requestid", res.RequestID);
+                var dictionary = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_dictionary");
+                var dictionaryTable = new TableParser.Logic.TableParser(dictionary!);
+                res.DictionaryDiff = dictionaryTable.ToString();
+                await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_requestid", res.RequestID);
                 res.UserData = userData;
                 var resdict = JsonConvert.DeserializeObject<Dictionary<string,object>>(JsonConvert.SerializeObject(res));
-                await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "ywp_user_data", userData);
-                await GeneralUtils.AddTablesToResponse(Consts.GAME_START_TABLES, resdict!, true, deserialized.Gdkey);
+                await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_data", userData);
+                await GeneralUtils.AddTablesToResponse(Consts.GAME_START_TABLES, resdict!, true, deserialized!.Gdkey!);
                 var encryptedRes = NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(resdict));
                 ctx.Response.Headers.ContentType = "application/json";
                 await ctx.Response.WriteAsync(encryptedRes);

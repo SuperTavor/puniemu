@@ -13,14 +13,17 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameStart.DataClasses
         public int IsFirstClear { get; set; }
 
         //C bool. idk what it does
-        [JsonProperty("youkaiHp")]
+        [JsonProperty("youkaiHP")]
         public int YoukaiHp { get; set; }
 
         [JsonProperty("responseCodeTeamEvent")]
-        public int ResponseCodeTeamEvent = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["responseCodeTeamEvent"]);
+        public int ResponseCodeTeamEvent = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager!.GamedataCache["responseCodeTeamEvent"]);
 
         [JsonProperty("ywp_user_data")]
         public YwpUserData UserData;
+
+        [JsonProperty("ywp_user_dictionary_diff")]
+        public string DictionaryDiff;
 
         //idk
         [JsonProperty("themeList")]
@@ -80,11 +83,13 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameStart.DataClasses
         //no idea
         [JsonProperty("itemDropMaxCnt")]
         public int ItemDropMaxCount = 2;
-        public GameStartResponse()
+        public GameStartResponse(YwpUserData data)
         {
             ResultCode = 0;
             ResultType = 0;
             NextScreenType = 0;
+            this.UserData = data;
+            this.DictionaryDiff = "";
         }
         
 
