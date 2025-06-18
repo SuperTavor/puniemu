@@ -3,7 +3,7 @@ using Puniemu.Src.Server.GameServer.DataClasses;
 
 namespace Puniemu.Src.Server.GameServer.Requests.GetL5IDStatus.DataClasses
 {
-    public class GetL5IDStatusResponse : PuniemuResponseBase
+    public class GetL5IDStatusResponse : PuniResponse
     {
         //it's always just the default constructor, since we do not support linking L5 accounts everything should be unlocked with the default 9999.... points
         [JsonProperty("L5IdStatus")]

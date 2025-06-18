@@ -3,7 +3,7 @@ using Puniemu.Src.Utils.GeneralUtils;
 using Puniemu.Src.Server.GameServer.DataClasses;
 namespace Puniemu.Src.Server.GameServer.Requests.Login.DataClasses
 {
-    public class LoginResponse : PuniemuResponseBase
+    public class LoginResponse : PuniResponse
     {
 
         // Flag for if the news page should be opened immediately after logging in. Constant.

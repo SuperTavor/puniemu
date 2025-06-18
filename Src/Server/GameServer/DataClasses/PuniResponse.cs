@@ -3,7 +3,7 @@ using Puniemu.Src.Utils.GeneralUtils;
 
 namespace Puniemu.Src.Server.GameServer.DataClasses
 {
-    public class PuniemuResponseBase
+    public class PuniResponse
     {
         // The unix time when the response was sent.
         [JsonProperty("serverDt")]

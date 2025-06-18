@@ -13,7 +13,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
 
         public static async Task HandleAsync(HttpContext ctx)
         {
-            // WIP : the code is rather messy because this .nhn is incomplete and still under development
             ctx.Response.ContentType = "application/json";
             ctx.Request.EnableBuffering();
             var buffer = new MemoryStream();

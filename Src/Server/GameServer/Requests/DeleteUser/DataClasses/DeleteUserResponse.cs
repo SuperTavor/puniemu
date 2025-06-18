@@ -4,7 +4,7 @@ using Puniemu.Src.Utils.GeneralUtils;
 using Puniemu.Src.ConfigManager;
 namespace Puniemu.Src.Server.GameServer.Requests.DeleteUser.DataClasses
 {
-    public class DeleteUserResponse: PuniemuResponseBase
+    public class DeleteUserResponse: PuniResponse
     {
 
         // Response Code (0 sucess or 1 error)

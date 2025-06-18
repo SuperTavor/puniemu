@@ -4,7 +4,7 @@ using Puniemu.Src.Server.GameServer.DataClasses;
 using Puniemu.Src.Utils.GeneralUtils;
 namespace Puniemu.Src.Server.GameServer.Requests.Init.DataClasses
 {
-    public class InitResponse : PuniemuResponseBase
+    public class InitResponse : PuniResponse
     {
         public InitResponse()
         {

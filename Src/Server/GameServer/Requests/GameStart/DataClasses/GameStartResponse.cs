@@ -3,7 +3,7 @@ using Puniemu.Src.Utils.GeneralUtils;
 using Puniemu.Src.Server.GameServer.DataClasses;
 namespace Puniemu.Src.Server.GameServer.Requests.GameStart.DataClasses
 {
-    public class GameStartResponse : PuniemuResponseBase
+    public class GameStartResponse : PuniResponse
     {
         //Information about the user's youkai.
         [JsonProperty("userYoukaiList")]

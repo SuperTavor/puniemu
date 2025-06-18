@@ -3,7 +3,7 @@ using Puniemu.Src.Utils.GeneralUtils;
 using Puniemu.Src.Server.GameServer.DataClasses;
 namespace Puniemu.Src.Server.GameServer.Requests.DeckEdit.DataClasses
 {
-    public class DeckEditResponse : PuniemuResponseBase
+    public class DeckEditResponse : PuniResponse
     {
 
         public DeckEditResponse()

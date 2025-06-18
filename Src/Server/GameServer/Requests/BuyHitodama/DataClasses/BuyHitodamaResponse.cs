@@ -3,7 +3,7 @@ using Puniemu.Src.Server.GameServer.DataClasses;
 
 namespace Puniemu.Src.Server.GameServer.Requests.BuyHitodama.DataClasses
 {
-    public class BuyHitodamaResponse: PuniemuResponseBase
+    public class BuyHitodamaResponse: PuniResponse
     {
         [JsonProperty("before")]
         public HitodamaInformation Before { get; set; }

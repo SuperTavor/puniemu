@@ -5,7 +5,7 @@ using Puniemu.Src.UserDataManager.Logic;
 
 namespace Puniemu.Src.Server.GameServer.Requests.GetGdkeyAccounts.DataClasses
 {
-    public class GetGdkeyAccountsResponse: PuniemuResponseBase
+    public class GetGdkeyAccountsResponse: PuniResponse
     {
         [JsonProperty("udkeyPlayerList")]
         public List<UdkeyPlayerItem> UDKeyPlayerList { get; set; } // List of UDKeyPlayerItem
@@ -15,7 +15,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetGdkeyAccounts.DataClasses
         public static async Task<GetGdkeyAccountsResponse?> ConstructAsync(string udkey,List<string> gdkeys)
         {
             List<UdkeyPlayerItem> playerItems = new();
-            if(!gdkeys.SequenceEqual(new List<string>()))
+            if(gdkeys.Count > 0)
             {
                 foreach (var gdkey in gdkeys)
                 {

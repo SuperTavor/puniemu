@@ -4,7 +4,7 @@ using Puniemu.Src.Utils.GeneralUtils;
 using Puniemu.Src.ConfigManager;
 namespace Puniemu.Src.Server.GameServer.Requests.UpdateProfile.DataClasses
 {
-    public class UpdateProfileResponse : PuniemuResponseBase
+    public class UpdateProfileResponse : PuniResponse
     {
 
         // Table that dictates which icon that the user has unlocked.

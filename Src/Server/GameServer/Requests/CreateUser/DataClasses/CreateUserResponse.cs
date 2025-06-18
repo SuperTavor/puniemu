@@ -2,7 +2,7 @@
 using Puniemu.Src.Server.GameServer.DataClasses;
 namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.DataClasses
 {
-    public class CreateUserResponse : PuniemuResponseBase
+    public class CreateUserResponse : PuniResponse
     {
 
         // Empty.

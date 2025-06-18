@@ -5,7 +5,7 @@ using Puniemu.Src.ConfigManager.Logic;
 using System.Xml.Linq;
 namespace Puniemu.Src.Server.GameServer.Requests.UserInfoRefresh.DataClasses
 {
-    public class UserInfoRefreshResponse : PuniemuResponseBase
+    public class UserInfoRefreshResponse : PuniResponse
     {
 
         // Basic user data.

@@ -4,7 +4,7 @@ using Puniemu.Src.Server.GameServer.DataClasses;
 
 namespace Puniemu.Src.Server.GameServer.Requests.UpdateTutorialFlag.DataClasses
 {
-    public class UpdateTutorialFlagResponse: PuniemuResponseBase
+    public class UpdateTutorialFlagResponse: PuniResponse
     {
 
         // Table of completed tutorials for the user.
