@@ -71,7 +71,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
            tables.Add("ywp_user_data", generatedUserData);
            //Set start date
            tables.Add("start_date",DateTimeOffset.Now.ToUnixTimeMilliseconds());
-           
+           tables.Add("login_stamp", "0|0|0");
            await UserDataManager.Logic.UserDataManager.SetEntireUserData(deserialized.Level5UserID,tables);
         }
     }
