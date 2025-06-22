@@ -20,6 +20,9 @@ using Puniemu.Src.Server.GameServer.Requests.UpdateTutorialFlag.Logic;
 using Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic;
 using Puniemu.Src.Server.GameServer.Requests.Rename.Logic;
 using Puniemu.Src.Server.GameServer.Requests.GameUseItem.Logic;
+using Puniemu.Src.Server.GameServer.Requests.GameContinue.Logic;
+using Puniemu.Src.Server.GameServer.Requests.GameRetire.Logic;
+using Puniemu.Src.Server.GameServer.Requests.LoginStamp.Logic;
 
 namespace Puniemu.Src;
 class Program
@@ -137,6 +140,18 @@ class Program
         app.MapPost("/gameUseItem.nhn", async ctx =>
         {
             await GameUseItemHandler.HandleAsync(ctx);
+        });
+        app.MapPost("/gameRetire.nhn", async ctx =>
+        {
+            await GameRetireHandler.HandleAsync(ctx);
+        });
+        app.MapPost("/gameContinue.nhn", async ctx =>
+        {
+            await GameContinueHandler.HandleAsync(ctx);
+        });
+        app.MapPost("/loginStamp.nhn", async ctx =>
+        {
+            await LoginStampHandler.HandleAsync(ctx);
         });
     }
 
