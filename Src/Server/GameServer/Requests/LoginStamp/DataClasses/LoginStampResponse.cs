@@ -4,7 +4,7 @@ using Puniemu.Src.Utils.GeneralUtils;
 using Puniemu.Src.ConfigManager;
 namespace Puniemu.Src.Server.GameServer.Requests.LoginStamp.DataClasses
 {
-    public class LoginStampResponse : PuniemuResponseBase
+    public class LoginStampResponse : PuniResponse
     {
         // Basic user data.
         [JsonProperty("ywp_user_data")]
