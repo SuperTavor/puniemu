@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Puniemu.Src.Server.GameServer.DataClasses;
+using Puniemu.Src.Server.GameServer.Logic;
 using Puniemu.Src.Server.GameServer.Requests.DeckEdit.DataClasses;
 using System;
 using System.Buffers;
@@ -22,18 +23,14 @@ namespace Puniemu.Src.Server.GameServer.Requests.DeckEdit.Logic
             // tutorial handling
             var tutorialList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_tutorial_list");
             var tutorialListTable = new TableParser.Logic.TableParser(tutorialList!);
-            var idx = 0;
-            foreach (string[] str in tutorialListTable.Table)
+
+            if (TutorialFlagManager.GetStatus(tutorialListTable, 1000) == 6)
             {
-                if (str[0] == "1" && str[1] == "1000" && str[2] == "6")
-                {
-                    tutorialListTable.Table[idx][2] = "7";
-                } 
-                else if (str[0] == "2" && str[1] == "1" && str[2] == "0")
-                {
-                    tutorialListTable.Table[idx][2] = "1";
-                }
-                idx++;
+                tutorialListTable = TutorialFlagManager.EditTutorialFlg(tutorialListTable, 1, 1000, 7);
+            }
+            if (TutorialFlagManager.GetStatus(tutorialListTable, 1) == 0)
+            {
+                tutorialListTable = TutorialFlagManager.EditTutorialFlg(tutorialListTable, 2, 1, 1);
             }
 
             // Get Watch Id

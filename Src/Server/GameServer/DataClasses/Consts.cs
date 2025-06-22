@@ -67,6 +67,25 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
             "ywp_user_player_plate",
 
         };
+
+        public static readonly List<string> INIT_GACHA_TABLES = new List<string>
+        {
+            "ywp_mst_item",
+            "ywp_mst_gacha",
+            "ywp_user_event",
+            "ywp_mst_youkai_bonus_effect_exclude",
+            "ywp_mst_event_group_assist_disp",
+            "ywp_mst_event",
+            "ywp_user_gacha_stamp",
+            "ywp_user_icon_budge",
+            "ywp_user_gacha",
+            "ywp_mst_event_youkai_assist_disp",
+            "ywp_mst_gacha_convert_item",
+            "ywp_user_data",
+            "ywp_mst_youkai_pos_effect_exclude",
+            "ywp_mst_coin_purchase_master"
+        };
+
         public static readonly List<string> GAME_START_TABLES = new List<string>
         {
             "ywp_user_event_condition",

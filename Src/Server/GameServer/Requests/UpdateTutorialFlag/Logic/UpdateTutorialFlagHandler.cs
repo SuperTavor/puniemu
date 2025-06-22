@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Puniemu.Src.Server.GameServer.DataClasses;
 using Puniemu.Src.Server.GameServer.Requests.UpdateTutorialFlag.DataClasses;
+using Puniemu.Src.Server.GameServer.Logic;
 using System.Buffers;
 using System.Text;
 
@@ -19,14 +20,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.UpdateTutorialFlag.Logic
             var deserialized = JsonConvert.DeserializeObject<UpdateTutorialFlagRequest>(requestJsonString!);
             var tutorialList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_tutorial_list");
             var tutorialListTable = new TableParser.Logic.TableParser(tutorialList!);
-            //Find the index to modify
-            var index = tutorialListTable.FindIndex([deserialized.TutorialType.ToString(), deserialized.TutorialId.ToString()]);
-            if(index == -1)
-            {
-                tutorialListTable.AddRow([deserialized.TutorialType.ToString(), deserialized.TutorialId.ToString(), deserialized.TutorialStatus.ToString()]);
-            }
-            //Set the tutorial status
-            tutorialListTable.Table[index][2] = deserialized.TutorialStatus.ToString();
+            tutorialListTable = TutorialFlagManager.EditTutorialFlg(tutorialListTable, deserialized.TutorialType, deserialized.TutorialId, deserialized.TutorialStatus);
             var modifiedTutoList = tutorialListTable.ToString();
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!,"ywp_user_tutorial_list",modifiedTutoList);
             var userdata = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized!.Level5UserId!, "ywp_user_data");

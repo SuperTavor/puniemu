@@ -5,6 +5,7 @@ using Puniemu.Src.Server.GameServer.Requests.GameUseItem.DataClasses;
 using Puniemu.Src.Server.GameServer.DataClasses;
 using System.Text;
 using System.Buffers;
+using Puniemu.Src.Server.GameServer.Logic;
 
 namespace Puniemu.Src.Server.GameServer.Requests.GameUseItem.Logic
 {
@@ -24,14 +25,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameUseItem.Logic
             var playerItem = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_item");
             var playerItemTable = new TableParser.Logic.TableParser(playerItem!);
 
-            var idx = playerItemTable.FindIndex([deserialized.ItemId.ToString()!]);
-            if (idx != -1)
-            {
-                if (int.Parse(playerItemTable.Table[idx][1]) > 0)
-                {
-                    playerItemTable.Table[idx][1] = (int.Parse(playerItemTable.Table[idx][1]) - 1).ToString();
-                }
-            }
+            playerItemTable = ItemManager.RemoveItem(playerItemTable,(int) deserialized.ItemId!, 1);
+
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_item", playerItemTable.ToString());
             var renameResponse = new GameUseItemResponse(userData!, playerItemTable.ToString(), deserialized.ItemId);
             var marshalledResponse = JsonConvert.SerializeObject(renameResponse);
