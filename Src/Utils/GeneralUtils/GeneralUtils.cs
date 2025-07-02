@@ -1,10 +1,9 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Puniemu.Src.ConfigManager.Logic;
 
 namespace Puniemu.Src.Utils.GeneralUtils
 {
-    public class GeneralUtils
+    public static class GeneralUtils
     {
         public static async Task SendBadRequest(HttpContext ctx)
         {
@@ -15,7 +14,7 @@ namespace Puniemu.Src.Utils.GeneralUtils
 
         public static T DeserializeGameDataToTypeAndCheckValidity<T>(string gamedataName)
         {
-            T? output = JsonConvert.DeserializeObject<T>(ConfigManager.Logic.ConfigManager.GameDataManager!.GamedataCache[gamedataName]);
+            T? output = JsonConvert.DeserializeObject<T>(DataManager.Logic.DataManager.GameDataManager!.GamedataCache[gamedataName]);
             if (output == null) throw new FormatException($"{gamedataName} static gamedata should be a(n) {typeof(T).FullName}");
             return output;
         }
@@ -44,7 +43,7 @@ namespace Puniemu.Src.Utils.GeneralUtils
                     }
                 }
                 //Meaning it's constant
-                else tableText = ConfigManager.Logic.ConfigManager.GameDataManager!.GamedataCache[table];
+                else tableText = DataManager.Logic.DataManager.GameDataManager!.GamedataCache[table];
 
                 if (tableText != null)
                 {

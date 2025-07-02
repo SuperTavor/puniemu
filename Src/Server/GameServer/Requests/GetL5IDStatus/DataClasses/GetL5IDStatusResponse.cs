@@ -1,10 +1,10 @@
 using Newtonsoft.Json;
 using Puniemu.Src.Server.GameServer.DataClasses;
 using Puniemu.Src.Utils.GeneralUtils;
-using Puniemu.Src.ConfigManager;
+
 namespace Puniemu.Src.Server.GameServer.Requests.GetL5IDStatus.DataClasses
 {
-    public class GetL5IDStatusResponse : PuniemuResponseBase
+    public class GetL5IDStatusResponse : PuniResponse
     {
         // Basic user data.
         [JsonProperty("L5IdStatus")]

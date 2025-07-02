@@ -8,14 +8,14 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.DataClasses
 
         // Flag for if the news page should be opened immediately after logging in. Constant.
         [JsonProperty("noticePageListFlg")]
-        public int NoticePageListFlag = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager!.GamedataCache["noticePageListFlg"]);
+        public int NoticePageListFlag = int.Parse(DataManager.Logic.DataManager.GameDataManager!.GamedataCache["noticePageListFlg"]);
 
         // Idk, should be good as 0.
         [JsonProperty("monthlyPurchasableLeft")]
         public long MonthlyPurchasableLeft { get; set; }
 
         [JsonProperty("teamEventButtonHiddenFlg")]
-        public int TeamEventButtonHiddenFlag = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["teamEventButtonHiddenFlg"]);
+        public int TeamEventButtonHiddenFlag = int.Parse(DataManager.Logic.DataManager.GameDataManager.GamedataCache["teamEventButtonHiddenFlg"]);
 
         [JsonProperty("noticePageList")]
         public List<object> NoticePageList = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<object>>("noticePageList");
@@ -24,7 +24,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.DataClasses
         public List<object> MstMapMobPeriodNoList = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<object>>("mstMapMobPeriodNoList");
 
         [JsonProperty("responseCodeTeamEvent")] 
-        public int ResponseCodeTeamEvent = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["responseCodeTeamEvent"]);
+        public int ResponseCodeTeamEvent = int.Parse(DataManager.Logic.DataManager.GameDataManager.GamedataCache["responseCodeTeamEvent"]);
 
 
         public LoginResponse()

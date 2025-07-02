@@ -10,8 +10,8 @@ namespace Puniemu.Src.Server.GameServer.Logic
     {
         public static TableParser.Logic.TableParser AddYoukai(TableParser.Logic.TableParser parser, long YoukaiId)
         {
-            var YoukaiMstTable = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(ConfigManager.Logic.ConfigManager.GameDataManager!.GamedataCache["ywp_mst_youkai"]!)!["tableData"]);
-            var YoukaiLevelMstTable = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["ywp_mst_youkai_level"]!)!["tableData"]);
+            var YoukaiMstTable = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager!.GamedataCache["ywp_mst_youkai"]!)!["tableData"]);
+            var YoukaiLevelMstTable = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai_level"]!)!["tableData"]);
             var UserYoukaiIndex = parser.FindIndex([YoukaiId.ToString()]);
             var MstYoukaiIndex = YoukaiMstTable.FindIndex([YoukaiId.ToString()]);
             if (UserYoukaiIndex == -1)

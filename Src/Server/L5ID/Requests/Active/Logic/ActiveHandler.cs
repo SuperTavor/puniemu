@@ -1,6 +1,7 @@
 ﻿using Puniemu.Src.Server.L5ID.DataClasses;
 using Newtonsoft.Json;
 using Puniemu.Src.Server.L5ID.Requests.Active.DataClasses;
+using Puniemu.Src.UserDataManager.Logic;
 namespace Puniemu.Src.Server.L5ID.Requests.Active.Logic
 {
     //This call is seeimgly used to check the validity of udkeys and gdkeys on the L5id server.
@@ -13,7 +14,7 @@ namespace Puniemu.Src.Server.L5ID.Requests.Active.Logic
             string udkey;
             if (!queryParams.ContainsKey("udkey"))
             {
-                udkey = Key.GenerateKey("d-");
+                udkey = await UserDataManager.Logic.UserDataManager.NewDeviceAsync();
             }
             else
             {

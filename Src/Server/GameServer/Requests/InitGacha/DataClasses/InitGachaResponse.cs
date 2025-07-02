@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using Puniemu.Src.ConfigManager.Logic;
+
 using Puniemu.Src.Server.GameServer.DataClasses;
 using Puniemu.Src.Server.GameServer.DataClasses.Gacha;
 using Puniemu.Src.Server.GameServer.DataClasses.Gacha.GachaStamp;
@@ -92,9 +92,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.InitGacha.DataClasses
         {
             var instance = new InitGachaResponse();
 
-            instance.YwpMstGacha = (string)JsonConvert.DeserializeObject<Dictionary<string,object>>(ConfigManager.Logic.ConfigManager.GameDataManager!.GamedataCache["ywp_mst_gacha"])["tableData"];
-            instance.YwpMstItem = (string)JsonConvert.DeserializeObject<Dictionary<string, object>>(ConfigManager.Logic.ConfigManager.GameDataManager!.GamedataCache["ywp_mst_item"])["tableData"];
-            instance.GachaStampList = JsonConvert.DeserializeObject<List<GachaStamp>>(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["gachaStampList"]);
+            instance.YwpMstGacha = (string)JsonConvert.DeserializeObject<Dictionary<string,object>>(DataManager.Logic.DataManager.GameDataManager!.GamedataCache["ywp_mst_gacha"])["tableData"];
+            instance.YwpMstItem = (string)JsonConvert.DeserializeObject<Dictionary<string, object>>(DataManager.Logic.DataManager.GameDataManager!.GamedataCache["ywp_mst_item"])["tableData"];
+            instance.GachaStampList = JsonConvert.DeserializeObject<List<GachaStamp>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["gachaStampList"]);
         }
 
     }

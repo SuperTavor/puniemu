@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 using Puniemu.Src.UserDataManager;
-using Puniemu.Src.ConfigManager;
+
 using Puniemu.Src.Server.GameServer.Requests.LoginStamp.DataClasses;
 using Puniemu.Src.Server.GameServer.DataClasses;
 using System.Text;
@@ -34,8 +34,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.LoginStamp.Logic
             var dictionaryYoukaiTable = new TableParser.Logic.TableParser("");
 
 
-            var LoginStamp = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(ConfigManager.Logic.ConfigManager.GameDataManager!.GamedataCache["ywp_mst_login_stamp"]!)!["tableData"]);
-            var LoginStampReward = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(ConfigManager.Logic.ConfigManager.GameDataManager!.GamedataCache["ywp_mst_login_stamp_reward"]!)!["tableData"]);
+            var LoginStamp = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager!.GamedataCache["ywp_mst_login_stamp"]!)!["tableData"]);
+            var LoginStampReward = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager!.GamedataCache["ywp_mst_login_stamp_reward"]!)!["tableData"]);
 
             var LoginUserStamp = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserID!, "login_stamp");
             var LoginUserStampTable = new TableParser.Logic.TableParser(LoginUserStamp!);
