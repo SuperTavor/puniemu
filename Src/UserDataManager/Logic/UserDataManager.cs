@@ -117,7 +117,7 @@ namespace Puniemu.Src.UserDataManager.Logic
             var device = response.Models.FirstOrDefault();
             if(device.Gdkeys == null) device.Gdkeys = new List<string>();
             device.Gdkeys.Add(gdkey); 
-            device.Update<Device>();
+            await device.Update<Device>();
         }
     }
 }
