@@ -23,7 +23,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.DataClasses
         [JsonProperty("mstMapMobPeriodNoList")]
         public List<object> MstMapMobPeriodNoList = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<object>>("mstMapMobPeriodNoList");
 
-        [JsonProperty("responseCodeTeamEvent")]
+        [JsonProperty("responseCodeTeamEvent")] 
         public int ResponseCodeTeamEvent = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["responseCodeTeamEvent"]);
 
 
