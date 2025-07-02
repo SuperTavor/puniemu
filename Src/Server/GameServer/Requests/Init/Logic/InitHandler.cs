@@ -13,13 +13,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.Init.Logic
         public static async Task HandleAsync(HttpContext ctx)
         {
             ctx.Response.ContentType = "application/json";
-            if (ConfigManager.Logic.ConfigManager.Cfg!.Value.IsMaintenance)
-            {
-                var msg = new MsgBoxResponse(ConfigManager.Logic.ConfigManager.Cfg.Value.MaintenanceMsg, "Maintenance Notice");
-                var encryptedMsgJson = NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(msg));
-                await ctx.Response.WriteAsync(encryptedMsgJson);
-                return;
-            }
             //read and decrypt request
             ctx.Request.EnableBuffering();
             var readResult = await ctx.Request.BodyReader.ReadAsync();
@@ -56,10 +49,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.Init.Logic
             if (dict.ContainsKey("appVer"))
             {
                 var appVer = dict["appVer"];
-                if ((string)appVer != ConfigManager.Logic.ConfigManager.Cfg!.Value.ClientVersion)
+                if ((string)appVer != DataManager.Logic.DataManager.GameVersion)
                 {
                     //Display "Wrong version" message box in the client
-                    var msg = new MsgBoxResponse("Game version is not\ncompatible with the server.", ConfigManager.Logic.ConfigManager.Cfg!.Value.ServerName);
+                    var msg = new MsgBoxResponse("Game version is not\ncompatible with the server.", DataManager.Logic.DataManager.ServerName!);
                     var jsonMsg = JsonConvert.SerializeObject(msg);
                     var encrypted = NHNCrypt.Logic.NHNCrypt.EncryptResponse(jsonMsg);
                     await ctx.Response.WriteAsync(encrypted);

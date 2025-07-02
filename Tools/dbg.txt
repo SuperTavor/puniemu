@@ -1,0 +1,1 @@
+{"shopSaleList":[],"serverDt":1751489767458,"ywpToken":"","ymoneyShopSaleList":[5],"mstVersionMaster":16747,"resultCode":32,"token":"d4cdab206b50dd37155dce81d35edbfb67f012082f5fea9d70e21dc7e36a013b","nextScreenType":3,"dialogMsg":"エラーが発生しました。\nタイトルに戻ります。","hitodamaShopSaleList":[],"webServerIp":"","storeUrl":"","dialogTitle":"","resultType":1}

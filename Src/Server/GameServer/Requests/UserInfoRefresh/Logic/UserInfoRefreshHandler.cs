@@ -2,7 +2,7 @@
 using Puniemu.Src.Server.GameServer.Requests.UserInfoRefresh.DataClasses;
 using Puniemu.Src.Server.GameServer.DataClasses;
 using System.Text;
-using Puniemu.Src.ConfigManager.Logic;
+
 using System;
 using System.Collections.Generic;
 using System.Reflection;

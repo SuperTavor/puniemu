@@ -17,7 +17,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameStart.DataClasses
         public int YoukaiHp { get; set; }
 
         [JsonProperty("responseCodeTeamEvent")]
-        public int ResponseCodeTeamEvent = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager!.GamedataCache["responseCodeTeamEvent"]);
+        public int ResponseCodeTeamEvent = int.Parse(DataManager.Logic.DataManager.GameDataManager!.GamedataCache["responseCodeTeamEvent"]);
 
         [JsonProperty("ywp_user_data")]
         public YwpUserData UserData;

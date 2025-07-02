@@ -40,7 +40,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameRetire.Logic
                 await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(errSession)));
                 return;
             }
-            var jsonLevelData = JsonConvert.DeserializeObject<Dictionary<string, StageData>>(ConfigManager.Logic.ConfigManager.GameDataManager!.GamedataCache["stage_data"]);
+            var jsonLevelData = JsonConvert.DeserializeObject<Dictionary<string, StageData>>(DataManager.Logic.DataManager.GameDataManager!.GamedataCache["stage_data"]);
             if (jsonLevelData == null || !(jsonLevelData.ContainsKey(deserialized.StageId.ToString())))
             {
                 await GeneralUtils.SendBadRequest(ctx);
@@ -64,11 +64,11 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameRetire.Logic
             res.UserGameResultData.Money = deserialized.Score;
             res.UserGameResultData.StageId = deserialized.StageId;
 
-            var MstEnemyParam = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["ywp_mst_youkai_enemy_param"]!)!["tableData"]);
-            var stageConditionInfo = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["ywp_mst_stage_condition"]!)!["tableData"], "", "^");
-            var stagesInfo = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["ywp_mst_stage"]!)!["tableData"]);
+            var MstEnemyParam = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai_enemy_param"]!)!["tableData"]);
+            var stageConditionInfo = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_stage_condition"]!)!["tableData"], "", "^");
+            var stagesInfo = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_stage"]!)!["tableData"]);
             var stageInfoIdx = stagesInfo.FindIndex([deserialized.StageId.ToString()]);
-            var YoukaiLevelMstTable = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["ywp_mst_youkai_level"]!)!["tableData"]);
+            var YoukaiLevelMstTable = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai_level"]!)!["tableData"]);
             List<long> starIdx = new List<long> { long.Parse(stagesInfo.Table[stageInfoIdx][8]), long.Parse(stagesInfo.Table[stageInfoIdx][9]), long.Parse(stagesInfo.Table[stageInfoIdx][10])};
 
             // stage
@@ -104,7 +104,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameRetire.Logic
 
             // enemy list
             // gameRetire for some ywp_user data, he send only modified row (ywp_user_..._diff)
-            var YoukaiMstTable = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["ywp_mst_youkai"]!)!["tableData"]);
+            var YoukaiMstTable = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai"]!)!["tableData"]);
             var userYoukai = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai");
             var dictionaryYoukai = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_dictionary");
             var dictionaryYoukaiTable = new TableParser.Logic.TableParser(dictionaryYoukai!); 

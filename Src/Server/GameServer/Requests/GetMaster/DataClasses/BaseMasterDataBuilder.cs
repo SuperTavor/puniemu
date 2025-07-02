@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using Puniemu.Src.ConfigManager.Logic;
 using Puniemu.Src.Utils.GeneralUtils;
 using System;
 using System.Collections.Generic;
@@ -22,7 +21,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetMaster.DataClasses
                 ["token"] = null,
                 ["storeUrl"] = "",
                 ["webServerIp"] = "",
-                ["mstVersionMaster"] = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager!.GamedataCache["mstVersionMaster"]),
+                ["mstVersionMaster"] = int.Parse(DataManager.Logic.DataManager.GameDataManager!.GamedataCache["mstVersionMaster"]),
                 ["nextScreenType"] = 0,
                 ["ymoneyShopSaleList"] = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<int>>("ymoneyShopSaleList"),
                 ["dialogMsg"] = ""

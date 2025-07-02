@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using Puniemu.Src.ConfigManager.Logic;
 using Puniemu.Src.Server.GameServer.DataClasses;
 
 namespace Puniemu.Src.Server.GameServer.Requests.UpdateTutorialFlag.DataClasses

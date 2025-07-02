@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using Puniemu.Src.ConfigManager.Logic;
+
 using Puniemu.Src.Server.GameServer.DataClasses;
 using Puniemu.Src.Utils.GeneralUtils;
 namespace Puniemu.Src.Server.GameServer.Requests.Init.DataClasses
@@ -8,14 +8,15 @@ namespace Puniemu.Src.Server.GameServer.Requests.Init.DataClasses
     {
         public InitResponse()
         {
-            MstVersionMaster = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager!.GamedataCache["mstVersionMaster"]);
+            MstVersionMaster = int.Parse(DataManager.Logic.DataManager.GameDataManager!.GamedataCache["mstVersionMaster"]);
             ResultCode = 0;
             NextScreenType = 0;
-            YwpMstVersionMaster = ConfigManager.Logic.ConfigManager.GameDataManager.GamedataCache["ywp_mst_version_master"];
+            YwpMstVersionMaster = DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_version_master"];
             GameServerURL = Consts.OG_GAMESERVER_URL;
             IsEnableSerialCode = 1;
             APKey = "";
-            ImgServer = ConfigManager.Logic.ConfigManager.Cfg!.Value.BaseDataDownloadURL;
+            //Supabase storage is still wip so only the external download is supported here
+            ImgServer = DataManager.Logic.DataManager.DataDownloadURL!;
             ResultType = 0;
             DispNoticeFlag = 2;
             NoticePageList = GeneralUtils.DeserializeGameDataToTypeAndCheckValidity<List<Dictionary<string, int>>>("noticePageList");

@@ -64,7 +64,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.DeckEdit.Logic
                     var gotten = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<object>(deserialized!.Gdkey!, table);
                     tableText = JsonConvert.SerializeObject(gotten);
                 }
-                else tableText = ConfigManager.Logic.ConfigManager.GameDataManager!.GamedataCache[table];
+                else tableText = DataManager.Logic.DataManager.GameDataManager!.GamedataCache[table];
                 //if we can't deserialize json it means it's not a json and we store it as is
                 object tableObj = new();
                 try

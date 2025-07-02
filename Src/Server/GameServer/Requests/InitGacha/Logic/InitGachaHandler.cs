@@ -15,6 +15,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.InitGacha.Logic
             ctx.Request.BodyReader.AdvanceTo(readResult.Buffer.End);
             var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             var deserialized = JsonConvert.DeserializeObject<InitGachaRequest>(requestJsonString!);
+
         }
     }
 }

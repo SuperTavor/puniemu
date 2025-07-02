@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using Puniemu.Src.ConfigManager.Logic;
+
 using Puniemu.Src.Server.GameServer.DataClasses;
 
 namespace Puniemu.Src.Server.GameServer.Requests.DefaultHandler.Logic
@@ -12,7 +12,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.DefaultHandler.Logic
             {
                 var path = ctx.Request.Path;
                 var formattedMsg = $"Unimplemented request:\n{path}";
-                var msgStruct = new MsgBoxResponse(formattedMsg, ConfigManager.Logic.ConfigManager.Cfg!.Value.ServerName);
+                var msgStruct = new MsgBoxResponse(formattedMsg, DataManager.Logic.DataManager.ServerName!);
                 var msgJson = JsonConvert.SerializeObject(msgStruct);
                 var encrypted = NHNCrypt.Logic.NHNCrypt.EncryptResponse(msgJson);
                 ctx.Response.Headers.ContentType = "application/json";

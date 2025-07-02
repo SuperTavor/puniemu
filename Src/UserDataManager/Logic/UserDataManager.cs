@@ -1,9 +1,9 @@
-﻿using FireSharp;
-using FireSharp.Config;
-using FireSharp.Interfaces;
-using Newtonsoft.Json;
-using Puniemu.Src.ConfigManager.Logic;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Puniemu.Src.UserDataManager.DataClasses;
+using Supabase;
 using System.Collections;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace Puniemu.Src.UserDataManager.Logic
 {
     public static class UserDataManager
@@ -13,126 +13,111 @@ namespace Puniemu.Src.UserDataManager.Logic
             public TableNotFoundException() : base() { }
         }
 
-        private static IFirebaseClient? _client;
+        private static Supabase.Client? _client;
         //Check credentials and connect to the Firestore database.
         public static void Initialize()
         {
             try
             {
-                _client = new FirebaseClient(new FirebaseConfig()
+                _client = new Supabase.Client(DataManager.Logic.DataManager.SupabaseURL!, DataManager.Logic.DataManager.SupabaseKey!,
+                new SupabaseOptions
                 {
-                    BasePath = ConfigManager.Logic.ConfigManager.Cfg!.Value.FirebaseBasePath,
-                    AuthSecret = ConfigManager.Logic.ConfigManager.Cfg!.Value.FirebaseAuthSecret
+                    AutoRefreshToken = true,
                 });
             }
             catch
             {
-                Console.WriteLine("Couldn't create firebase client.");
+                Console.WriteLine("Couldn't create supabase client.");
                 Environment.Exit(1);
             }
         }
 
+        // returns the udkey of the newly created device
+        public static async Task<string> NewDeviceAsync()
+        {
+            var device = new Device() 
+            { 
+                UdKey = Guid.NewGuid().ToString(),
+                Gdkeys = new()
+            };
+            var response = await _client!.From<Device>().Insert(device);
+            var newDevice = response.Models.First();
+            return newDevice.UdKey;
+        }
+        // returns the udkey of the newly created device
+        public static async Task<string> NewAccountAsync()
+        {
+            var acc = new Account()
+            {
+                Gdkey = Guid.NewGuid().ToString(),
+                YwpUserTables = new(),
+                LastLoginTime = ""
+            };
+            //response is saved to get the generated id
+            var response = await _client!.From<Account>().Insert(acc);
+            var newAcc = response.Models.First();
+            return newAcc.Gdkey;
+        }
         //Gets user data from specific account
-        public static async Task SetYwpUserAsync<T>(string gdkey, string tableId, T data)
+        public static async Task SetYwpUserAsync(string gdkey, string tableId, object data)
         {
-            var tableKey = $"UserData/{gdkey}/Tables/{tableId}";
-            //Set table data
-            await _client!.SetAsync(tableKey, JsonConvert.SerializeObject(data));
+            var response = await _client!.From<Account>().Where(a => a.Gdkey == gdkey).Get();
+            var account = response.Models.FirstOrDefault();
+            account.YwpUserTables[tableId] = data;
+            await account.Update<Account>();
         }
-        public static async Task AssignGdkeyToCharacterID(string characterId, string gdkey)
-        {
-            await _client!.SetAsync($"CharacterIdGdkeyAssignment/{characterId}", gdkey);
-        }
+
         public static async Task DeleteUser(string udkey, string gdkey)
         {
-            await _client!.DeleteAsync($"UserData/{gdkey}");
             await RemoveGdkeyFromUdkey(udkey, gdkey);
+            await _client.From<Account>().Where(a => a.Gdkey == gdkey).Delete();
         }
 
         private static async Task RemoveGdkeyFromUdkey(string udkey, string gdkey)
         {
-            var accountsPath = $"Devices/{udkey}/Accounts";
-            var deviceGdkeys = await _client!.GetAsync(accountsPath);
-            if (deviceGdkeys.Body == "null")
-            {
-                return;
-            }
-            else
-            {
-                var list = deviceGdkeys.ResultAs<List<string>>();
-                list.Remove(gdkey);
-                await _client.SetAsync(accountsPath, list);
-            }
+            var response = await _client.From<Device>().Where(d => d.UdKey == udkey).Get();
+            var device = response.Models.FirstOrDefault();
+            device.Gdkeys.Remove(gdkey);
         }
         //Sets user data for specific account
         public static async Task<T?> GetYwpUserAsync<T>(string gdkey, string tableId)
         {
-            var res = await _client!.GetAsync($"UserData/{gdkey}/Tables/{tableId}");
-            var converted = JsonConvert.DeserializeObject<T>(res.ResultAs<string>());
-            return converted;
+            var response = await _client!.From<Account>().Where(a => a.Gdkey == gdkey).Get();
+            var account = response.Models.FirstOrDefault();
+            var tbl = account.YwpUserTables[tableId];
+            JToken token = JToken.FromObject(tbl);
+            return token.ToObject<T>();
         }
 
         public static async Task<Dictionary<string,object>> GetEntireUserData(string gdkey)
         {
-            var tablesRef = await _client!.GetAsync($"UserData/{gdkey}/Tables");
-            var tables = tablesRef.ResultAs<Dictionary<string, string>>();
-            var convertedTables = new Dictionary<string, object>();
-            foreach(var table in tables)
-            {
-                if(table.Value != null)
-                {
-                    try
-                    {
-                        convertedTables[table.Key] = JsonConvert.DeserializeObject<object>(table.Value)!;
-                    }
-                    catch
-                    {
-                        convertedTables[table.Key] = table.Value;
-                    }
-                }
-            }
-            return convertedTables;
+            var response = await _client!.From<Account>().Where(a => a.Gdkey == gdkey).Get();
+            var account = response.Models.FirstOrDefault();
+            return account.YwpUserTables;
         }
         public static async Task SetEntireUserData(string gdkey, Dictionary<string,object> data)
         {
-            var jsonifiedData = new Dictionary<string, string>();
-            foreach(var item in data)
-            {
-                if(item.Value != null)
-                {
-                    jsonifiedData[item.Key] = JsonConvert.SerializeObject(item.Value);
-                }
-            }
-            await _client!.SetAsync($"UserData/{gdkey}/Tables", jsonifiedData);
+            var response = await _client!.From<Account>().Where(a => a.Gdkey == gdkey).Get();
+            var account = response.Models.FirstOrDefault();
+            account.YwpUserTables = data;
+            await account.Update<Account>();
         }
         //Gets all corresponding GDKeys from under a specified UDKey.
         public static async Task<List<string>> GetGdkeysFromUdkeyAsync(string udkey)
         {
-            var accountsPath = $"Devices/{udkey}/Accounts";
-            var deviceGdkeys = await _client!.GetAsync(accountsPath);
-            if(deviceGdkeys.Body == "null")
-            {
-                return new List<string>();
-            }
-            else
-            {
-                return deviceGdkeys.ResultAs<List<string>>();
-            }
+            var response = await _client.From<Device>().Where(d => d.UdKey == udkey).Get();
+            var device = response.Models.FirstOrDefault();
+            return device.Gdkeys;
         }
         //Add a gdkey association to a udkey
-        public static async Task RegisterGdKeyInUdKeyAsync(string udkey, string gdkey)
+        public static async Task AddAccountToDevice(string udkey, string gdkey)
         {
-            var accountsPath = $"Devices/{udkey}/Accounts";
-            var deviceGdkeys = await _client!.GetAsync(accountsPath);
-            List<string> gdkeys = new();
-            if (deviceGdkeys.Body != "null")
-            {
-                gdkeys = deviceGdkeys.ResultAs<List<string>>();
-            }
-            gdkeys.Add(gdkey);
-
-            await _client.SetAsync(accountsPath, gdkeys);
+            // get the correct device
+            var response = await _client.From<Device>().Where(d => d.UdKey == udkey).Get();
+            var device = response.Models.FirstOrDefault();
+            if(device.Gdkeys == null) device.Gdkeys = new List<string>();
+            device.Gdkeys.Add(gdkey); 
+            await device.Update<Device>();
         }
-
     }
 }

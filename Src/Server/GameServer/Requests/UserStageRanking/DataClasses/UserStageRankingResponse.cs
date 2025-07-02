@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Puniemu.Src.Server.GameServer.DataClasses;
 using Puniemu.Src.Utils.GeneralUtils;
-using Puniemu.Src.ConfigManager;
+
 namespace Puniemu.Src.Server.GameServer.Requests.UserStageRanking.DataClasses
 {
     public class UserStageRankingResponse: PuniResponse

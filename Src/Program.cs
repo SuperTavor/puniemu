@@ -23,6 +23,7 @@ using Puniemu.Src.Server.GameServer.Requests.GameUseItem.Logic;
 using Puniemu.Src.Server.GameServer.Requests.GameContinue.Logic;
 using Puniemu.Src.Server.GameServer.Requests.GameRetire.Logic;
 using Puniemu.Src.Server.GameServer.Requests.LoginStamp.Logic;
+using Puniemu.Src.Utils.GeneralUtils;
 
 namespace Puniemu.Src;
 class Program
@@ -30,6 +31,9 @@ class Program
     static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+
+        //Add the config to DataManager so it can be used globally
+        DataManager.Logic.DataManager.StaticInit(builder.Configuration);
 
         var app = builder.Build();
         //Rewrite to redirect mainly all .NHN requests to .NHN/, as ASP.NET Core thinks it's static serving otherwise or something
@@ -40,8 +44,6 @@ class Program
 
 
         app.UseRewriter(rewriteOptions);
-
-        ConfigManager.Logic.ConfigManager.Initialize();
 
         //Init database connection
         UserDataManager.Logic.UserDataManager.Initialize();

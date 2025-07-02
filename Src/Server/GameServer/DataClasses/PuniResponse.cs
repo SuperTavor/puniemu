@@ -20,7 +20,7 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
 
         //Version of assets on the server.
         [JsonProperty("mstVersionMaster")]
-        public int MstVersionMaster = int.Parse(ConfigManager.Logic.ConfigManager.GameDataManager!.GamedataCache["mstVersionMaster"]);
+        public int MstVersionMaster = int.Parse(DataManager.Logic.DataManager.GameDataManager!.GamedataCache["mstVersionMaster"]);
        
         // Constant.
         [JsonProperty("shopSaleList")]
