@@ -16,6 +16,9 @@ namespace Puniemu.Src.UserDataManager.DataClasses
         [Column("last_lgn_time")]
         public string LastLoginTime { get; set; }
 
+        [Column("start_date")]
+        public long StartDate { get; set; }
+
         [Column("opening_tutorial_flag")]
         public bool OpeningTutorialFlag { get; set; }
     }

@@ -5,11 +5,13 @@ using System.Text;
 using System.Buffers;
 using Puniemu.Src.UserDataManager.Logic;
 using Puniemu.Src.DataManager.Logic;
+using Puniemu.Src.UserDataManager.DataClasses;
 
 namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
 {
     public class CreateUserHandler
     {
+        private static Account Acc { get; set; }
         public static async Task HandleAsync(HttpContext ctx)
         {
             ctx.Request.EnableBuffering();
@@ -18,6 +20,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
             ctx.Request.BodyReader.AdvanceTo(readResult.Buffer.End);
             var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             var deserialized = JsonConvert.DeserializeObject<CreateUserRequest>(requestJsonString!);
+            var dbres = await UserDataManager.Logic.UserDataManager.SupabaseClient.From<Account>().Where(x => x.Gdkey == deserialized.Level5UserID).Get();
+            Acc = dbres.Model;
             ctx.Response.ContentType = "application/json";
             var generatedUserData = new YwpUserData((PlayerIcon)deserialized.IconID, (PlayerTitle)deserialized.IconID, deserialized.Level5UserID, deserialized.PlayerName);
             try
@@ -31,6 +35,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
                 return;
             }
             var createUserResponse = new CreateUserResponse(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_user_tutorial_list_def"], generatedUserData);
+            Acc.Update<Account>();
             var marshalledResponse = JsonConvert.SerializeObject(createUserResponse);
             var encryptedResponse = NHNCrypt.Logic.NHNCrypt.EncryptResponse(marshalledResponse);
             await ctx.Response.WriteAsync(encryptedResponse);            
@@ -62,12 +67,11 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
                     throw new Exception();
                 }
            }
-            //Set openingTutorialFlg
-           tables.Add("opening_tutorial_flg", 0);
+
            //Set ywpuser data
            tables.Add("ywp_user_data", generatedUserData);
            //Set start date
-           tables.Add("start_date",DateTimeOffset.Now.ToUnixTimeMilliseconds());
+           Acc.StartDate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
            tables.Add("login_stamp", "0|0|0");
            await UserDataManager.Logic.UserDataManager.SetEntireUserData(deserialized.Level5UserID,tables);
         }

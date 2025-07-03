@@ -13,13 +13,14 @@ namespace Puniemu.Src.UserDataManager.Logic
             public TableNotFoundException() : base() { }
         }
 
-        private static Supabase.Client? _client;
+        public static Supabase.Client? SupabaseClient;
+
         //Check credentials and connect to the Firestore database.
         public static void Initialize()
         {
             try
             {
-                _client = new Supabase.Client(DataManager.Logic.DataManager.SupabaseURL!, DataManager.Logic.DataManager.SupabaseKey!,
+                SupabaseClient = new Supabase.Client(DataManager.Logic.DataManager.SupabaseURL!, DataManager.Logic.DataManager.SupabaseKey!,
                 new SupabaseOptions
                 {
                     AutoRefreshToken = true,
@@ -40,7 +41,7 @@ namespace Puniemu.Src.UserDataManager.Logic
                 UdKey = Guid.NewGuid().ToString(),
                 Gdkeys = new()
             };
-            var response = await _client!.From<Device>().Insert(device);
+            var response = await SupabaseClient!.From<Device>().Insert(device);
             var newDevice = response.Models.First();
             return newDevice.UdKey;
         }
@@ -54,14 +55,14 @@ namespace Puniemu.Src.UserDataManager.Logic
                 LastLoginTime = ""
             };
             //response is saved to get the generated id
-            var response = await _client!.From<Account>().Insert(acc);
+            var response = await SupabaseClient!.From<Account>().Insert(acc);
             var newAcc = response.Models.First();
             return newAcc.Gdkey;
         }
         //Gets user data from specific account
         public static async Task SetYwpUserAsync(string gdkey, string tableId, object data)
         {
-            var response = await _client!.From<Account>().Where(a => a.Gdkey == gdkey).Get();
+            var response = await SupabaseClient!.From<Account>().Where(a => a.Gdkey == gdkey).Get();
             var account = response.Models.FirstOrDefault();
             account.YwpUserTables[tableId] = data;
             await account.Update<Account>();
@@ -70,34 +71,33 @@ namespace Puniemu.Src.UserDataManager.Logic
         public static async Task DeleteUser(string udkey, string gdkey)
         {
             await RemoveGdkeyFromUdkey(udkey, gdkey);
-            await _client.From<Account>().Where(a => a.Gdkey == gdkey).Delete();
+            await SupabaseClient.From<Account>().Where(a => a.Gdkey == gdkey).Delete();
         }
 
         private static async Task RemoveGdkeyFromUdkey(string udkey, string gdkey)
         {
-            var response = await _client.From<Device>().Where(d => d.UdKey == udkey).Get();
+            var response = await SupabaseClient.From<Device>().Where(d => d.UdKey == udkey).Get();
             var device = response.Models.FirstOrDefault();
             device.Gdkeys.Remove(gdkey);
         }
         //Sets user data for specific account
         public static async Task<T?> GetYwpUserAsync<T>(string gdkey, string tableId)
         {
-            var response = await _client!.From<Account>().Where(a => a.Gdkey == gdkey).Get();
+            var response = await SupabaseClient!.From<Account>().Where(a => a.Gdkey == gdkey).Get();
             var account = response.Models.FirstOrDefault();
             var tbl = account.YwpUserTables[tableId];
             JToken token = JToken.FromObject(tbl);
             return token.ToObject<T>();
         }
-
         public static async Task<Dictionary<string,object>> GetEntireUserData(string gdkey)
         {
-            var response = await _client!.From<Account>().Where(a => a.Gdkey == gdkey).Get();
+            var response = await SupabaseClient!.From<Account>().Where(a => a.Gdkey == gdkey).Get();
             var account = response.Models.FirstOrDefault();
             return account.YwpUserTables;
         }
         public static async Task SetEntireUserData(string gdkey, Dictionary<string,object> data)
         {
-            var response = await _client!.From<Account>().Where(a => a.Gdkey == gdkey).Get();
+            var response = await SupabaseClient!.From<Account>().Where(a => a.Gdkey == gdkey).Get();
             var account = response.Models.FirstOrDefault();
             account.YwpUserTables = data;
             await account.Update<Account>();
@@ -105,7 +105,7 @@ namespace Puniemu.Src.UserDataManager.Logic
         //Gets all corresponding GDKeys from under a specified UDKey.
         public static async Task<List<string>> GetGdkeysFromUdkeyAsync(string udkey)
         {
-            var response = await _client.From<Device>().Where(d => d.UdKey == udkey).Get();
+            var response = await SupabaseClient.From<Device>().Where(d => d.UdKey == udkey).Get();
             var device = response.Models.FirstOrDefault();
             return device.Gdkeys;
         }
@@ -113,7 +113,7 @@ namespace Puniemu.Src.UserDataManager.Logic
         public static async Task AddAccountToDevice(string udkey, string gdkey)
         {
             // get the correct device
-            var response = await _client.From<Device>().Where(d => d.UdKey == udkey).Get();
+            var response = await SupabaseClient.From<Device>().Where(d => d.UdKey == udkey).Get();
             var device = response.Models.FirstOrDefault();
             if(device.Gdkeys == null) device.Gdkeys = new List<string>();
             device.Gdkeys.Add(gdkey); 

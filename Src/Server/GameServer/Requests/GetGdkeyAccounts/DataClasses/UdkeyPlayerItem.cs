@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Puniemu.Src.Server.GameServer.DataClasses;
+using Puniemu.Src.UserDataManager.DataClasses;
 
 namespace Puniemu.Src.Server.GameServer.Requests.GetGdkeyAccounts.DataClasses
 {
@@ -42,17 +43,18 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetGdkeyAccounts.DataClasses
                 return null;
             }
 
+            var res = await UserDataManager.Logic.UserDataManager.SupabaseClient.From<Account>().Where(x => x.Gdkey == gdkey).Get();
+            var account = res.Model;
             UdkeyPlayerItem playerItem = new();
 
             playerItem.IconID = (PlayerIcon)userData!.IconID;
             playerItem.PlayerName = userData.PlayerName;
             var UserDeck = new TableParser.Logic.TableParser((await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(gdkey, "ywp_user_youkai_deck"))!);
             playerItem.PartnerYokaiID = int.Parse(UserDeck.Table[0][1]);
-            var startTimestamp = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<long>(gdkey, "start_date");
+            var startTimestamp = account.StartDate;
             var startTimestampString = DateTimeOffset.FromUnixTimeMilliseconds(startTimestamp).DateTime.ToString("yyyy-MM-dd HH:mm:ss");
             playerItem.StartDate = startTimestampString;
-            //Placeholder as this can only be implemented when we're done with login.nhn
-            playerItem.LastUpdateDate = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(gdkey, "lgn_date");
+            playerItem.LastUpdateDate = account.LastLoginTime; 
             playerItem.TitleID = (PlayerTitle)userData.CharacterTitleID;
             playerItem.GDKey = gdkey;
             playerItem.UserID = userData.UserID;
