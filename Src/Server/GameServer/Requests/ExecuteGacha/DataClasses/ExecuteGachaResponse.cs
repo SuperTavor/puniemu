@@ -15,7 +15,7 @@ using System.Text.RegularExpressions;
 
 namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.DataClasses
 {
-    public class ExecuteGachaResponse : PuniResponse
+    public class ExecuteGachaResponse : CommonResponse
     {
         [JsonProperty("ywp_user_tutorial_list")]
         public string? YwpUserTutorialList { get; set; }

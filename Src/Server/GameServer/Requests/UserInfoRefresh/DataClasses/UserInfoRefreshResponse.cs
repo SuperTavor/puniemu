@@ -4,7 +4,7 @@ using Puniemu.Src.Utils.GeneralUtils;
 using System.Xml.Linq;
 namespace Puniemu.Src.Server.GameServer.Requests.UserInfoRefresh.DataClasses
 {
-    public class UserInfoRefreshResponse : PuniResponse
+    public class UserInfoRefreshResponse : CommonResponse
     {
 
         // Basic user data.

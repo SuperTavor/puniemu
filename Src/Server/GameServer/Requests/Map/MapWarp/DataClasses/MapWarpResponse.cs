@@ -4,7 +4,7 @@ using Puniemu.Src.Utils.GeneralUtils;
 
 namespace Puniemu.Src.Server.GameServer.Requests.MapWarp.DataClasses
 {
-    public class MapWarpResponse : PuniResponse
+    public class MapWarpResponse : CommonResponse
     {
         // Basic user data.
         [JsonProperty("ywp_user_data")]

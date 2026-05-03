@@ -4,7 +4,7 @@ using Puniemu.Src.Utils.GeneralUtils;
 
 namespace Puniemu.Src.Server.GameServer.Requests.GetL5IDStatus.DataClasses
 {
-    public class GetL5IDStatusResponse : PuniResponse
+    public class GetL5IDStatusResponse : CommonResponse
     {
         // Basic user data.
         [JsonProperty("L5IdStatus")]

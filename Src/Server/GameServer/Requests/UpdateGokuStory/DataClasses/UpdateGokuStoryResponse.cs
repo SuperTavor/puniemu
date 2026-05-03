@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Puniemu.Src.Server.GameServer.Requests.UpdateGokuStory.DataClasses
 {
-    public class UpdateGokuStoryResponse : PuniResponse
+    public class UpdateGokuStoryResponse : CommonResponse
     {
         [JsonProperty("ywp_user_icon_budge")]
         public string? YwpUserIconBudge { get; set; }

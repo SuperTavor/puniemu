@@ -7,7 +7,7 @@ using Puniemu.Src.Server.GameServer.Requests.FriendSearch.DataClasses;
 
 namespace Puniemu.Src.Server.GameServer.Requests.FriendSearch.DataClasses
 {
-    public class FriendSearchResponse : PuniResponse
+    public class FriendSearchResponse : CommonResponse
     {
         [JsonProperty("friend")]
         public FriendsEntry? Friend { get; set; }

@@ -1,9 +1,10 @@
 ﻿using Newtonsoft.Json;
 using Puniemu.Src.Utils.GeneralUtils;
+using System.Reflection;
 
 namespace Puniemu.Src.Server.GameServer.DataClasses
 {
-    public class PuniResponse
+    public class CommonResponse
     {
         // The unix time when the response was sent.
         [JsonProperty("serverDt")]
@@ -55,6 +56,29 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
 
         [JsonProperty("mstVersionVer")]
         public int MstVersionVer { get; set; } // Version of assets on the server
+
+        public async Task<Dictionary<string, object>> ToDictionary()
+        {
+            var dict = new Dictionary<string, object>();
+
+            var type = GetType();
+
+            var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public);
+
+            foreach (var field in fields)
+            {
+                var jsonProp = field.GetCustomAttribute<JsonPropertyAttribute>();
+                if (jsonProp == null || string.IsNullOrWhiteSpace(jsonProp.PropertyName))
+                    continue;
+
+                var key = jsonProp.PropertyName;
+                var value = field.GetValue(this);
+
+                dict[key] = value!;
+            }
+
+            return dict;
+        }
 
     }
 

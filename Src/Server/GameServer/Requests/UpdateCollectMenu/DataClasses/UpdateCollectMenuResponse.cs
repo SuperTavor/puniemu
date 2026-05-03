@@ -3,7 +3,7 @@ using Puniemu.Src.Server.GameServer.DataClasses;
 
 namespace Puniemu.Src.Server.GameServer.Requests.UpdateCollectMenu.DataClasses
 {
-    public class UpdateCollectMenuResponse : PuniResponse
+    public class UpdateCollectMenuResponse : CommonResponse
     {
         // Basic user data.
         [JsonProperty("ywp_user_data")]

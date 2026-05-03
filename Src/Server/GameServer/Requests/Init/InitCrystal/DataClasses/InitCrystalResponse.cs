@@ -7,7 +7,7 @@ using Puniemu.Src.Server.GameServer.DataClasses;
 
 namespace Puniemu.Src.Server.GameServer.Requests.InitCrystal.DataClasses
 {
-    public class InitCrystalResponse : PuniResponse
+    public class InitCrystalResponse : CommonResponse
     {
         private JObject? _jo;
 

@@ -8,7 +8,7 @@ using Puniemu.Src.Utils.GeneralUtils;
 
 namespace Puniemu.Src.Server.GameServer.Requests.InitGacha.DataClasses
 {
-    public class InitGachaResponse : PuniResponse
+    public class InitGachaResponse : CommonResponse
     {
         //Info about the cranks
         //theorized variables:

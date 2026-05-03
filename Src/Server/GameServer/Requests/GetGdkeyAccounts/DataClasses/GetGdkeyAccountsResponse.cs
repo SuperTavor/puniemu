@@ -4,7 +4,7 @@ using Puniemu.Src.UserDataManager.Logic;
 
 namespace Puniemu.Src.Server.GameServer.Requests.GetGdkeyAccounts.DataClasses
 {
-    public class GetGdkeyAccountsResponse: PuniResponse
+    public class GetGdkeyAccountsResponse: CommonResponse
     {
         [JsonProperty("udkeyPlayerList")]
         public List<UdkeyPlayerItem>? UDKeyPlayerList { get; set; } // List of UDKeyPlayerItem

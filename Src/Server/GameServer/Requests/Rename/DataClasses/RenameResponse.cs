@@ -4,7 +4,7 @@ using Puniemu.Src.Utils.GeneralUtils;
 
 namespace Puniemu.Src.Server.GameServer.Requests.Rename.DataClasses
 {
-    public class RenameResponse : PuniResponse
+    public class RenameResponse : CommonResponse
     {
         // Basic user data.
         [JsonProperty("ywp_user_data")]

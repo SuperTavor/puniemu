@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Puniemu.Src.DataManager.Logic;
 using Puniemu.Src.Server.GameServer.DataClasses;
 using Puniemu.Src.Server.GameServer.Requests.Login.DataClasses;
 using Puniemu.Src.UserDataManager.DataClasses;
@@ -25,10 +26,18 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.Logic
             var dbRes = (await UserDataManager.Logic.UserDataManager.SupabaseClient!.From<Account>().Where(x => x.Gdkey == deserialized.Gdkey).Get())!;
             var acc = dbRes.Model!;
             //Construct response
-            var res = new LoginResponse();
+            CommonLoginResponse res = new CommonLoginResponse();
+            if (DataManager.Logic.DataManager.IsWibWob)
+            {
+                res = new DataClasses.WibWob.LoginResponse();
+            }
+            else res = new DataClasses.Puni.LoginResponse();
+
+            await res.ConstructAsync(deserialized!.Gdkey!);
             //Get the user tables
-            var resdict = (await res.ToDictionary(deserialized!.Gdkey!))!;            
-            await GeneralUtils.AddTablesToResponse(Consts.LOGIN_TABLES,resdict!,true,deserialized!.Gdkey!);
+            var resdict = (await res.ToDictionary())!;            
+            //for now for testing just add puni login tables, similar anyway
+            await GeneralUtils.AddTablesToResponse(Consts.LOGIN_TABLES_PUNI,resdict!,true,deserialized!.Gdkey!);
             //Set last login time to now
             acc.LastLoginTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             await acc.Update<Account>();

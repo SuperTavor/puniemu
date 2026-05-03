@@ -8,7 +8,7 @@ using Puniemu.Src.Server.GameServer.Requests.FriendRequestDelete.DataClasses;
 namespace Puniemu.Src.Server.GameServer.Requests.FriendRequestDelete.DataClasses
 {
     //Todo send ywp_user_friend
-    public class FriendRequestDeleteResponse : PuniResponse
+    public class FriendRequestDeleteResponse : CommonResponse
     {
         [JsonProperty("responseCode")]
         public int ResponseCode { get; set; }

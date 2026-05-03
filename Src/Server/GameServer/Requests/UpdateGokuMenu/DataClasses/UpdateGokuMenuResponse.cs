@@ -7,7 +7,7 @@ using Puniemu.Src.Server.GameServer.DataClasses;
 
 namespace Puniemu.Src.Server.GameServer.Requests.UpdateGokuMenu.DataClasses
 {
-    public class UpdateGokuMenuResponse : PuniResponse
+    public class UpdateGokuMenuResponse : CommonResponse
     {
         private JObject? _jo;
 

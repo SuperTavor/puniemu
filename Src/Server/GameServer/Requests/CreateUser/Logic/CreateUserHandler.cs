@@ -149,7 +149,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
             CreateSave(ref tables, generatedUserData);
 
             tables["opening_tutorial_flg"] = false;
-            foreach (var userTable in Consts.LOGIN_TABLES.Where(x => x.Contains("ywp_user") && x != "ywp_user_data"))
+            foreach (var userTable in Consts.LOGIN_TABLES_PUNI.Where(x => x.Contains("ywp_user") && x != "ywp_user_data"))
             {
                 //initialize with default if exists, else 
                 if (tables.ContainsKey(userTable) == true)

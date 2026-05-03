@@ -4,7 +4,7 @@ using Puniemu.Src.Utils.GeneralUtils;
 
 namespace Puniemu.Src.Server.GameServer.Requests.MapUnLock.DataClasses
 {
-    public class MapUnLockResponse : PuniResponse
+    public class MapUnLockResponse : CommonResponse
     {
         // Basic user data.
         [JsonProperty("ywp_user_data")]

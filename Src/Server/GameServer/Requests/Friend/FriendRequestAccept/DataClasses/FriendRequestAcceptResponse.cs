@@ -9,7 +9,7 @@ using Puniemu.Src.Server.GameServer.Requests.FriendRequestAccept.DataClasses;
 namespace Puniemu.Src.Server.GameServer.Requests.FriendRequestAccept.DataClasses
 {
     //Todo send ywp_user_friend
-    public class FriendRequestAcceptResponse : PuniResponse
+    public class FriendRequestAcceptResponse : CommonResponse
     {
         [JsonProperty("responseCode")]
         public int ResponseCode { get; set; }

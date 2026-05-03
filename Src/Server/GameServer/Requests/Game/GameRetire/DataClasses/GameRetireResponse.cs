@@ -3,7 +3,7 @@ using Puniemu.Src.Utils.GeneralUtils;
 using Puniemu.Src.Server.GameServer.DataClasses;
 namespace Puniemu.Src.Server.GameServer.Requests.GameRetire.DataClasses
 {
-    public class GameRetireResponse : PuniResponse
+    public class GameRetireResponse : CommonResponse
     {
         //IDK
         [JsonProperty("teamEventButtonHiddenFlg")]

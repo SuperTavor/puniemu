@@ -34,7 +34,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.InitGoku.DataClasses
         [JsonProperty("updateReadFlg")]
         public int UpdateReadFlg { get; set; }
     }
-    public class InitGokuResponse : PuniResponse
+    public class InitGokuResponse : CommonResponse
     {
         [JsonProperty("ywp_mst_goku_story")]
         public List<Dictionary<string,object?>>? YwpMstGokuStory { get; set; }

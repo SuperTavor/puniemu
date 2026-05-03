@@ -5,7 +5,7 @@ using Puniemu.Src.Server.GameServer.Requests.FriendRequestAccept.DataClasses;
 
 namespace Puniemu.Src.Server.GameServer.Requests.FriendDelete.DataClasses
 {
-    public class FriendDeleteResponse : PuniResponse
+    public class FriendDeleteResponse : CommonResponse
     {
         [JsonProperty("responseCode")]
         public int ResponseCode { get; set; }

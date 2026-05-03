@@ -7,7 +7,7 @@ using Puniemu.Src.UserDataManager.Logic;
 
 namespace Puniemu.Src.Server.GameServer.Requests.UpdateCrystalMenu.DataClasses
 {
-    public class UpdateCrystalMenuResponse : PuniResponse
+    public class UpdateCrystalMenuResponse : CommonResponse
     {
         private JObject _jo = new JObject();
 

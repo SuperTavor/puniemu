@@ -3,7 +3,7 @@ using Puniemu.Src.Utils.GeneralUtils;
 using Puniemu.Src.Server.GameServer.DataClasses;
 namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.DataClasses
 {
-    public class GameEndResponse : PuniResponse
+    public class GameEndResponse : CommonResponse
     {
         //IDK
         [JsonProperty("eventTeamPoint")]

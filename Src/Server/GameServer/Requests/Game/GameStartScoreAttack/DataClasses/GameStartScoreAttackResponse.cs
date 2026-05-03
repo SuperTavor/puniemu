@@ -3,7 +3,7 @@ using Puniemu.Src.Server.GameServer.DataClasses;
 
 namespace Puniemu.Src.Server.GameServer.Requests.StartScoreAttack.DataClasses
 {
-    public class StartScoreAttackResponse : PuniResponse
+    public class StartScoreAttackResponse : CommonResponse
     {
         [JsonProperty("serverDt")]
         public long ServerDt { get; set; }

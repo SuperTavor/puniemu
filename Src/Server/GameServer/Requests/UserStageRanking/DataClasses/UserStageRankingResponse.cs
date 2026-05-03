@@ -4,7 +4,7 @@ using Puniemu.Src.Utils.GeneralUtils;
 
 namespace Puniemu.Src.Server.GameServer.Requests.UserStageRanking.DataClasses
 {
-    public class UserStageRankingResponse: PuniResponse
+    public class UserStageRankingResponse: CommonResponse
     {
 
         [JsonProperty("ywp_user_stage_rank")]

@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Puniemu.Src.Server.L5ID.DataClasses;
 using System.Collections;
+using System.Text.Json.Serialization;
 namespace Puniemu.Src.Server.L5ID.Requests.Active.DataClasses
 {
     public class ActiveResponse
@@ -33,6 +34,8 @@ namespace Puniemu.Src.Server.L5ID.Requests.Active.DataClasses
         [JsonProperty("sign_nonce")]
         public string? SignNonce { get; set; }
 
+        [JsonProperty("is_created")]
+        public bool IsCreated = false;
 
         /*Using this instead of the constructors as constructors don't support async.
         Refer to comments on the actual class properties for explanations on the wrappedKeySet
@@ -66,7 +69,8 @@ namespace Puniemu.Src.Server.L5ID.Requests.Active.DataClasses
                 MaxGDKeys = 3,
                 RCClientVersion = new RcClientVersion(),
                 SignTimestamp = DateTimeOffset.Now.ToUnixTimeMilliseconds(),
-                SignNonce = "123"
+                SignNonce = "123",
+                IsCreated = false
             };
 
             return instance;

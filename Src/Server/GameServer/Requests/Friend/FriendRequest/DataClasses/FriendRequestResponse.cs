@@ -8,7 +8,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.FriendRequest.DataClasses
 {
     //Todo send ywp_user_friend
 
-    public class FriendRequestResponse : PuniResponse
+    public class FriendRequestResponse : CommonResponse
     {
         [JsonProperty("responseCode")]
         public int ResponseCode { get; set; }

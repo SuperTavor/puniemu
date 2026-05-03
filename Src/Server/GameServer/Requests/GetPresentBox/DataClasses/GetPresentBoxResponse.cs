@@ -4,7 +4,7 @@ using Puniemu.Src.Utils.GeneralUtils;
 using System.Xml.Linq;
 namespace Puniemu.Src.Server.GameServer.Requests.GetPresentBox.DataClasses
 {
-    public class GetPresentBoxResponse : PuniResponse
+    public class GetPresentBoxResponse : CommonResponse
     {
     }
 }

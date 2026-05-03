@@ -6,7 +6,7 @@ using Puniemu.Src.Server.GameServer.DataClasses;
 
 namespace Puniemu.Src.Server.GameServer.Requests.Friend.DataClasses
 {
-    public class FriendsResponse : PuniResponse
+    public class FriendsResponse : CommonResponse
     {
         [JsonProperty("ywp_user_data")]
         public YwpUserData? YwpUserData { get; set; }

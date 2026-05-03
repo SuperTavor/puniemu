@@ -4,7 +4,7 @@ using Puniemu.Src.Utils.GeneralUtils;
 
 namespace Puniemu.Src.Server.GameServer.Requests.GameEndScoreAttack.DataClasses
 {
-    public class GameEndScoreAttackResponse : PuniResponse
+    public class GameEndScoreAttackResponse : CommonResponse
     {
         [JsonProperty("serverDt")]
         public long ServerDt { get; set; }

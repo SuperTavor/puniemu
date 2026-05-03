@@ -3,7 +3,7 @@ using Puniemu.Src.Server.GameServer.DataClasses;
 
 namespace Puniemu.Src.Server.GameServer.Requests.UpdateTutorialFlag.DataClasses
 {
-    public class UpdateTutorialFlagResponse: PuniResponse
+    public class UpdateTutorialFlagResponse: CommonResponse
     {
 
         // Table of completed tutorials for the user.
