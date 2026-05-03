@@ -4,7 +4,6 @@ using Puniemu.Src.Server.GameServer.Requests.GetL5IDStatus.Logic;
 using Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic;
 using Puniemu.Src.Server.GameServer.Requests.Init.Logic;
 using Puniemu.Src.Server.GameServer.Requests.GetMaster.Logic;
-using Puniemu.Src.Server.L5ID.Requests.Active.Logic;
 using Puniemu.Src.Server.L5ID.Requests.CreateGDKey.Logic;
 using Puniemu.Src.Server.GameServer.Requests.GetGdkeyAccounts.Logic;
 using Puniemu.Src.Server.GameServer.Requests.UpdateProfile.Logic;
@@ -47,7 +46,7 @@ using Puniemu.Src.Server.GameServer.Requests.MapUnLock.Logic;
 using Puniemu.Src.Utils.GeneralUtils;
 using Puniemu.Src.Server.GameServer.Requests.FriendRequestAccept.Logic;
 using Puniemu.Src.Server.GameServer.Requests.GetRanking.Logic;
-
+using Puniemu.Src.Server.L5ID.Requests;
 namespace Puniemu.Src;
 class Program
 {
@@ -85,7 +84,7 @@ class Program
         // for Puni 
         app.MapGet("/l5id" + L5ID_BASE +"active/", async ctx =>
         {
-            await ActiveHandler.HandleAsync(ctx);
+            await Puniemu.Src.Server.L5ID.Requests.Active.Logic.Puni.ActiveHandler.HandleAsync(ctx);
         });
         app.MapGet("/l5id" + L5ID_BASE + "create_gdkey/", async ctx =>
         {
@@ -94,7 +93,7 @@ class Program
         //For WibWob
         app.MapGet(L5ID_BASE + "active.nhn/", async ctx =>
         {
-            await ActiveHandler.HandleAsync(ctx);
+            await Puniemu.Src.Server.L5ID.Requests.Active.Logic.WibWob.ActiveHandler.HandleAsync(ctx);
         });
         app.MapGet(L5ID_BASE + "create_gdkey.nhn/", async ctx =>
         {

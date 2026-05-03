@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using Puniemu.Src.UserDataManager.DataClasses;
 using Supabase;
 using System.Collections;
+using System.ComponentModel;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace Puniemu.Src.UserDataManager.Logic
 {
@@ -34,18 +35,31 @@ namespace Puniemu.Src.UserDataManager.Logic
         }
 
         // returns the udkey of the newly created device
-        public static async Task<string> NewDeviceAsync()
+        public static async Task<string> NewDeviceAsync(string? udkey = null)
         {
-            var device = new Device() 
-            { 
-                UdKey = Guid.NewGuid().ToString(),
-                Gdkeys = new()
-            };
-            var response = await SupabaseClient!.From<Device>().Insert(device);
+            Device dev = new Device();
+            dev.Gdkeys = new();
+            if (udkey == null)
+            {
+                dev.UdKey = Guid.NewGuid().ToString();
+            }
+            else dev.UdKey = udkey;
+            var response = await SupabaseClient!.From<Device>().Insert(dev);
             var newDevice = response.Models.First();
             return newDevice.UdKey!;
         }
-        // returns the udkey of the newly created device
+
+        //checks if udkey exists
+        public static async Task<bool> IsDeviceExists(string udkey)
+        {
+            var response = await SupabaseClient!
+                .From<Device>()
+                .Where(d => d.UdKey == udkey)
+                .Count(Supabase.Postgrest.Constants.CountType.Exact);
+
+            return response > 0;
+        }
+        // returns the gdkey of the newly created account
         public static async Task<string> NewAccountAsync()
         {
             var acc = new Account()
@@ -92,6 +106,7 @@ namespace Puniemu.Src.UserDataManager.Logic
             var response = await SupabaseClient!.From<Device>().Where(d => d.UdKey == udkey).Get();
             var device = response.Models.FirstOrDefault()!;
             device.Gdkeys!.Remove(gdkey);
+            await device.Update<Device>();
         }
         //Sets user data for specific account
         public static async Task<T?> GetYwpUserAsync<T>(string gdkey, string tableId)

@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using Puniemu.Src.Server.L5ID.Requests.Active.DataClasses;
 using Puniemu.Src.UserDataManager.Logic;
-namespace Puniemu.Src.Server.L5ID.Requests.Active.Logic
+namespace Puniemu.Src.Server.L5ID.Requests.Active.Logic.Puni
 {
     //This call is seeimgly used to check the validity of udkeys and gdkeys on the L5id server.
     public class ActiveHandler
