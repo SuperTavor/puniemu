@@ -15,7 +15,6 @@ using Puniemu.Src.Server.GameServer.Requests.BuyHitodama.Logic;
 using Puniemu.Src.Server.GameServer.Requests.InitBilling.Logic;
 using Puniemu.Src.Server.GameServer.Requests.GameStart.Logic;
 using Puniemu.Src.Server.GameServer.Requests.DeckEdit.Logic;
-using Puniemu.Src.Server.GameServer.Requests.UpdateTutorialFlag.Logic;
 using Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic;
 using Puniemu.Src.Server.GameServer.Requests.Rename.Logic;
 using Puniemu.Src.Server.GameServer.Requests.GameUseItem.Logic;
@@ -47,6 +46,8 @@ using Puniemu.Src.Utils.GeneralUtils;
 using Puniemu.Src.Server.GameServer.Requests.FriendRequestAccept.Logic;
 using Puniemu.Src.Server.GameServer.Requests.GetRanking.Logic;
 using Puniemu.Src.Server.L5ID.Requests;
+using Puniemu.Src.Server.GameServer.Requests.UpdateTutorialFlag.Logic.Puni;
+using Puniemu.Src.DataManager.Logic;
 namespace Puniemu.Src;
 class Program
 {
@@ -121,7 +122,11 @@ class Program
         });
         app.MapPost("/updateTutorialFlg.nhn", async ctx =>
         {
-            await UpdateTutorialFlagHandler.HandleAsync(ctx);
+            if(DataManager.Logic.DataManager.IsWibWob)
+            {
+                await Server.GameServer.Requests.UpdateTutorialFlag.Logic.WibWob.UpdateTutorialFlagHandler.HandleAsync(ctx);
+            }
+            await Server.GameServer.Requests.UpdateTutorialFlag.Logic.Puni.UpdateTutorialFlagHandler.HandleAsync(ctx);
         });
         app.MapPost("/getL5idStatus.nhn", async ctx =>
         {
