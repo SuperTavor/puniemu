@@ -13,7 +13,6 @@ using Puniemu.Src.Server.GameServer.Requests.UserStageRanking.Logic;
 using Puniemu.Src.Server.GameServer.Requests.Login.Logic;
 using Puniemu.Src.Server.GameServer.Requests.BuyHitodama.Logic;
 using Puniemu.Src.Server.GameServer.Requests.InitBilling.Logic;
-using Puniemu.Src.Server.GameServer.Requests.GameStart.Logic;
 using Puniemu.Src.Server.GameServer.Requests.DeckEdit.Logic;
 using Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic;
 using Puniemu.Src.Server.GameServer.Requests.Rename.Logic;
@@ -48,6 +47,7 @@ using Puniemu.Src.Server.GameServer.Requests.GetRanking.Logic;
 using Puniemu.Src.Server.L5ID.Requests;
 using Puniemu.Src.Server.GameServer.Requests.UpdateTutorialFlag.Logic.Puni;
 using Puniemu.Src.DataManager.Logic;
+using Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic.Puni;
 namespace Puniemu.Src;
 class Program
 {
@@ -162,7 +162,10 @@ class Program
         });
         app.MapPost("/gameStart.nhn", async ctx =>
         {
-            await GameStartHandler.HandleAsync(ctx);
+            if(DataManager.Logic.DataManager.IsWibWob)
+            {
+                await Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic.WibWob.GameStartHandler.HandleAsync(ctx);
+            } else await Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic.Puni.GameStartHandler.HandleAsync(ctx);
         });
         app.MapPost("/deckEdit.nhn", async ctx =>
         {

@@ -11,6 +11,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.UpdateTutorialFlag.DataClasses.
         public int TutorialStatus { get; set;  }
 
         [JsonProperty("tutorialId")] 
-        public int TutorialId { get; set;  }
+        public long TutorialId { get; set;  }
     }
 }
