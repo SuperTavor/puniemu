@@ -17,6 +17,118 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
 {
     public static class GameEndHandler
     {
+        public static void HandleUserYoukai(ref GameEndRequest deserialized, ref GameEndResponse res, ref TableParser<YwpUserYoukai> userYoukaiTable, ref TableParser<YwpUserYoukai> userYoukaiTableDiff)
+        {
+            var YoukaiMstTable = new TableParser<YwpMstYoukai>(
+                JsonConvert.DeserializeObject<Dictionary<string, string>>(
+                    DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai"]!
+                    )!["tableData"]
+            );
+            var YoukaiLevelMstTable = new TableParser<YwpMstYoukaiLevel>(
+                JsonConvert.DeserializeObject<Dictionary<string, string>>(
+                    DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai_level"]!
+                    )!["tableData"]
+            );
+            var YoukaiLevelOpenMstTable = new TableParser<YwpMstYoukaiLevelOpen>(
+                JsonConvert.DeserializeObject<Dictionary<string, string>>(
+                    DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai_level_open"]!
+                    )!["tableData"]
+            );
+
+            foreach (UserYoukaiResultListReq i in deserialized!.UserYoukaiResultList!)
+            {
+                var youkaiIDx = userYoukaiTable.FindIndex([i.YoukaiId.ToString()]);
+                var YoukaiMstIndex = MstYoukaiManager.GetYoukaiIndex(ref YoukaiMstTable, i.YoukaiId);
+                if (youkaiIDx < 0 || YoukaiMstIndex < 0)
+                {
+                    continue;
+                }
+                UserYoukaiResultListRes item = new();
+                item.HaveFlg = false; // TODO
+                item.CanEvolve = false; //todo
+                item.IsLockLevel = false; //todo (need to paid to be able to level up)
+                item.isMaxLevel = false;
+                item.youkaiId = i.YoukaiId;
+                item.Before.Level = userYoukaiTable.Items[youkaiIDx].Level;
+                item.Before.Exp = (int)userYoukaiTable.Items[youkaiIDx].Exp;
+                item.Before.ExpBar.Denominator = userYoukaiTable.Items[youkaiIDx].ExpDenominator;
+                item.Before.ExpBar.Numerator = userYoukaiTable.Items[youkaiIDx].ExpNumerator;
+                item.Before.ExpBar.Percentage = userYoukaiTable.Items[youkaiIDx].Percentage;
+                item.After.Level = item.Before.Level;
+                item.After.Exp = item.Before.Exp;
+                item.After.ExpBar.Denominator = item.Before.ExpBar.Denominator;
+                item.After.ExpBar.Numerator = item.Before.ExpBar.Numerator;
+                item.After.ExpBar.Percentage = item.Before.ExpBar.Percentage;
+
+                
+                if (userYoukaiTable.Items[youkaiIDx].Level < YoukaiMstTable.Items[YoukaiMstIndex].MaxLevel && userYoukaiTable.Items[youkaiIDx].IsLockedLevel == 0)
+                {
+
+                    var LevelIndex = 0;
+                    var Level = item.Before.Level;
+                    item.After.Exp = item.Before.Exp + res.UserGameResultData.Exp;
+
+                    // get new level for youkai
+                    while (LevelIndex != -1)
+                    {
+                        LevelIndex = MstYoukaiManager.GetYoukaiLevelIndex(ref YoukaiLevelMstTable, YoukaiMstTable.Items[YoukaiMstIndex].LevelType, Level);
+                        Level++;
+                        if (LevelIndex == -1)
+                            break;
+                        if ((item.After.Exp < YoukaiLevelMstTable.Items[LevelIndex].BaseExp) || (item.After.Exp > YoukaiLevelMstTable.Items[LevelIndex].MaxExp))
+                        {
+                            continue;
+                        }
+                        item.After.Level = YoukaiLevelMstTable.Items[LevelIndex].Level;
+                        item.After.ExpBar.Denominator = (YoukaiLevelMstTable.Items[LevelIndex].MaxExp + 1) - YoukaiLevelMstTable.Items[LevelIndex].BaseExp;
+                        item.After.ExpBar.Numerator = item.After.Exp - YoukaiLevelMstTable.Items[LevelIndex].BaseExp;
+                        item.After.ExpBar.Percentage = (int)(((double)item.After.ExpBar.Numerator / (double)item.After.ExpBar.Denominator) * 100.0f);
+                        break;
+                    }
+
+                    int YoukaiLevelOpenIndex = MstYoukaiManager.GetYoukaiLevelOpenIndex(ref YoukaiLevelOpenMstTable, item.Before.Level, item.After.Level, YoukaiMstTable.Items[YoukaiMstIndex].YoukaiRarity);
+                    if (YoukaiLevelOpenIndex != -1)
+                    {
+                        item.After.Level = YoukaiLevelOpenMstTable.Items[YoukaiLevelOpenIndex].Level;
+                        userYoukaiTable.Items[youkaiIDx].IsLockedLevel = 1;
+                        int tmpindex = MstYoukaiManager.GetYoukaiLevelIndex(ref YoukaiLevelMstTable, YoukaiMstTable.Items[YoukaiMstIndex].LevelType, item.After.Level);
+                        if (tmpindex != -1)
+                        {
+                            item.After.ExpBar.Denominator = (YoukaiLevelMstTable.Items[tmpindex].MaxExp + 1) - YoukaiLevelMstTable.Items[tmpindex].BaseExp;
+                            item.After.Exp = YoukaiLevelMstTable.Items[tmpindex].BaseExp;
+                            item.After.ExpBar.Numerator = 0;
+                            item.After.ExpBar.Percentage = 0;
+                        }
+                    }
+                }
+                if (item.Before.Level != item.After.Level)
+                    item.HaveFlg = false;
+                userYoukaiTable.Items[youkaiIDx].Level = item.After.Level;
+                userYoukaiTable.Items[youkaiIDx].Exp = item.After.Exp;
+                userYoukaiTable.Items[youkaiIDx].ExpDenominator = item.After.ExpBar.Denominator;
+                userYoukaiTable.Items[youkaiIDx].ExpNumerator = item.After.ExpBar.Numerator;
+                userYoukaiTable.Items[youkaiIDx].Percentage = item.After.ExpBar.Percentage;
+
+                int hpOffset = (YoukaiMstTable.Items[YoukaiMstIndex].MaxHp - YoukaiMstTable.Items[YoukaiMstIndex].BaseHp) / YoukaiMstTable.Items[YoukaiMstIndex].MaxLevel;
+                int atkOffset = (YoukaiMstTable.Items[YoukaiMstIndex].MaxAtk - YoukaiMstTable.Items[YoukaiMstIndex].BaseAtk) / YoukaiMstTable.Items[YoukaiMstIndex].MaxLevel;
+                userYoukaiTable.Items[youkaiIDx].Hp += (hpOffset * (item.After.Level - item.Before.Level));
+                userYoukaiTable.Items[youkaiIDx].Atk += (atkOffset * (item.After.Level - item.Before.Level));
+                if (userYoukaiTable.Items[youkaiIDx].IsLockedLevel == 1)
+                {
+                    item.IsLockLevel = true;
+                }
+                if (userYoukaiTable.Items[youkaiIDx].Level >= YoukaiMstTable.Items[YoukaiMstIndex].MaxLevel)
+                {
+                    item.isMaxLevel = true;
+                    item.IsLockLevel = false;
+                    userYoukaiTable.Items[youkaiIDx].IsLockedLevel = 0;
+                    userYoukaiTable.Items[youkaiIDx].Level = YoukaiMstTable.Items[YoukaiMstIndex].MaxLevel;
+                }
+                YwpUserYoukai yokai = userYoukaiTable.Items[youkaiIDx];
+                userYoukaiTableDiff.AddItem(yokai);
+                res.UserYoukaiResultList.Add(item);
+            }
+        }
         public static void HandleStage(ref GameEndRequest deserialized, ref GameEndResponse res, ref int FirstClear, ref TableParser<YwpUserStage> ywpUserStage, ref TableParser<YwpUserMap> ywpUserMap)
         {
             var ywpMstStage = new TableParser<YwpMstStage>(
@@ -264,7 +376,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
 
             var MstEnemyParam = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai_enemy_param"]!)!["tableData"]);
             //var stageInfoIdx = stagesInfo.FindIndex([deserialized.StageId.ToString()]);
-            var YoukaiLevelMstTable = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai_level"]!)!["tableData"]);
             //List<long> starIdx = new List<long> { long.Parse(stagesInfo.Table[stageInfoIdx][8]), long.Parse(stagesInfo.Table[stageInfoIdx][9]), long.Parse(stagesInfo.Table[stageInfoIdx][10])};
 
             // items data
@@ -288,7 +399,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
 
                 // enemy list
                 // gameEnd for some ywp_user data, he send only modified row (ywp_user_..._diff)
-                var YoukaiMstTable = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai"]!)!["tableData"]);
             var userYoukai = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai");
             var userYoukaiSkill = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai_skill");
             var dictionaryYoukai = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_dictionary");
@@ -388,67 +498,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
             }
 
             // yokai user list
-            foreach (UserYoukaiResultListReq i in deserialized!.UserYoukaiResultList!)
-            {
-                var youkaiIDx = userYoukaiTable.FindIndex([i.YoukaiId.ToString()]);
-                if (youkaiIDx != -1) {
-                    var YoukaiMstIndex = YoukaiMstTable.FindIndex([i.YoukaiId.ToString()]);
-                    var levelType = int.Parse(YoukaiMstTable.Table[YoukaiMstIndex][5]); // get level exp const value
-                    UserYoukaiResultListRes item = new();
-                    item.HaveFlg = false; // TODO
-                    item.CanEvolve = false; //todo
-                    item.IsLockLevel = false; //todo (need to paid to be able to level up)
-                    item.isMaxLevel = false; //todo
-                    item.youkaiId = i.YoukaiId;
-                    item.Before.Level = userYoukaiTable.Items[youkaiIDx].Level;
-                    item.Before.Exp = (int)userYoukaiTable.Items[youkaiIDx].Exp;
-                    item.Before.ExpBar.Denominator = userYoukaiTable.Items[youkaiIDx].ExpDenominator;
-                    item.Before.ExpBar.Numerator = userYoukaiTable.Items[youkaiIDx].ExpNumerator;
-                    item.Before.ExpBar.Percentage = userYoukaiTable.Items[youkaiIDx].Percentage;
-
-
-                    var LevelIndex = 0;
-                    var const_exp = 200; // test
-                    item.After.Exp = item.Before.Exp + const_exp;
-                    var index = 1;
-
-                    while (LevelIndex != -1)
-                    {
-                        LevelIndex = -1;
-                        var tmpIdx = 0;
-                        foreach (string[] str in YoukaiLevelMstTable.Table)
-                        {
-                            if (str[0] == levelType.ToString() && str[1] == index.ToString())
-                                LevelIndex = tmpIdx;
-                            tmpIdx++;
-                        }
-                        if (LevelIndex != -1)
-                        {
-                            if ((item.After.Exp >= int.Parse(YoukaiLevelMstTable.Table[LevelIndex][2])) && (item.After.Exp <= int.Parse(YoukaiLevelMstTable.Table[LevelIndex][3])))
-                            {
-                                item.After.Level = int.Parse(YoukaiLevelMstTable.Table[LevelIndex][1]);
-                                item.After.ExpBar.Denominator = (int.Parse(YoukaiLevelMstTable.Table[LevelIndex][3]) + 1) - int.Parse(YoukaiLevelMstTable.Table[LevelIndex][2]);
-                                item.After.ExpBar.Numerator = item.After.Exp - int.Parse(YoukaiLevelMstTable.Table[LevelIndex][2]);
-                                item.After.ExpBar.Percentage = (int)(((double)((double)item.After.ExpBar.Numerator / (double)item.After.ExpBar.Denominator)) * 100);
-                                break;
-                            }
-                            index++;
-                        }
-                    }
-                    if (index == -1)
-                        item.isMaxLevel = true;
-                    if (item.Before.Level != item.After.Level)
-                        item.HaveFlg = false;
-                    userYoukaiTable.Items[youkaiIDx].Level = item.After.Level;
-                    userYoukaiTable.Items[youkaiIDx].Exp = item.After.Exp;
-                    userYoukaiTable.Items[youkaiIDx].ExpDenominator = item.After.ExpBar.Denominator;
-                    userYoukaiTable.Items[youkaiIDx].ExpNumerator = item.After.ExpBar.Numerator;
-                    userYoukaiTable.Items[youkaiIDx].Percentage = item.After.ExpBar.Percentage;
-                    YwpUserYoukai yokai = userYoukaiTable.Items[youkaiIDx];
-                    youkaiDiff.AddItem(yokai);
-                    res.UserYoukaiResultList.Add(item);
-                }
-            }
+            HandleUserYoukai(ref deserialized, ref res, ref userYoukaiTable, ref youkaiDiff);
 
             // edit tutorial
             var tutorialList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_tutorial_list");
