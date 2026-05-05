@@ -2,7 +2,7 @@ from flask import Flask, send_from_directory, abort
 import os
 
 app = Flask(__name__)
-BASE_DIR = input("Enter your data download directory name: ")
+BASE_DIR = "eal"
 
 @app.route('/<path:filename>', methods=['GET'])
 def download_file(filename):
