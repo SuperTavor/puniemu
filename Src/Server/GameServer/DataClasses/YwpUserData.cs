@@ -161,7 +161,7 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
             this.UsingItemList = new List<object>();
             this.HitodamaRecoverSec = 0;
             this.LimitTimeSaleEndDt = "";
-            this.EquipWatchID = 0;
+            this.EquipWatchID = 10101;
             this.PlateID = 1;
             this.EffectID = 1;
         }
