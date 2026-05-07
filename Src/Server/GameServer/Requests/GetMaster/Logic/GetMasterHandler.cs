@@ -4,12 +4,13 @@ using Puniemu.Src.Utils.GeneralUtils;
 using Puniemu.Src.Server.GameServer.DataClasses;
 using Puniemu.Src.Server.GameServer.Requests.GetMaster.DataClasses;
 using System.Buffers;
+using System.Collections.Concurrent;
 namespace Puniemu.Src.Server.GameServer.Requests.GetMaster.Logic
 {
     public class GetMasterHandler
     {
         // To not unmarshal every time and improve performance, we store the unmarshalled versions of previously unmarshalled jsons
-        private static Dictionary<string, object> UnmarshalCache = new();
+        private static ConcurrentDictionary<string, object> UnmarshalCache = new();
         //Tables sometimes requested by the server that are never delivered, even on the official servers.
         private static object UnmarshalOrGetFromCache(string jsonName, string jsonStr)
         {
