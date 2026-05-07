@@ -15,7 +15,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
 {
     public class CreateUserHandler
     {
-        private static Account? Acc { get; set; }
 
         public static Tuple<string, string> CreateUserYoukaiSave()
         {
@@ -118,13 +117,13 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
             var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             var deserialized = JsonConvert.DeserializeObject<CreateUserRequest>(requestJsonString!);
             var dbres = await UserDataManager.Logic.UserDataManager.SupabaseClient!.From<Account>().Where(x => x.Gdkey == deserialized.Level5UserID).Get();
-            Acc = dbres.Model!;
+            var acc = dbres.Model!;
             ctx.Response.ContentType = "application/json";
             var generatedUserData = new YwpUserData((PlayerIcon)deserialized.IconID, (PlayerTitle)deserialized.IconID, deserialized.Level5UserID, deserialized.PlayerName);
-            Acc.StartDate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            Acc.CharacterId = generatedUserData.CharacterID;
-            Acc.UserId = generatedUserData.UserID;
-            await Acc.Update<Account>();
+            acc.StartDate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            acc.CharacterId = generatedUserData.CharacterID;
+            acc.UserId = generatedUserData.UserID;
+            await acc.Update<Account>();
             try
             {
                 await RegisterDefaultTables(deserialized, generatedUserData);
