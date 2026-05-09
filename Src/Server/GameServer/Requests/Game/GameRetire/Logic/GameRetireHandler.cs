@@ -33,7 +33,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameRetire.Logic
                 await GeneralUtils.SendBadRequest(ctx);
                 return;
             }
-            var ReqId = await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_requestid");
+            var ReqId = await DBService.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_requestid");
             if ((ReqId == null || deserialized.RequestID == null || ReqId == "" || deserialized.RequestID == "") || (ReqId != deserialized.RequestID))
             {
                 var errSession = new MsgBoxResponse("This session is invalid", "INVALID SESSION");
@@ -47,7 +47,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameRetire.Logic
                 return;
             }
             StageData LevelData = jsonLevelData[deserialized.StageId.ToString()];
-            var userData = await UserDataManager.Logic.DBService.GetYwpUserAsync<YwpUserData>(deserialized!.Gdkey!, "ywp_user_data");
+            var userData = await DBService.Logic.DBService.GetYwpUserAsync<YwpUserData>(deserialized!.Gdkey!, "ywp_user_data");
             if (userData == null)
             {
                 await GeneralUtils.SendBadRequest(ctx);
@@ -72,7 +72,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameRetire.Logic
             List<long> starIdx = new List<long> { long.Parse(stagesInfo.Table[stageInfoIdx][8]), long.Parse(stagesInfo.Table[stageInfoIdx][9]), long.Parse(stagesInfo.Table[stageInfoIdx][10])};
 
             // stage
-            var stageList = await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_stage");
+            var stageList = await DBService.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_stage");
             var stageListTable = new TableParser.Logic.TableParser(stageList!);
 
             var stageIndex = stageListTable.FindIndex([deserialized.StageId.ToString()]);
@@ -105,8 +105,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameRetire.Logic
             // enemy list
             // gameRetire for some ywp_user data, he send only modified row (ywp_user_..._diff)
             var YoukaiMstTable = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai"]!)!["tableData"]);
-            var userYoukai = await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai");
-            var dictionaryYoukai = await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_dictionary");
+            var userYoukai = await DBService.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai");
+            var dictionaryYoukai = await DBService.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_dictionary");
             var dictionaryYoukaiTable = new TableParser.Logic.TableParser(dictionaryYoukai!); 
             var userYoukaiTable = new TableParser.Logic.TableParser(userYoukai!);
 
@@ -186,12 +186,12 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameRetire.Logic
                     res.UserYoukaiResultList.Add(item);
                 }
             }
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_requestid", "");
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_stage", stageListTable.ToString());
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_youkai", userYoukaiTable.ToString());
+            await DBService.Logic.DBService.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_requestid", "");
+            await DBService.Logic.DBService.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_stage", stageListTable.ToString());
+            await DBService.Logic.DBService.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_youkai", userYoukaiTable.ToString());
             userData.YMoney += res.UserGameResultData.Money; // add money to user
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_data", userData);
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_dictionary", dictionaryYoukaiTable.ToString());
+            await DBService.Logic.DBService.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_data", userData);
+            await DBService.Logic.DBService.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_dictionary", dictionaryYoukaiTable.ToString());
 
 
             var resdict = JsonConvert.DeserializeObject<Dictionary<string, object>>(JsonConvert.SerializeObject(res));

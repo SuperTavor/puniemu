@@ -3,8 +3,8 @@ using Newtonsoft.Json.Linq;
 using Puniemu.Src.DataManager.Logic;
 using Puniemu.Src.Server.GameServer.DataClasses;
 using Puniemu.Src.Server.GameServer.Requests.Login.DataClasses;
-using Puniemu.Src.UserDataManager.DataClasses;
-using Puniemu.Src.UserDataManager.Logic;
+using Puniemu.Src.DBService.DataClasses;
+using Puniemu.Src.DBService.Logic;
 using Puniemu.Src.Utils.GeneralUtils;
 using System.Buffers;
 using System.Text;
@@ -23,7 +23,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.Logic
             var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             var deserialized = JsonConvert.DeserializeObject<LoginRequest>(requestJsonString!)!;
 
-            var dbRes = (await UserDataManager.Logic.DBService.SupabaseClient!.From<Account>().Where(x => x.Gdkey == deserialized.Gdkey).Get())!;
+            var dbRes = (await DBService.Logic.DBService.SupabaseClient!.From<Account>().Where(x => x.Gdkey == deserialized.Gdkey).Get())!;
             var acc = dbRes.Model!;
             //Construct response
             CommonLoginResponse res = new CommonLoginResponse();

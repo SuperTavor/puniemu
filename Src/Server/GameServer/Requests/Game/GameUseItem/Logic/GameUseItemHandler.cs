@@ -1,5 +1,5 @@
 using Newtonsoft.Json;
-using Puniemu.Src.UserDataManager;
+using Puniemu.Src.DBService;
 
 using Puniemu.Src.Server.GameServer.Requests.GameUseItem.DataClasses;
 using Puniemu.Src.Server.GameServer.DataClasses;
@@ -21,13 +21,13 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameUseItem.Logic
             var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             var deserialized = JsonConvert.DeserializeObject<GameUseItemRequest>(requestJsonString!);
             ctx.Response.ContentType = "application/json";
-            var userData = await UserDataManager.Logic.DBService.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data");
-            var playerItem = await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_item");
+            var userData = await DBService.Logic.DBService.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data");
+            var playerItem = await DBService.Logic.DBService.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_item");
             var playerItemTable = new TableParser.Logic.TableParser(playerItem!);
 
             playerItemTable = ItemManager.RemoveItem(playerItemTable,(int) deserialized.ItemId!, 1);
 
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_item", playerItemTable.ToString());
+            await DBService.Logic.DBService.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_item", playerItemTable.ToString());
             var renameResponse = new GameUseItemResponse(userData!, playerItemTable.ToString(), deserialized.ItemId);
             var marshalledResponse = JsonConvert.SerializeObject(renameResponse);
             var encryptedResponse = NHNCrypt.Logic.NHNCrypt.EncryptResponse(marshalledResponse);

@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using Puniemu.Src.UserDataManager;
+using Puniemu.Src.DBService;
 
 using Puniemu.Src.Server.GameServer.Requests.UserStageRanking.DataClasses;
 using Puniemu.Src.Server.GameServer.DataClasses;
@@ -20,7 +20,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.UserStageRanking.Logic
             var deserialized = JsonConvert.DeserializeObject<UserStageRankingRequest>(requestJsonString!);
             ctx.Response.ContentType = "application/json";
             // get all ywp_user_stage_rank data
-            var userStageRankingData = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<dynamic>>(deserialized.Level5UserID, "ywp_user_stage_rank");
+            var userStageRankingData = await DBService.Logic.DBService.GetYwpUserAsync<List<dynamic>>(deserialized.Level5UserID, "ywp_user_stage_rank");
             List<object> newList = new List<object>();
             // try to get requested stage id data in ywp_user_stage_rank
             if (userStageRankingData != null) {
@@ -45,7 +45,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.UserStageRanking.Logic
                 if (userStageRankingData != null)
                 {
                     userStageRankingData.Add(newDict);
-                    await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_stage_rank", userStageRankingData);
+                    await DBService.Logic.DBService.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_stage_rank", userStageRankingData);
                 }
             }
             var updateProfileResponse = new UserStageRankingResponse(newList);

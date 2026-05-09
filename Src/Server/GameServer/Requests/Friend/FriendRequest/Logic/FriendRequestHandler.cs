@@ -23,14 +23,14 @@ namespace Puniemu.Src.Server.GameServer.Requests.FriendRequest.Logic
 
             var res = new FriendRequestResponse();
 
-            string targetGdkey = await UserDataManager.Logic.DBService.GetGdkeyFromUserId(deserialized!.TargetUserId!)!;
+            string targetGdkey = await DBService.Logic.DBService.GetGdkeyFromUserId(deserialized!.TargetUserId!)!;
 
             res.ResponseCode = 0;
             bool good = false;
             if (!targetGdkey.IsNullOrEmpty())
             {
-                YwpUserData? myUserData = await UserDataManager.Logic.DBService.GetYwpUserAsync<YwpUserData>(deserialized!.Level5UserID!, "ywp_user_data");
-                YwpUserData? targetUserData = (await UserDataManager.Logic.DBService.GetYwpUserAsync<YwpUserData>(targetGdkey!, "ywp_user_data"))!;
+                YwpUserData? myUserData = await DBService.Logic.DBService.GetYwpUserAsync<YwpUserData>(deserialized!.Level5UserID!, "ywp_user_data");
+                YwpUserData? targetUserData = (await DBService.Logic.DBService.GetYwpUserAsync<YwpUserData>(targetGdkey!, "ywp_user_data"))!;
                 good = (targetUserData != null && myUserData != null);
                 if (good)
                 {
@@ -38,8 +38,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.FriendRequest.Logic
                 }
                 if (good)
                 {
-                    var myFriendList = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<object>>(deserialized.Level5UserID!, "ywp_user_friend");
-                    var targetFriendList = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<object>>(targetGdkey!, "ywp_user_friend");
+                    var myFriendList = await DBService.Logic.DBService.GetYwpUserAsync<List<object>>(deserialized.Level5UserID!, "ywp_user_friend");
+                    var targetFriendList = await DBService.Logic.DBService.GetYwpUserAsync<List<object>>(targetGdkey!, "ywp_user_friend");
                     good = true;
                     if (targetFriendList!.Count > targetUserData!.FriendMaxCount)
                     {
@@ -51,7 +51,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.FriendRequest.Logic
                     }
                     else
                     {
-                        var targetFriendRequestList = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<FriendRequestEntry>>(targetGdkey!, "ywp_user_friend_request_recv");
+                        var targetFriendRequestList = await DBService.Logic.DBService.GetYwpUserAsync<List<FriendRequestEntry>>(targetGdkey!, "ywp_user_friend_request_recv");
                         FriendRequestEntry entry = new();
                         int idx = 0;
                         foreach (FriendRequestEntry element in targetFriendRequestList!)
@@ -76,7 +76,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.FriendRequest.Logic
                         entry.CharacterId = myUserData.CharacterID;
                         entry.UserId = myUserData.UserID;
                         targetFriendRequestList.Add(entry);
-                        await UserDataManager.Logic.DBService.SetYwpUserAsync(targetGdkey!, "ywp_user_friend_request_recv", targetFriendRequestList);
+                        await DBService.Logic.DBService.SetYwpUserAsync(targetGdkey!, "ywp_user_friend_request_recv", targetFriendRequestList);
                     }
                 }
             }
@@ -86,7 +86,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.FriendRequest.Logic
                 await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(errSession)));
                 return;
             }
-            res.YwpUserFriendRequestRecv = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<FriendRequestEntry>>(deserialized.Level5UserID!, "ywp_user_friend_request_recv");
+            res.YwpUserFriendRequestRecv = await DBService.Logic.DBService.GetYwpUserAsync<List<FriendRequestEntry>>(deserialized.Level5UserID!, "ywp_user_friend_request_recv");
             foreach (FriendRequestEntry item in res.YwpUserFriendRequestRecv!)
             {
                 item.RequestDtSentence = GameServer.Logic.GenerateFriendData.GetTimeDifferenceString(item.RequestDt!);

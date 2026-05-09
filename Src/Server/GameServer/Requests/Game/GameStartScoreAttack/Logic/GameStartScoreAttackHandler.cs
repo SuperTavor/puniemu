@@ -30,7 +30,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.StartScoreAttack.Logic
                 return;
             }
 
-            var userData = await UserDataManager.Logic.DBService.GetYwpUserAsync<YwpUserData>(req.Level5UserId!, "ywp_user_data");
+            var userData = await DBService.Logic.DBService.GetYwpUserAsync<YwpUserData>(req.Level5UserId!, "ywp_user_data");
             if (userData == null)
             {
                 await GeneralUtils.SendBadRequest(ctx);
@@ -62,16 +62,16 @@ namespace Puniemu.Src.Server.GameServer.Requests.StartScoreAttack.Logic
 
                 try
                 {
-                    var deckData = await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(req.Level5UserId!, "ywp_user_youkai_deck");
-                    var youkaiData = await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(req.Level5UserId!, "ywp_user_youkai");
+                    var deckData = await DBService.Logic.DBService.GetYwpUserAsync<string>(req.Level5UserId!, "ywp_user_youkai_deck");
+                    var youkaiData = await DBService.Logic.DBService.GetYwpUserAsync<string>(req.Level5UserId!, "ywp_user_youkai");
 
                     if (deckData != null && youkaiData != null)
                     {
                         BuildUserYoukaiList(res, deckData, youkaiData);
                     }
 
-                    await UserDataManager.Logic.DBService.SetYwpUserAsync(req.Level5UserId!, "ywp_user_requestid", requestId);
-                    await UserDataManager.Logic.DBService.SetYwpUserAsync(req.Level5UserId!, "ywp_user_data", userData);
+                    await DBService.Logic.DBService.SetYwpUserAsync(req.Level5UserId!, "ywp_user_requestid", requestId);
+                    await DBService.Logic.DBService.SetYwpUserAsync(req.Level5UserId!, "ywp_user_data", userData);
 
                     var resDict = JsonConvert.DeserializeObject<Dictionary<string, object>>(JsonConvert.SerializeObject(res))!;
 

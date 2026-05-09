@@ -64,10 +64,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.FriendRequestAccept.Logic
             var deserialized = JsonConvert.DeserializeObject<FriendRequestAcceptRequest>(requestJsonString)!;
 
             var res = new FriendRequestAcceptResponse();
-            var my = (await UserDataManager.Logic.DBService.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID!, "ywp_user_data"))!;
-            var tgdkey = await UserDataManager.Logic.DBService.GetGdkeyFromUserId(deserialized.TargetUserId!);
-            var YwpUserFriendRequestRecvFriend = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<FriendRequestEntry>>(tgdkey, "ywp_user_friend_request_recv");
-            res.YwpUserFriendRequestRecv = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<FriendRequestEntry>>(deserialized.Level5UserID!, "ywp_user_friend_request_recv");
+            var my = (await DBService.Logic.DBService.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID!, "ywp_user_data"))!;
+            var tgdkey = await DBService.Logic.DBService.GetGdkeyFromUserId(deserialized.TargetUserId!);
+            var YwpUserFriendRequestRecvFriend = await DBService.Logic.DBService.GetYwpUserAsync<List<FriendRequestEntry>>(tgdkey, "ywp_user_friend_request_recv");
+            res.YwpUserFriendRequestRecv = await DBService.Logic.DBService.GetYwpUserAsync<List<FriendRequestEntry>>(deserialized.Level5UserID!, "ywp_user_friend_request_recv");
             int idx = 0;
             bool found = false;
             res.YwpUserFriend = null;
@@ -78,7 +78,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.FriendRequestAccept.Logic
             {
                 if (element.UserId!.Equals(deserialized!.TargetUserId))
                 {
-                    var elemntUsrdata = await UserDataManager.Logic.DBService.GetYwpUserAsync<YwpUserData>(tgdkey, "ywp_user_data");
+                    var elemntUsrdata = await DBService.Logic.DBService.GetYwpUserAsync<YwpUserData>(tgdkey, "ywp_user_data");
 
                     res.YwpUserFriendRequestRecv.RemoveAt(idx);
                     found = true;
@@ -90,7 +90,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.FriendRequestAccept.Logic
                     usr.MapLockSendFlg = 0; 
                     usr.PlayerName = elemntUsrdata.PlayerName;
                     usr.IconId = elemntUsrdata.IconID;
-                    usr.LastPlayDt = await UserDataManager.Logic.DBService.GetLastLoginTime(tgdkey);
+                    usr.LastPlayDt = await DBService.Logic.DBService.GetLastLoginTime(tgdkey);
                     usr.LastPlayDtSentence = GameServer.Logic.GenerateFriendData.GetTimeDifferenceString(usr.LastPlayDt);
                     usr.TitleId = elemntUsrdata.CharacterTitleID;
                     break;
@@ -108,13 +108,13 @@ namespace Puniemu.Src.Server.GameServer.Requests.FriendRequestAccept.Logic
                 me.MapLockSendFlg = 0;
                 me.PlayerName = my.PlayerName;
                 me.IconId = my.IconID;
-                me.LastPlayDt = await UserDataManager.Logic.DBService.GetLastLoginTime(deserialized.Level5UserID!);
+                me.LastPlayDt = await DBService.Logic.DBService.GetLastLoginTime(deserialized.Level5UserID!);
                 me.LastPlayDtSentence = GameServer.Logic.GenerateFriendData.GetTimeDifferenceString(usr.LastPlayDt!);
                 me.TitleId = my.CharacterTitleID;
 
-                res.YwpUserFriend = (await UserDataManager.Logic.DBService.GetYwpUserAsync<List<FriendEntry>>(deserialized.Level5UserID!, "ywp_user_friend"))!;
+                res.YwpUserFriend = (await DBService.Logic.DBService.GetYwpUserAsync<List<FriendEntry>>(deserialized.Level5UserID!, "ywp_user_friend"))!;
                 res.ResponseCode = 0;
-                YwpUserFriendFriend = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<FriendEntry>>(tgdkey, "ywp_user_friend");
+                YwpUserFriendFriend = await DBService.Logic.DBService.GetYwpUserAsync<List<FriendEntry>>(tgdkey, "ywp_user_friend");
                 found = false;
                 foreach( FriendEntry item in res.YwpUserFriend!)
                 {
@@ -142,12 +142,12 @@ namespace Puniemu.Src.Server.GameServer.Requests.FriendRequestAccept.Logic
                 }
                 idx++;
             }
-            res.YwpUserFriendStarRank = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<FriendRankEntry>>(deserialized.Level5UserID!, "ywp_user_friend_star_rank");
-            var otherYwpUserFriendStarRank = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<FriendRankEntry>>(tgdkey, "ywp_user_friend_star_rank");
-            res.YwpUserFriendRank = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<FriendRankEntry>>(deserialized.Level5UserID!, "ywp_user_friend_rank");
-            var otherYwpUserFriendRank = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<FriendRankEntry>>(tgdkey, "ywp_user_friend_rank");
-            var YwpUserFriendDictionaryRank = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<FriendRankEntry>>(deserialized.Level5UserID!, "ywp_user_friend_dictionary_rank");
-            var otherYwpUserFriendDictionaryRank = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<FriendRankEntry>>(tgdkey, "ywp_user_friend_dictionary_rank");
+            res.YwpUserFriendStarRank = await DBService.Logic.DBService.GetYwpUserAsync<List<FriendRankEntry>>(deserialized.Level5UserID!, "ywp_user_friend_star_rank");
+            var otherYwpUserFriendStarRank = await DBService.Logic.DBService.GetYwpUserAsync<List<FriendRankEntry>>(tgdkey, "ywp_user_friend_star_rank");
+            res.YwpUserFriendRank = await DBService.Logic.DBService.GetYwpUserAsync<List<FriendRankEntry>>(deserialized.Level5UserID!, "ywp_user_friend_rank");
+            var otherYwpUserFriendRank = await DBService.Logic.DBService.GetYwpUserAsync<List<FriendRankEntry>>(tgdkey, "ywp_user_friend_rank");
+            var YwpUserFriendDictionaryRank = await DBService.Logic.DBService.GetYwpUserAsync<List<FriendRankEntry>>(deserialized.Level5UserID!, "ywp_user_friend_dictionary_rank");
+            var otherYwpUserFriendDictionaryRank = await DBService.Logic.DBService.GetYwpUserAsync<List<FriendRankEntry>>(tgdkey, "ywp_user_friend_dictionary_rank");
             
             CreateUserRank(deserialized.TargetUserId!, otherYwpUserFriendStarRank!, res.YwpUserFriendStarRank!);
             CreateUserRank(deserialized.Level5UserID!, res.YwpUserFriendStarRank!, otherYwpUserFriendStarRank!);
@@ -158,21 +158,21 @@ namespace Puniemu.Src.Server.GameServer.Requests.FriendRequestAccept.Logic
             CreateUserRank(deserialized.TargetUserId!, otherYwpUserFriendDictionaryRank!, YwpUserFriendDictionaryRank!);
             CreateUserRank(deserialized.Level5UserID!, YwpUserFriendDictionaryRank!, otherYwpUserFriendDictionaryRank!);
 
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_friend_star_rank", res.YwpUserFriendStarRank!);
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(tgdkey, "ywp_user_friend_star_rank", otherYwpUserFriendStarRank!);
+            await DBService.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_friend_star_rank", res.YwpUserFriendStarRank!);
+            await DBService.Logic.DBService.SetYwpUserAsync(tgdkey, "ywp_user_friend_star_rank", otherYwpUserFriendStarRank!);
            
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_friend_rank", res.YwpUserFriendRank!);
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(tgdkey, "ywp_user_friend_rank", otherYwpUserFriendRank!);
+            await DBService.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_friend_rank", res.YwpUserFriendRank!);
+            await DBService.Logic.DBService.SetYwpUserAsync(tgdkey, "ywp_user_friend_rank", otherYwpUserFriendRank!);
 
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_friend_dictionary_rank", YwpUserFriendDictionaryRank!);
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(tgdkey, "ywp_user_friend_dictionary_rank", otherYwpUserFriendDictionaryRank!);
+            await DBService.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_friend_dictionary_rank", YwpUserFriendDictionaryRank!);
+            await DBService.Logic.DBService.SetYwpUserAsync(tgdkey, "ywp_user_friend_dictionary_rank", otherYwpUserFriendDictionaryRank!);
 
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_friend_request_recv", res.YwpUserFriendRequestRecv);
+            await DBService.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_friend_request_recv", res.YwpUserFriendRequestRecv);
             if (res.YwpUserFriend != null)
-                await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_friend", res.YwpUserFriend);
+                await DBService.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_friend", res.YwpUserFriend);
             if (YwpUserFriendFriend != null)
-                await UserDataManager.Logic.DBService.SetYwpUserAsync(tgdkey, "ywp_user_friend", YwpUserFriendFriend);
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(tgdkey, "ywp_user_friend_request_recv", YwpUserFriendRequestRecvFriend);
+                await DBService.Logic.DBService.SetYwpUserAsync(tgdkey, "ywp_user_friend", YwpUserFriendFriend);
+            await DBService.Logic.DBService.SetYwpUserAsync(tgdkey, "ywp_user_friend_request_recv", YwpUserFriendRequestRecvFriend);
             var outDict = JsonConvert.DeserializeObject<Dictionary<string, object>>(JsonConvert.SerializeObject(res));
             var outResponse = NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(outDict));
             await ctx.Response.WriteAsync(outResponse);

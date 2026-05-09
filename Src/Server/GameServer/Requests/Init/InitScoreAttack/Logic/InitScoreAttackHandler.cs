@@ -99,7 +99,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.InitScoreAttack.Logic
             try
             {
                 // Récupérer les données utilisateur
-                var userData = await UserDataManager.Logic.DBService.GetYwpUserAsync<YwpUserData>(gdkey, "ywp_user_data");
+                var userData = await DBService.Logic.DBService.GetYwpUserAsync<YwpUserData>(gdkey, "ywp_user_data");
                 if (userData == null) return 5; // Bronze par défaut
                 
                 // Calculer le score total du joueur
@@ -126,10 +126,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.InitScoreAttack.Logic
             try
             {
                 // Lire les données de stage
-                var stageRaw = await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(gdkey, "ywp_user_stage");
+                var stageRaw = await DBService.Logic.DBService.GetYwpUserAsync<string>(gdkey, "ywp_user_stage");
                 if (string.IsNullOrEmpty(stageRaw))
                 {
-                    var stageList = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<string>>(gdkey, "ywp_user_stage");
+                    var stageList = await DBService.Logic.DBService.GetYwpUserAsync<List<string>>(gdkey, "ywp_user_stage");
                     if (stageList == null || stageList.Count == 0) return (0, 0);
                     stageRaw = string.Join("*", stageList);
                 }

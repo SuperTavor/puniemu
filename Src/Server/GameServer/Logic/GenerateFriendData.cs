@@ -60,12 +60,12 @@ namespace Puniemu.Src.Server.GameServer.Logic
         public static async void RefreshYwpUserFriend(string gdkey, int TitleId, int IconId, string PlayerName, long YoukaiId, string LastPlayDt)
         {
             // update friends list
-            var me = (await UserDataManager.Logic.DBService.GetYwpUserAsync<YwpUserData>(gdkey, "ywp_user_data"))!;
-            var myFriendList = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<FriendEntry>>(gdkey, "ywp_user_friend");
+            var me = (await DBService.Logic.DBService.GetYwpUserAsync<YwpUserData>(gdkey, "ywp_user_data"))!;
+            var myFriendList = await DBService.Logic.DBService.GetYwpUserAsync<List<FriendEntry>>(gdkey, "ywp_user_friend");
             foreach (FriendEntry item in myFriendList!)
             {
-                string? targetGdkey = await UserDataManager.Logic.DBService.GetGdkeyFromUserId(item.UserId!);
-                var friendFriendList = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<FriendEntry>>(targetGdkey, "ywp_user_friend");
+                string? targetGdkey = await DBService.Logic.DBService.GetGdkeyFromUserId(item.UserId!);
+                var friendFriendList = await DBService.Logic.DBService.GetYwpUserAsync<List<FriendEntry>>(targetGdkey, "ywp_user_friend");
                 foreach (FriendEntry item2 in friendFriendList!)
                 {
                     if (item2.UserId == me.UserID)
@@ -82,7 +82,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
                             item2.LastPlayDt = LastPlayDt;
                     }
                 }
-                await UserDataManager.Logic.DBService.SetYwpUserAsync(targetGdkey, "ywp_user_friend", friendFriendList!);
+                await DBService.Logic.DBService.SetYwpUserAsync(targetGdkey, "ywp_user_friend", friendFriendList!);
             }
         }
         public static async void RefreshYwpUserFriendRank(string gdkey, int addStars, int mode)
@@ -99,7 +99,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
                 }
             }
             // update friends rank list
-            var me = await UserDataManager.Logic.DBService.GetYwpUserAsync<YwpUserData>(gdkey, "ywp_user_data");
+            var me = await DBService.Logic.DBService.GetYwpUserAsync<YwpUserData>(gdkey, "ywp_user_data");
             List<FriendRankEntry>? myFriendRankList = null;
             string? table = null;
             if (mode == 0)
@@ -109,17 +109,17 @@ namespace Puniemu.Src.Server.GameServer.Logic
             else
                 throw new Exception();
 
-            myFriendRankList = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<FriendRankEntry>>(gdkey, table);
+            myFriendRankList = await DBService.Logic.DBService.GetYwpUserAsync<List<FriendRankEntry>>(gdkey, table);
             foreach (FriendRankEntry item in myFriendRankList!)
             {
                 if (item.Self == 1)
                 {
                     EditElement(item, addStars, me!);
-                    await UserDataManager.Logic.DBService.SetYwpUserAsync(gdkey, table, myFriendRankList!);
+                    await DBService.Logic.DBService.SetYwpUserAsync(gdkey, table, myFriendRankList!);
                     continue;
                 }
-                string? targetGdkey = await UserDataManager.Logic.DBService.GetGdkeyFromUserId(item.UserId!);
-                var friendFriendRankList = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<FriendRankEntry>>(targetGdkey, "ywp_user_friend");
+                string? targetGdkey = await DBService.Logic.DBService.GetGdkeyFromUserId(item.UserId!);
+                var friendFriendRankList = await DBService.Logic.DBService.GetYwpUserAsync<List<FriendRankEntry>>(targetGdkey, "ywp_user_friend");
                 foreach (FriendRankEntry item2 in friendFriendRankList!)
                 {
                     if (item2.UserId == me!.UserID)
@@ -127,7 +127,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
                         EditElement(item2, addStars, me);
                     }
                 }
-                await UserDataManager.Logic.DBService.SetYwpUserAsync(targetGdkey, table, friendFriendRankList!);
+                await DBService.Logic.DBService.SetYwpUserAsync(targetGdkey, table, friendFriendRankList!);
             }
         }
     }

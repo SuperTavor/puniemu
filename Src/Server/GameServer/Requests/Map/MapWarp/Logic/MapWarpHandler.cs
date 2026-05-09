@@ -1,5 +1,5 @@
 using Newtonsoft.Json;
-using Puniemu.Src.UserDataManager;
+using Puniemu.Src.DBService;
 
 using Puniemu.Src.Server.GameServer.Requests.MapWarp.DataClasses;
 using Puniemu.Src.Server.GameServer.DataClasses;
@@ -25,9 +25,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapWarp.Logic
             var deserialized = JsonConvert.DeserializeObject<MapWarpRequest>(requestJsonString!);
             ctx.Response.ContentType = "application/json";
 
-            var userData = await UserDataManager.Logic.DBService.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data");
-            var userStage = await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_stage");
-            var userMap = new TableParser.Logic.TableParser(await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_map"));
+            var userData = await DBService.Logic.DBService.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data");
+            var userStage = await DBService.Logic.DBService.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_stage");
+            var userMap = new TableParser.Logic.TableParser(await DBService.Logic.DBService.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_map"));
 
 
             var index = userMap.FindIndex([deserialized.MapId.ToString()]);
@@ -109,7 +109,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapWarp.Logic
 
             resdict!["ywp_user_stage"] = userStage.ToString();
             resdict!["ywp_user_map"] = userMap.ToString();
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_data", userData);
+            await DBService.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_data", userData);
 
             await GeneralUtils.AddTablesToResponse(ywpKeys, resdict!, true, deserialized!.Level5UserID!);
             var marshalledResponse = JsonConvert.SerializeObject(resdict);

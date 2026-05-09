@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Puniemu.Src.DBService.Logic;
+using Puniemu.Src.DBService.DataClasses;
 using System.Linq.Expressions;
 
 namespace Puniemu.Src.Utils.GeneralUtils
@@ -20,13 +22,13 @@ namespace Puniemu.Src.Utils.GeneralUtils
             return output;
         }
 
-        public static async Task AddTablesToResponse(IEnumerable<string> tables, Dictionary<string,object?> resultDictionary, bool isDownloadOnce, string gdkey = "")
+        public static async Task AddTablesToResponse(IEnumerable<string> tables, Dictionary<string,object?> resultDictionary, bool preloadUserTables, string gdkey = "")
         {
-            Dictionary<string, object>? userTables = null;
+            DBService.DataClasses.Account acc = null;
 
-            if(isDownloadOnce && gdkey != string.Empty)
+            if(preloadUserTables && gdkey != string.Empty)
             {
-                userTables = (await UserDataManager.Logic.DBService.GetEntireUserData(gdkey))!;
+                acc = await DBService.Logic.DBService.GetAccountObjectAsync(gdkey);
             }
             foreach(var table in tables)
             {
@@ -34,13 +36,13 @@ namespace Puniemu.Src.Utils.GeneralUtils
                 object? tableObj = new();
                 if (table.StartsWith("ywp_user"))
                 {
-                    if(isDownloadOnce && userTables != null)
+                    if(preloadUserTables && acc != null)
                     {
-                        tableObj = userTables[table];
+                        tableObj = acc.GetFieldByJsonName<object>(table, true);
                     }
                     else
                     {
-                        tableObj = await UserDataManager.Logic.DBService.GetYwpUserAsync<object>(gdkey, table);
+                        tableObj = await DBService.Logic.DBService.GetYwpUserAsync<object>(gdkey, table);
                     }
                 }
                 //Meaning it's constant

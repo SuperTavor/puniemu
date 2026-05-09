@@ -1,7 +1,7 @@
 ﻿using Supabase.Postgrest.Attributes;
 using Supabase.Postgrest.Models;
 
-namespace Puniemu.Src.UserDataManager.DataClasses
+namespace Puniemu.Src.DBService.DataClasses
 {
     [Table("device")]
     public class Device : BaseModel

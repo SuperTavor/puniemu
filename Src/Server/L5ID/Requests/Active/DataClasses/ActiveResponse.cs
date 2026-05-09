@@ -45,7 +45,7 @@ namespace Puniemu.Src.Server.L5ID.Requests.Active.DataClasses
         {
             var gdkeys = new List<Key>();
             var udkey = new Key(udkeyValue);
-            foreach (var key in await UserDataManager.Logic.DBService.GetGdkeysFromUdkeyAsync(udkeyValue))
+            foreach (var key in await DBService.Logic.DBService.GetGdkeysFromUdkeyAsync(udkeyValue))
             {
                 gdkeys.Add(new Key(key));
             }

@@ -27,7 +27,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.UserInfoRefresh.Logic
             UserInfoRefreshResponse userInfoRefreshResponse;
             try
             {
-                userData = await UserDataManager.Logic.DBService.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data");
+                userData = await DBService.Logic.DBService.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data");
                 userInfoRefreshResponse = new UserInfoRefreshResponse(userData!);
                 // Convert struct into dict (because the response can have different number of ywp_user table)
                 var userInfoRefreshDict = userInfoRefreshResponse.ToDictionary();
@@ -36,7 +36,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.UserInfoRefresh.Logic
                 {
                     try
                     {
-                        var tempTable = await UserDataManager.Logic.DBService.GetYwpUserAsync<object>(deserialized.Level5UserID, item);
+                        var tempTable = await DBService.Logic.DBService.GetYwpUserAsync<object>(deserialized.Level5UserID, item);
                         userInfoRefreshDict.Add(item, tempTable!);
                     }
                     catch (Exception ex)

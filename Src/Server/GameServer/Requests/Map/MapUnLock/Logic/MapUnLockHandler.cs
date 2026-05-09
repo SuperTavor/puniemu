@@ -1,5 +1,5 @@
 using Newtonsoft.Json;
-using Puniemu.Src.UserDataManager;
+using Puniemu.Src.DBService;
 
 using Puniemu.Src.Server.GameServer.Requests.MapUnLock.DataClasses;
 using Puniemu.Src.Server.GameServer.DataClasses;
@@ -26,9 +26,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapUnLock.Logic
             var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             var deserialized = JsonConvert.DeserializeObject<MapUnLockRequest>(requestJsonString!);
             ctx.Response.ContentType = "application/json";
-            var userData = await UserDataManager.Logic.DBService.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data");
-            var userStage = new TableParser.Logic.TableParser<YwpUserStage>( await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_stage"));
-            var userMap = new TableParser.Logic.TableParser<YwpUserMap>(await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_map"));
+            var userData = await DBService.Logic.DBService.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data");
+            var userStage = new TableParser.Logic.TableParser<YwpUserStage>( await DBService.Logic.DBService.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_stage"));
+            var userMap = new TableParser.Logic.TableParser<YwpUserMap>(await DBService.Logic.DBService.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_map"));
 
             List<YwpMstMap> mstMap = JsonConvert.DeserializeObject<List<YwpMstMap>>(
                 JsonConvert.DeserializeObject<Dictionary<string, object>>(
@@ -68,8 +68,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapUnLock.Logic
 
 
             GenerateFriendData.RefreshYwpUserFriend(deserialized.Level5UserID, -1, -1, userData!.PlayerName, -1, "");
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_data", userData);
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_stage", userStage.ToString());
+            await DBService.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_data", userData);
+            await DBService.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_stage", userStage.ToString());
             var res = new MapUnLockResponse(userData!);
             var resdict = JsonConvert.DeserializeObject<Dictionary<string, object>>(JsonConvert.SerializeObject(res))!;
             var marshalledResponse = JsonConvert.SerializeObject(resdict);

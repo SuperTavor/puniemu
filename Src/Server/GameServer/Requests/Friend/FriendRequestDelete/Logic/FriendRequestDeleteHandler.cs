@@ -22,7 +22,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.FriendRequestDelete.Logic
             var deserialized = JsonConvert.DeserializeObject<FriendRequestDeleteRequest>(requestJsonString!);
 
             var res = new FriendRequestDeleteResponse();
-            res.YwpUserFriendRequestRecv = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<FriendRequestEntry>>(deserialized!.Level5UserID!, "ywp_user_friend_request_recv");
+            res.YwpUserFriendRequestRecv = await DBService.Logic.DBService.GetYwpUserAsync<List<FriendRequestEntry>>(deserialized!.Level5UserID!, "ywp_user_friend_request_recv");
             int idx = 0;
             int to_delete = -1;
             foreach (FriendRequestEntry element in res.YwpUserFriendRequestRecv!)
@@ -43,7 +43,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.FriendRequestDelete.Logic
             {
                 res.YwpUserFriendRequestRecv.RemoveAt(to_delete);
             }
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized.Level5UserID!, "ywp_user_friend_request_recv", res.YwpUserFriendRequestRecv);
+            await DBService.Logic.DBService.SetYwpUserAsync(deserialized.Level5UserID!, "ywp_user_friend_request_recv", res.YwpUserFriendRequestRecv);
             var outDict = JsonConvert.DeserializeObject<Dictionary<string, object>>(JsonConvert.SerializeObject(res));
             var outResponse = NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(outDict));
             await ctx.Response.WriteAsync(outResponse);

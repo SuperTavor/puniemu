@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Puniemu.Src.Server.GameServer.DataClasses;
-using Puniemu.Src.UserDataManager.Logic;
+using Puniemu.Src.DBService.Logic;
 
 namespace Puniemu.Src.Server.GameServer.Requests.GetGdkeyAccounts.DataClasses
 {
@@ -21,7 +21,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetGdkeyAccounts.DataClasses
                     var item = await UdkeyPlayerItem.ConstructAsync(gdkey);
                     if (item == null)
                     {
-                        await UserDataManager.Logic.DBService.DeleteUser(udkey, gdkey);
+                        await DBService.Logic.DBService.DeleteUser(udkey, gdkey);
                         return null;
                     }
                     playerItems.Add(item.Value);

@@ -37,7 +37,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.FriendDelete.Logic
             }
 
             // Récupère mes données (demandeur)
-            var myData = await UserDataManager.Logic.DBService.GetYwpUserAsync<YwpUserData>(
+            var myData = await DBService.Logic.DBService.GetYwpUserAsync<YwpUserData>(
                 deserialized.Level5UserID, "ywp_user_data"
             );
 
@@ -58,7 +58,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.FriendDelete.Logic
             string? targetGdkey = null;
             try
             {
-                targetGdkey = await UserDataManager.Logic.DBService.GetGdkeyFromUserId(targetUserId);
+                targetGdkey = await DBService.Logic.DBService.GetGdkeyFromUserId(targetUserId);
             }
             catch
             {
@@ -66,14 +66,14 @@ namespace Puniemu.Src.Server.GameServer.Requests.FriendDelete.Logic
             }
 
             // --- Suppression côté demandeur ---
-            var myFriends = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<FriendEntry>>(
+            var myFriends = await DBService.Logic.DBService.GetYwpUserAsync<List<FriendEntry>>(
                 myGdkey, "ywp_user_friend"
             ) ?? new List<FriendEntry>();
 
             // retire targetUserId de ma liste d'amis
             myFriends.RemoveAll(f => f != null && f.UserId == targetUserId);
 
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(myGdkey, "ywp_user_friend", myFriends);
+            await DBService.Logic.DBService.SetYwpUserAsync(myGdkey, "ywp_user_friend", myFriends);
 
             // Supprime aussi dans mes autres tables (rank / star_rank / request_recv)
             await RemoveFriendFromAllTables(myGdkey, targetUserId);
@@ -81,25 +81,25 @@ namespace Puniemu.Src.Server.GameServer.Requests.FriendDelete.Logic
             // --- Suppression côté cible (si on a son gdkey) ---
             if (!string.IsNullOrEmpty(targetGdkey))
             {
-                var targetFriends = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<FriendEntry>>(
+                var targetFriends = await DBService.Logic.DBService.GetYwpUserAsync<List<FriendEntry>>(
                     targetGdkey, "ywp_user_friend"
                 ) ?? new List<FriendEntry>();
 
                 // retire mon UserID de sa liste d'amis (ATTENTION : on compare avec myData.UserID)
                 targetFriends.RemoveAll(f => f != null && f.UserId == myUserId);
 
-                await UserDataManager.Logic.DBService.SetYwpUserAsync(targetGdkey, "ywp_user_friend", targetFriends);
+                await DBService.Logic.DBService.SetYwpUserAsync(targetGdkey, "ywp_user_friend", targetFriends);
 
                 // Supprime aussi dans ses autres tables
                 await RemoveFriendFromAllTables(targetGdkey, myUserId);
             }
 
             // Recharger les tables mises à jour côté demandeur (pour la réponse)
-            res.YwpUserData = await UserDataManager.Logic.DBService.GetYwpUserAsync<YwpUserData>(myGdkey, "ywp_user_data");
-            res.YwpUserFriend = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<FriendEntry>>(myGdkey, "ywp_user_friend") ?? new List<FriendEntry>();
-            res.YwpUserFriendRank = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<FriendEntry>>(myGdkey, "ywp_user_friend_rank") ?? new List<FriendEntry>();
-            res.YwpUserFriendStarRank = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<FriendRankEntry>>(myGdkey, "ywp_user_friend_star_rank") ?? new List<FriendRankEntry>();
-            res.YwpUserFriendRequestRecv = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<FriendRequestEntry>>(myGdkey, "ywp_user_friend_request_recv") ?? new List<FriendRequestEntry>();
+            res.YwpUserData = await DBService.Logic.DBService.GetYwpUserAsync<YwpUserData>(myGdkey, "ywp_user_data");
+            res.YwpUserFriend = await DBService.Logic.DBService.GetYwpUserAsync<List<FriendEntry>>(myGdkey, "ywp_user_friend") ?? new List<FriendEntry>();
+            res.YwpUserFriendRank = await DBService.Logic.DBService.GetYwpUserAsync<List<FriendEntry>>(myGdkey, "ywp_user_friend_rank") ?? new List<FriendEntry>();
+            res.YwpUserFriendStarRank = await DBService.Logic.DBService.GetYwpUserAsync<List<FriendRankEntry>>(myGdkey, "ywp_user_friend_star_rank") ?? new List<FriendRankEntry>();
+            res.YwpUserFriendRequestRecv = await DBService.Logic.DBService.GetYwpUserAsync<List<FriendRequestEntry>>(myGdkey, "ywp_user_friend_request_recv") ?? new List<FriendRequestEntry>();
 
             res.ResponseCode = 0;
 
@@ -111,24 +111,24 @@ namespace Puniemu.Src.Server.GameServer.Requests.FriendDelete.Logic
         private static async Task RemoveFriendFromAllTables(string gdkey, string removedUserId)
         {
             // ywp_user_friend (FriendEntry)
-            var friends = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<FriendEntry>>(gdkey, "ywp_user_friend") ?? new List<FriendEntry>();
+            var friends = await DBService.Logic.DBService.GetYwpUserAsync<List<FriendEntry>>(gdkey, "ywp_user_friend") ?? new List<FriendEntry>();
             friends.RemoveAll(f => f != null && f.UserId == removedUserId);
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(gdkey, "ywp_user_friend", friends);
+            await DBService.Logic.DBService.SetYwpUserAsync(gdkey, "ywp_user_friend", friends);
 
             // ywp_user_friend_rank (FriendEntry)
-            var rank = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<FriendEntry>>(gdkey, "ywp_user_friend_rank") ?? new List<FriendEntry>();
+            var rank = await DBService.Logic.DBService.GetYwpUserAsync<List<FriendEntry>>(gdkey, "ywp_user_friend_rank") ?? new List<FriendEntry>();
             rank.RemoveAll(f => f != null && f.UserId == removedUserId);
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(gdkey, "ywp_user_friend_rank", rank);
+            await DBService.Logic.DBService.SetYwpUserAsync(gdkey, "ywp_user_friend_rank", rank);
 
             // ywp_user_friend_star_rank (FriendStarRankEntry from FriendRequestAccept.Logic)
-            var starRank = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<FriendRankEntry>>(gdkey, "ywp_user_friend_star_rank") ?? new List<FriendRankEntry>();
+            var starRank = await DBService.Logic.DBService.GetYwpUserAsync<List<FriendRankEntry>>(gdkey, "ywp_user_friend_star_rank") ?? new List<FriendRankEntry>();
             starRank.RemoveAll(f => f != null && f.UserId == removedUserId);
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(gdkey, "ywp_user_friend_star_rank", starRank);
+            await DBService.Logic.DBService.SetYwpUserAsync(gdkey, "ywp_user_friend_star_rank", starRank);
 
             // ywp_user_friend_request_recv (FriendRequestEntry)
-            var recv = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<FriendRequestEntry>>(gdkey, "ywp_user_friend_request_recv") ?? new List<FriendRequestEntry>();
+            var recv = await DBService.Logic.DBService.GetYwpUserAsync<List<FriendRequestEntry>>(gdkey, "ywp_user_friend_request_recv") ?? new List<FriendRequestEntry>();
             recv.RemoveAll(f => f != null && f.UserId == removedUserId);
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(gdkey, "ywp_user_friend_request_recv", recv);
+            await DBService.Logic.DBService.SetYwpUserAsync(gdkey, "ywp_user_friend_request_recv", recv);
 
             // Note: on ne supprime pas l'objet ywp_user_data lui-même.
         }

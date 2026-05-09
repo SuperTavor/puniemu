@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Puniemu.Src.Server.GameServer.DataClasses;
-using Puniemu.Src.UserDataManager.DataClasses;
+using Puniemu.Src.DBService.DataClasses;
 
 namespace Puniemu.Src.Server.GameServer.Requests.GetGdkeyAccounts.DataClasses
 {
@@ -34,9 +34,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetGdkeyAccounts.DataClasses
         public static async Task<UdkeyPlayerItem?> ConstructAsync(string gdkey)
         {
             YwpUserData? userData;
-            userData = await UserDataManager.Logic.DBService.GetYwpUserAsync<YwpUserData>(gdkey, "ywp_user_data");
-            var res = await UserDataManager.Logic.DBService.SupabaseClient!.From<Account>().Where(x => x.Gdkey == gdkey).Get();
-            var account = res.Model!;
+            userData = await DBService.Logic.DBService.GetYwpUserAsync<YwpUserData>(gdkey, "ywp_user_data");
+            var account = await DBService.Logic.DBService.GetAccountObjectAsync(gdkey);
             UdkeyPlayerItem playerItem = new();
 
             playerItem.IconID = (PlayerIcon)userData!.IconID;

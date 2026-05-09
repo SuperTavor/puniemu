@@ -340,7 +340,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 await GeneralUtils.SendBadRequest(ctx);
                 return;
             }
-            var ReqId = await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_requestid");
+            var ReqId = await DBService.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_requestid");
             if ((ReqId == null || deserialized.RequestID == null || ReqId == "" || deserialized.RequestID == "") || (ReqId != deserialized.RequestID))
             {
                 var errSession = new MsgBoxResponse("This session is invalid", "INVALID SESSION");
@@ -354,7 +354,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 return;
             }
             StageData LevelData = jsonLevelData[deserialized.StageId.ToString()];
-            var userData = await UserDataManager.Logic.DBService.GetYwpUserAsync<YwpUserData>(deserialized!.Gdkey!, "ywp_user_data");
+            var userData = await DBService.Logic.DBService.GetYwpUserAsync<YwpUserData>(deserialized!.Gdkey!, "ywp_user_data");
             if (userData == null)
             {
                 await GeneralUtils.SendBadRequest(ctx);
@@ -379,7 +379,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
             //List<long> starIdx = new List<long> { long.Parse(stagesInfo.Table[stageInfoIdx][8]), long.Parse(stagesInfo.Table[stageInfoIdx][9]), long.Parse(stagesInfo.Table[stageInfoIdx][10])};
 
             // items data
-            var itemsList = await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_item");
+            var itemsList = await DBService.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_item");
             var itmesListTable = new TableParser.Logic.TableParser(itemsList!);
 
 
@@ -387,10 +387,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
             
             
             var ywpUserStage = new TableParser<YwpUserStage>(
-                await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_stage")
+                await DBService.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_stage")
             );
             var ywpUserMap = new TableParser<YwpUserMap>(
-                await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_map")
+                await DBService.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_map")
             );
             int FirstClear = 0;
             HandleStage(ref deserialized, ref res, ref FirstClear, ref ywpUserStage, ref ywpUserMap);
@@ -399,9 +399,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
 
                 // enemy list
                 // gameEnd for some ywp_user data, he send only modified row (ywp_user_..._diff)
-            var userYoukai = await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai");
-            var userYoukaiSkill = await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai_skill");
-            var dictionaryYoukai = await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_dictionary");
+            var userYoukai = await DBService.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai");
+            var userYoukaiSkill = await DBService.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai_skill");
+            var dictionaryYoukai = await DBService.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_dictionary");
             var dictionaryYoukaiTable = new TableParser.Logic.TableParser(dictionaryYoukai!);
             var userYoukaiTable = new TableParser<YwpUserYoukai>(userYoukai!);
             TableParser<YwpUserYoukaiSkill> userYoukaiSkillTable = new(userYoukaiSkill!);
@@ -462,7 +462,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 }
             }
             //add first reward item
-            var playerIcon = await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_player_icon");
+            var playerIcon = await DBService.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_player_icon");
             var playerIconTable = new TableParser.Logic.TableParser(playerIcon!);
             if (FirstClear == 1)
             {
@@ -501,7 +501,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
             HandleUserYoukai(ref deserialized, ref res, ref userYoukaiTable, ref youkaiDiff);
 
             // edit tutorial
-            var tutorialList = await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_tutorial_list");
+            var tutorialList = await DBService.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_tutorial_list");
             var tutorialListTable = new TableParser<YwpUserTutorialList>(tutorialList!);
             
             if (LevelData.TutorialEdit != null && LevelData.TutorialEdit.TutorialResp != null)
@@ -514,7 +514,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                     }
                 }
             }
-            var menufuncList = await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_menufunc");
+            var menufuncList = await DBService.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_menufunc");
             var menufuncListTable = new TableParser.Logic.TableParser(menufuncList!);
             if (LevelData.Menufunc != null)
             {
@@ -537,18 +537,18 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                     }
                 }
             }
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_requestid", "");
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_stage", ywpUserStage.ToString());
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_youkai", userYoukaiTable.ToString());
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_item", itmesListTable.ToString());
+            await DBService.Logic.DBService.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_requestid", "");
+            await DBService.Logic.DBService.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_stage", ywpUserStage.ToString());
+            await DBService.Logic.DBService.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_youkai", userYoukaiTable.ToString());
+            await DBService.Logic.DBService.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_item", itmesListTable.ToString());
             userData.YMoney += res.UserGameResultData.Money; // add money to user
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_data", userData);
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_menufunc", menufuncListTable.ToString());
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_tutorial_list", tutorialListTable.ToString());
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_dictionary", dictionaryYoukaiTable.ToString());
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_player_icon", playerIconTable.ToString());
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_map", ywpUserMap.ToString());
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_youkai_skill", userYoukaiSkillTable.ToString());
+            await DBService.Logic.DBService.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_data", userData);
+            await DBService.Logic.DBService.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_menufunc", menufuncListTable.ToString());
+            await DBService.Logic.DBService.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_tutorial_list", tutorialListTable.ToString());
+            await DBService.Logic.DBService.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_dictionary", dictionaryYoukaiTable.ToString());
+            await DBService.Logic.DBService.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_player_icon", playerIconTable.ToString());
+            await DBService.Logic.DBService.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_map", ywpUserMap.ToString());
+            await DBService.Logic.DBService.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_youkai_skill", userYoukaiSkillTable.ToString());
 
             var resdict = JsonConvert.DeserializeObject<Dictionary<string, object>>(JsonConvert.SerializeObject(res));
             if (resdict == null)

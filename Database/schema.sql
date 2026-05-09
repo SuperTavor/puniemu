@@ -5,37 +5,40 @@ CREATE TABLE public.account (
     user_id TEXT,
     character_id TEXT,
 
-    last_lgn_time TIMESTAMPTZ,
+    last_lgn_time TEXT,
     start_date BIGINT NOT NULL,
-
+    opening_tutorial_flag BOOLEAN,
     login_stamp TEXT,
     ywp_user_data JSONB,
     ywp_user_icon_budge JSONB,
     ywp_user_tutorial_list JSONB,
     ywp_user_menufunc JSONB,
     ywp_user_map JSONB,
-
+    ywp_user_gacha_stamp JSONB,
     ywp_user_hist_total JSONB,
     ywp_user_hist_youkai_total JSONB,
     ywp_user_hist_puzzle_daily JSONB,
     ywp_user_hist_puzzle_weekly JSONB,
     ywp_user_hist_youkai_daily JSONB,
-
+    ywp_user_youkai_collect JSONB,
     ywp_user_youkai JSONB,
     ywp_user_youkai_skill JSONB,
     ywp_user_youkai_deck JSONB,
     ywp_user_dictionary JSONB,
     ywp_user_conflate JSONB,
+    ywp_user_goku_story JSONB,
     ywp_user_item JSONB,
-
+    ywp_user_youkai_strong_skill JSONB,
+    ywp_user_mini_game_map JSONB,
     ywp_user_shop_item_remain_cnt JSONB,
     ywp_user_shop_item_unlock JSONB,
-
+    ywp_user_youkai_intro JSONB,
+    ywp_user_goku_youkai_intro_release JSONB,
     ywp_user_stage JSONB,
     ywp_user_player_icon JSONB,
     ywp_user_player_title JSONB,
     ywp_user_self_rank JSONB,
-
+    ywp_user_event_condition JSONB,
     ywp_user_event JSONB,
     ywp_user_medal_point_trade JSONB,
     ywp_user_youkai_medal_cnt JSONB,
@@ -68,23 +71,25 @@ CREATE TABLE public.account (
     ywp_user_local_youkai_new JSONB,
 
     ywp_user_friend JSONB,
+    ywp_user_event_point JSONB,
     ywp_user_friend_request_recv JSONB,
-
+    ywp_user_mini_game_map_friend JSONB,
     ywp_user_gacha JSONB,
     ywp_user_local_item_select JSONB,
-
+    ywp_user_stage_relation_progress JSONB,
     ywp_user_friend_raid_boss JSONB,
+    ywp_user_crystal_menu JSONB,
     ywp_user_local_treasure_series_unlocked JSONB,
-
+    ywp_user_league_rank JSONB,
     ywp_user_raid_boss_attack JSONB,
-
+    ywp_user_ads_play JSONB,
     ywp_user_friend_rank_event JSONB,
     ywp_user_local_stage_searched JSONB,
     ywp_user_local_event_movie_viewed JSONB,
-
+    ywp_user_player_plate JSONB,
     ywp_user_self_rank_event JSONB,
     ywp_user_all_rank_event JSONB,
-
+    ywp_user_score_attack_point_trade JSONB,
     ywp_user_local_raid_boss_cutin_viewed JSONB,
     ywp_user_local_oni_cutin_viewed JSONB,
 

@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Puniemu.Src.DataManager.Logic;
 using Puniemu.Src.Server.GameServer.DataClasses;
-using Puniemu.Src.UserDataManager.Logic;
+using Puniemu.Src.DBService.Logic;
 using Puniemu.Src.Utils.GeneralUtils;
 
 public class CommonLoginResponse : CommonResponse

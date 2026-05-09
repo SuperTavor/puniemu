@@ -1,8 +1,10 @@
-﻿using Puniemu.Src.Server.GameServer.DataClasses;
+﻿using Newtonsoft.Json;
+using Puniemu.Src.Server.GameServer.DataClasses;
 using Supabase.Postgrest.Attributes;
 using Supabase.Postgrest.Models;
+using System.Reflection;
 
-namespace Puniemu.Src.UserDataManager.DataClasses
+namespace Puniemu.Src.DBService.DataClasses
 {
     [Table("account")]
     public class Account : BaseModel
@@ -69,6 +71,12 @@ namespace Puniemu.Src.UserDataManager.DataClasses
         [Column("ywp_user_youkai_skill")]
         public string? YwpUserYoukaiSkill { get; set; }
 
+        [Column("ywp_user_mini_game_map")]
+        public string YwpUserMiniGameMap { get; set; }
+
+        [Column("ywp_user_youkai_strong_skill")]
+        public string? YwpUserYoukaiStrongSkill { get; set; }
+
         [Column("ywp_user_youkai_deck")]
         public string? YwpUserYoukaiDeck { get; set; }
 
@@ -101,6 +109,10 @@ namespace Puniemu.Src.UserDataManager.DataClasses
 
         [Column("ywp_user_event")]
         public string? YwpUserEvent { get; set; }
+
+        [Column("ywp_user_event_condition")]
+        public string? YwpUserEventCond { get; set; }
+
 
         [Column("ywp_user_medal_point_trade")]
         public string? YwpUserMedalPointTrade { get; set; }
@@ -258,10 +270,97 @@ namespace Puniemu.Src.UserDataManager.DataClasses
         [Column("ywp_user_login_stamp_list")]
         public string? YwpUserLoginStampList { get; set; }
 
+        [Column("ywp_user_youkai_collect")]
+        public string? YwpUserYoukaiCollect { get; set; }
 
-        public Account()
+        [Column("ywp_user_youkai_intro")]
+        public string? YwpUserYoukaiIntro { get; set; }
+
+        [Column("ywp_user_goku_youkai_intro_release")]
+        public string? YwpUserGokuYoukaiIntroRelease { get; set; }
+
+        [Column("ywp_user_goku_story")]
+        public string? YwpUserGokuStory { get; set; }
+
+        [Column("ywp_user_stage_relation_progress")]
+        public string? YwpUserStageRelationProgress { get; set; }
+
+        [Column("ywp_user_crystal_menu")]
+        public string? YwpUserCrystalMenu { get; set; }
+
+        [Column("ywp_user_event_point")]
+        public string? YwpUserEventPoint { get; set; }
+
+        [Column("ywp_user_mini_game_map_friend")]
+        public string? YwpUserMiniGameMapFriend { get; set; }
+
+        [Column("ywp_user_league_rank")]
+        public string? YwpUserLeagueRank { get; set; }
+
+        [Column("ywp_user_gacha_stamp")]
+        public string? YwpUserGachaStamp { get; set; }
+
+        [Column("ywp_user_player_plate")]
+        public string? YwpUserPlayerPlate { get; set; }
+
+        [Column("ywp_user_ads_play")]
+        public string? YwpUserAdsPlay { get; set; }
+
+        [Column("ywp_user_score_attack_point_trade")]
+        public string? YwpUserScoreAttackPointTrade { get; set; }
+
+        public PropertyInfo? GetFieldPropByJsonName(string fieldName)
         {
-         
+            if(!AccountPropertyCache.Cache.ContainsKey(fieldName))
+            {
+                var prop = typeof(Account)
+                    .GetProperties()
+                    .FirstOrDefault(p =>
+                    {
+                        var attr = p.GetCustomAttribute<ColumnAttribute>();
+                        return attr != null && attr.ColumnName == fieldName;
+                    })!;
+                if(prop == null)
+                {
+                    Console.WriteLine(fieldName);
+                    throw new ArgumentException($"Unknown ywp_user: {fieldName}");
+                }
+                else AccountPropertyCache.Cache[fieldName] = prop;
+            }
+
+            
+            return AccountPropertyCache.Cache[fieldName];
+        }
+
+        // isRaw = is not serialize object
+
+        public object? GetFieldByJsonName<T>(string fieldName, bool raw = false)
+        {
+            PropertyInfo? prop = GetFieldPropByJsonName(fieldName);
+            object? value = prop.GetValue(this);
+
+            if (raw)
+                return value;
+
+            return JsonConvert.DeserializeObject<T>(value as string ?? "");
+        }
+
+       
+        // isRaw = is not serialize object
+        public void SetFieldByJsonName(string fieldName, object fieldVal, bool raw = false)
+        {
+            PropertyInfo? prop = GetFieldPropByJsonName(fieldName);
+            object? finalVal = null;
+            if (fieldVal == null) finalVal = null;
+            else if(fieldVal.GetType() == typeof(string) && raw)
+            {
+                finalVal = fieldVal;
+            } 
+            else
+            {
+                finalVal = JsonConvert.SerializeObject(fieldVal);
+            }
+            prop.SetValue(this, finalVal);
         }
     }
 }

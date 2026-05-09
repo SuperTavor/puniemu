@@ -1,11 +1,11 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Puniemu.Src.UserDataManager.DataClasses;
+using Puniemu.Src.DBService.DataClasses;
 using Supabase;
 using Supabase.Postgrest.Attributes;
 using System.Reflection;
 
-namespace Puniemu.Src.UserDataManager.Logic
+namespace Puniemu.Src.DBService.Logic
 {
     public static class DBService
     {
@@ -102,6 +102,51 @@ namespace Puniemu.Src.UserDataManager.Logic
         {
             await RemoveGdkeyFromUdkey(udkey, gdkey);
             await SupabaseClient!.From<Account>().Where(a => a.Gdkey == gdkey).Delete();
+        }
+
+
+        //EXTREMELY slow and very bad. currently kept for legacy purposes in some requests, will be migrated in the future 
+        public static async Task<Dictionary<string, object?>> GetEntireUserData(string gdkey)
+        {
+            var response = await SupabaseClient!.From<Account>().Where(a => a.Gdkey == gdkey).Get();
+            var account = response.Models.FirstOrDefault()!;
+            var result = new Dictionary<string, object?>();
+
+            var type = account.GetType();
+
+            foreach (var prop in type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+            {
+                if (!prop.Name.StartsWith("YwpUser"))
+                    continue;
+
+                var columnAttr = prop.GetCustomAttribute<ColumnAttribute>();
+
+                if (columnAttr == null)
+                    continue;
+
+                var raw = prop.GetValue(account) as string;
+
+                result[columnAttr.ColumnName] =
+                    raw == null ? null : JsonConvert.DeserializeObject(raw);
+            }
+
+            foreach (var field in type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+            {
+                if (!field.Name.StartsWith("YwpUser"))
+                    continue;
+
+                var columnAttr = field.GetCustomAttribute<ColumnAttribute>();
+
+                if (columnAttr == null)
+                    continue;
+
+                var raw = field.GetValue(account) as string;
+
+                result[columnAttr.ColumnName] =
+                    raw == null ? null : JsonConvert.DeserializeObject(raw);
+            }
+
+            return result;
         }
 
         private static async Task RemoveGdkeyFromUdkey(string udkey, string gdkey)

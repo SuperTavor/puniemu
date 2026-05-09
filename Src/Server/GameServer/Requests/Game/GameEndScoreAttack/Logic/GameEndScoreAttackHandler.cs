@@ -32,7 +32,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEndScoreAttack.Logic
             }
 
             // Vérifier la session
-            var reqId = await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized.Level5UserId!, "ywp_user_requestid");
+            var reqId = await DBService.Logic.DBService.GetYwpUserAsync<string>(deserialized.Level5UserId!, "ywp_user_requestid");
             if (reqId == null || deserialized.RequestId == null || reqId == "" || deserialized.RequestId == "" || reqId != deserialized.RequestId)
             {
                 var errSession = new MsgBoxResponse("This session is invalid", "INVALID SESSION");
@@ -40,7 +40,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEndScoreAttack.Logic
                 return;
             }
 
-            var userData = await UserDataManager.Logic.DBService.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserId!, "ywp_user_data");
+            var userData = await DBService.Logic.DBService.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserId!, "ywp_user_data");
             if (userData == null)
             {
                 await GeneralUtils.SendBadRequest(ctx);
@@ -58,7 +58,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEndScoreAttack.Logic
 
 
             // Edit total best score
-            var hist_total = new TableParser.Logic.TableParser(await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized.Level5UserId!, "ywp_user_hist_total"));
+            var hist_total = new TableParser.Logic.TableParser(await DBService.Logic.DBService.GetYwpUserAsync<string>(deserialized.Level5UserId!, "ywp_user_hist_total"));
             hist_total.Table[0][21] = "2025-09-18 01:16:35";
             hist_total.Table[0][22] = "2258";
             var total_bestScore = long.Parse(hist_total.Table[0][22]);
@@ -73,7 +73,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEndScoreAttack.Logic
             res.UserGameResultData.TotalHighScore = total_bestScore;
 
             // Edit weekly best score
-            var hist_weekly = new TableParser.Logic.TableParser(await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized.Level5UserId!, "ywp_user_hist_puzzle_weekly"));
+            var hist_weekly = new TableParser.Logic.TableParser(await DBService.Logic.DBService.GetYwpUserAsync<string>(deserialized.Level5UserId!, "ywp_user_hist_puzzle_weekly"));
             var weekly_bestScore = long.Parse(hist_weekly.Table[3][0]);
             if (deserialized.Score > weekly_bestScore)
             {
@@ -82,8 +82,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEndScoreAttack.Logic
             }
             res.UserGameResultData.WeekHighScore = weekly_bestScore;
 
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized.Level5UserId!, "ywp_user_hist_puzzle_weekly", hist_weekly.ToString());
-            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized.Level5UserId!, "ywp_user_hist_total", hist_total.ToString());
+            await DBService.Logic.DBService.SetYwpUserAsync(deserialized.Level5UserId!, "ywp_user_hist_puzzle_weekly", hist_weekly.ToString());
+            await DBService.Logic.DBService.SetYwpUserAsync(deserialized.Level5UserId!, "ywp_user_hist_total", hist_total.ToString());
 
             try
             {
@@ -97,14 +97,14 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEndScoreAttack.Logic
                     ["is_new_record"] = isNewRecord,
                     ["use_current_score"] = isNewRecord // Si c'est un nouveau record, on l'affiche dans le classement
                 };
-                await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized.Level5UserId!, "ywp_pending_score", pendingScore);
+                await DBService.Logic.DBService.SetYwpUserAsync(deserialized.Level5UserId!, "ywp_pending_score", pendingScore);
 
                 // Mettre à jour res.UserGameResultData
                 res.UserGameResultData.ScoreUpdateFlg = isNewRecord ? 1 : 0;
                 // Gestion des yokai utilisés (code existant)
 
 
-                var userYoukai = await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized.Level5UserId!, "ywp_user_youkai");
+                var userYoukai = await DBService.Logic.DBService.GetYwpUserAsync<string>(deserialized.Level5UserId!, "ywp_user_youkai");
                 var userYoukaiTable = new TableParser.Logic.TableParser(userYoukai!);
                 var YoukaiMstTable = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager!.GamedataCache["ywp_mst_youkai"]!)!["tableData"]);
                 var YoukaiLevelMstTable = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai_level"]!)!["tableData"]);
@@ -201,15 +201,15 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEndScoreAttack.Logic
                 userData.YMoney += (int)res.UserGameResultData.Money;
 
                 // Nettoyer le requestId et sauvegarder les données
-                await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized.Level5UserId!, "ywp_user_requestid", "");
-                await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized.Level5UserId!, "ywp_user_youkai", userYoukaiTable.ToString());
-                await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized.Level5UserId!, "ywp_user_data", userData);
+                await DBService.Logic.DBService.SetYwpUserAsync(deserialized.Level5UserId!, "ywp_user_requestid", "");
+                await DBService.Logic.DBService.SetYwpUserAsync(deserialized.Level5UserId!, "ywp_user_youkai", userYoukaiTable.ToString());
+                await DBService.Logic.DBService.SetYwpUserAsync(deserialized.Level5UserId!, "ywp_user_data", userData);
 
                 // Nettoyer le compteur de continues pour ce score attack
                 string scoreAttackKey = $"sa_continues_{deserialized.RequestId}";
                 try
                 {
-                    await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized.Level5UserId!, scoreAttackKey, 0);
+                    await DBService.Logic.DBService.SetYwpUserAsync(deserialized.Level5UserId!, scoreAttackKey, 0);
                 }
                 catch
                 {

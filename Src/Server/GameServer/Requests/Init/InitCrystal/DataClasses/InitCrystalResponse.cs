@@ -98,10 +98,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.InitCrystal.DataClasses
             {
                 if (!string.IsNullOrEmpty(request?.DeviceId))
                 {
-                    var gdkeys = await Puniemu.Src.UserDataManager.Logic.DBService.GetGdkeysFromUdkeyAsync(request.DeviceId);
+                    var gdkeys = await Puniemu.Src.DBService.Logic.DBService.GetGdkeysFromUdkeyAsync(request.DeviceId);
                     if (gdkeys != null && gdkeys.Count > 0)
                     {
-                        var tables = (await Puniemu.Src.UserDataManager.Logic.DBService.GetEntireUserData(gdkeys[0]))!;
+                        var tables = (await Puniemu.Src.DBService.Logic.DBService.GetEntireUserData(gdkeys[0]))!;
                         if (tables != null && tables.ContainsKey("ywp_user_data"))
                         {
                             if (tables["ywp_user_data"] != null)

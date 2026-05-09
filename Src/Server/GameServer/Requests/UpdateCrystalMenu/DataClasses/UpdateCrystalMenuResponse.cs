@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Puniemu.Src.Server.GameServer.DataClasses;
-using Puniemu.Src.UserDataManager.Logic;
+using Puniemu.Src.DBService.Logic;
 
 namespace Puniemu.Src.Server.GameServer.Requests.UpdateCrystalMenu.DataClasses
 {

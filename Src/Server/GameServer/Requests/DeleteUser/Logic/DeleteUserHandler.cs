@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using Puniemu.Src.UserDataManager;
+using Puniemu.Src.DBService;
 
 using Puniemu.Src.Server.GameServer.Requests.DeleteUser.DataClasses;
 using Puniemu.Src.Server.GameServer.DataClasses;
@@ -19,7 +19,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.DeleteUser.Logic
             var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             var deserialized = JsonConvert.DeserializeObject<DeleteUserRequest>(requestJsonString!);
             ctx.Response.ContentType = "application/json";
-            var userData = await UserDataManager.Logic.DBService.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data");
+            var userData = await DBService.Logic.DBService.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data");
 
             // Response Code (If password (character id) was correct)
             int RespCode;
@@ -28,7 +28,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.DeleteUser.Logic
             {
                 RespCode = 0;
                 if (deserialized.FinalAnswerFlag == 1) {
-                    await UserDataManager.Logic.DBService.DeleteUser(deserialized.DeviceID,deserialized.Level5UserID);
+                    await DBService.Logic.DBService.DeleteUser(deserialized.DeviceID,deserialized.Level5UserID);
                 }
             } else {
                 RespCode = 1;
