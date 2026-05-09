@@ -59,7 +59,7 @@ public class CommonLoginResponse : CommonResponse
         MonthlyPurchasableLeft = 0;
 
         OpeningTutorialFlag =
-            await UserDataManager
+            await DBService
                 .GetYwpUserAsync<int>(gdkey, "opening_tutorial_flg");
     }
 }

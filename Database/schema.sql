@@ -1,0 +1,112 @@
+CREATE TABLE public.device ( udkey TEXT PRIMARY KEY, gdkeys TEXT[] );
+
+CREATE TABLE public.account (
+    gdkey TEXT PRIMARY KEY,
+    user_id TEXT,
+    character_id TEXT,
+
+    last_lgn_time TIMESTAMPTZ,
+    start_date BIGINT NOT NULL,
+
+    login_stamp TEXT,
+    ywp_user_data JSONB,
+    ywp_user_icon_budge JSONB,
+    ywp_user_tutorial_list JSONB,
+    ywp_user_menufunc JSONB,
+    ywp_user_map JSONB,
+
+    ywp_user_hist_total JSONB,
+    ywp_user_hist_youkai_total JSONB,
+    ywp_user_hist_puzzle_daily JSONB,
+    ywp_user_hist_puzzle_weekly JSONB,
+    ywp_user_hist_youkai_daily JSONB,
+
+    ywp_user_youkai JSONB,
+    ywp_user_youkai_skill JSONB,
+    ywp_user_youkai_deck JSONB,
+    ywp_user_dictionary JSONB,
+    ywp_user_conflate JSONB,
+    ywp_user_item JSONB,
+
+    ywp_user_shop_item_remain_cnt JSONB,
+    ywp_user_shop_item_unlock JSONB,
+
+    ywp_user_stage JSONB,
+    ywp_user_player_icon JSONB,
+    ywp_user_player_title JSONB,
+    ywp_user_self_rank JSONB,
+
+    ywp_user_event JSONB,
+    ywp_user_medal_point_trade JSONB,
+    ywp_user_youkai_medal_cnt JSONB,
+    ywp_user_event_point_trade JSONB,
+
+    ywp_user_steal_progress JSONB,
+    ywp_user_score_attack_reward JSONB,
+    ywp_user_youkai_legend_release_history JSONB,
+    ywp_user_event_tutorial JSONB,
+    ywp_user_raid_boss JSONB,
+    ywp_user_event_ranking_reward JSONB,
+
+    ywp_user_drive_progress JSONB,
+    ywp_user_youkai_bonus_effect JSONB,
+    ywp_user_event_progress JSONB,
+
+    ywp_user_treasure_series JSONB,
+    ywp_user_treasure JSONB,
+    ywp_user_present_box_list JSONB,
+
+    ywp_user_tournament_message JSONB,
+
+    ywp_user_friend_stage JSONB,
+    ywp_user_all_rank JSONB,
+    ywp_user_friend_rank JSONB,
+    ywp_user_friend_star_rank JSONB,
+    ywp_user_friend_dictionary_rank JSONB,
+    ywp_user_stage_rank JSONB,
+
+    ywp_user_local_youkai_new JSONB,
+
+    ywp_user_friend JSONB,
+    ywp_user_friend_request_recv JSONB,
+
+    ywp_user_gacha JSONB,
+    ywp_user_local_item_select JSONB,
+
+    ywp_user_friend_raid_boss JSONB,
+    ywp_user_local_treasure_series_unlocked JSONB,
+
+    ywp_user_raid_boss_attack JSONB,
+
+    ywp_user_friend_rank_event JSONB,
+    ywp_user_local_stage_searched JSONB,
+    ywp_user_local_event_movie_viewed JSONB,
+
+    ywp_user_self_rank_event JSONB,
+    ywp_user_all_rank_event JSONB,
+
+    ywp_user_local_raid_boss_cutin_viewed JSONB,
+    ywp_user_local_oni_cutin_viewed JSONB,
+
+    ywp_user_present_box JSONB,
+    ywp_user_mission JSONB,
+
+    ywp_user_local_medal_trade_chked JSONB,
+    ywp_user_local_event_trade_chked JSONB,
+
+    ywp_user_local_player_icon_select JSONB,
+    ywp_user_local_player_title_select JSONB,
+
+    ywp_user_local_webpage_chked JSONB,
+    ywp_user_local_event_help_chked JSONB,
+
+    ywp_user_local_shop_item_unlock JSONB,
+    ywp_user_local_shop_item_select JSONB,
+
+    ywp_user_watch JSONB,
+    ywp_user_local_watch_select JSONB,
+    ywp_user_local_watch_unlock JSONB,
+
+    ywp_user_hitodama_buy JSONB,
+    ywp_user_login_stamp_list JSONB
+);

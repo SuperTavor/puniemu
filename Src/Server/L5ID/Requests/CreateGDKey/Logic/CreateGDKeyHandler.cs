@@ -18,8 +18,8 @@ namespace Puniemu.Src.Server.L5ID.Requests.CreateGDKey.Logic
             }
             else
             {
-                var gdkey = await UserDataManager.Logic.UserDataManager.NewAccountAsync();
-                await UserDataManager.Logic.UserDataManager.AddAccountToDevice(query["udkey"]!, gdkey);
+                var gdkey = await UserDataManager.Logic.DBService.NewAccountAsync();
+                await UserDataManager.Logic.DBService.AddAccountToDevice(query["udkey"]!, gdkey);
                 var res = new CreateGDKeyGoodResponse(gdkey);
                 var json = JsonConvert.SerializeObject(res);
                 await ctx.Response.WriteAsync(json);

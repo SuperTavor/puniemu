@@ -14,7 +14,7 @@ namespace Puniemu.Src.Server.L5ID.Requests.Active.Logic.Puni
             string udkey;
             if (!queryParams.ContainsKey("udkey"))
             {
-                udkey = await UserDataManager.Logic.UserDataManager.NewDeviceAsync();
+                udkey = await UserDataManager.Logic.DBService.NewDeviceAsync();
             }
             else
             {

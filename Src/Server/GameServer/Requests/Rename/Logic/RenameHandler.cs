@@ -22,7 +22,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Rename.Logic
             var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             var deserialized = JsonConvert.DeserializeObject<RenameRequest>(requestJsonString!);
             ctx.Response.ContentType = "application/json";
-            var userData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data");
+            var userData = await UserDataManager.Logic.DBService.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data");
 
             if (userData != null && !deserialized.NewPlayerName.IsNullOrEmpty())
             {
@@ -33,7 +33,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Rename.Logic
             var marshalledResponse = JsonConvert.SerializeObject(renameResponse);
             var encryptedResponse = NHNCrypt.Logic.NHNCrypt.EncryptResponse(marshalledResponse);
             await ctx.Response.WriteAsync(encryptedResponse);
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_data", userData);
+            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_data", userData);
         }
     }
 }

@@ -12,17 +12,17 @@ namespace Puniemu.Src.Server.GameServer.Logic
 {
     public class MapManager
     {
-        public static void AddMap(ref TableParser<YwpUserMap> parser, long mapId)
+        public static void AddMap(TableParser<YwpUserMap> parser, long mapId)
         {
-            var MapIndex = GetMapIndex(ref parser, mapId);
+            var MapIndex = GetMapIndex(parser, mapId);
             if (MapIndex == -1)
             {
                 parser.AddItem(new YwpUserMap {MapId = mapId, IsUnlocked = 0, FriendCount = 0 });
             }
         }
-        public static void UpdateMap(ref TableParser<YwpUserMap> parser, long mapId, int isUnlockd)
+        public static void UpdateMap(TableParser<YwpUserMap> parser, long mapId, int isUnlockd)
         {
-            var MapIndex = GetMapIndex(ref parser, mapId);
+            var MapIndex = GetMapIndex(parser, mapId);
             if (MapIndex != -1)
             {
                 if (isUnlockd == 1 && parser.Items[MapIndex].IsUnlocked == 0)
@@ -31,7 +31,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
                 }
             }
         }
-        public static int GetMapIndex(ref TableParser<YwpUserMap> parser, long mapId)
+        public static int GetMapIndex(TableParser<YwpUserMap> parser, long mapId)
         {
             uint count = 0;
             foreach (YwpUserMap i in parser.Items)

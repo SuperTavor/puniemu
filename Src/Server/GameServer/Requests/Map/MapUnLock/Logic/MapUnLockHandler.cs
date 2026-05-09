@@ -26,11 +26,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapUnLock.Logic
             var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             var deserialized = JsonConvert.DeserializeObject<MapUnLockRequest>(requestJsonString!);
             ctx.Response.ContentType = "application/json";
-            var UserTables = await UserDataManager.Logic.UserDataManager.GetEntireUserData(deserialized!.Level5UserID!);
-
-            var userData = UserDataManager.Logic.UserDataManager.GetYwpUserFromJson<YwpUserData>("ywp_user_data", UserTables)!;
-            var userStage = new TableParser<YwpUserStage>(UserDataManager.Logic.UserDataManager.GetYwpUserFromJson<string>("ywp_user_stage", UserTables)!);
-            var userMap = new TableParser<YwpUserMap>(UserDataManager.Logic.UserDataManager.GetYwpUserFromJson<string>("ywp_user_map", UserTables)!);
+            var userData = await UserDataManager.Logic.DBService.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data");
+            var userStage = new TableParser.Logic.TableParser<YwpUserStage>( await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_stage"));
+            var userMap = new TableParser.Logic.TableParser<YwpUserMap>(await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_map"));
 
             List<YwpMstMap> mstMap = JsonConvert.DeserializeObject<List<YwpMstMap>>(
                 JsonConvert.DeserializeObject<Dictionary<string, object>>(
@@ -38,9 +36,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapUnLock.Logic
                 )!["data"].ToString()!
             )!;
 
-            var userMapIndex = MapManager.GetMapIndex(ref userMap, deserialized.MapId);
-            var mstMapIndex = MstMapManager.GetMapIndex(ref mstMap, deserialized.MapId);
-            var userStageIndex = StageManager.GetStageIndex(ref userStage, (((int)deserialized.MapId * 1000) + 1));
+            var userMapIndex = MapManager.GetMapIndex(userMap, deserialized.MapId);
+            var mstMapIndex = MstMapManager.GetMapIndex(mstMap, deserialized.MapId);
+            var userStageIndex = StageManager.GetStageIndex(userStage, (((int)deserialized.MapId * 1000) + 1));
             if (userMapIndex == -1 || mstMapIndex == -1)
             {
                 var errSession = new MsgBoxResponse("Map don't exist or unknown", "Error");
@@ -61,7 +59,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapUnLock.Logic
                 return;
             }
             userData.YMoney -= (int)mstMap[mstMapIndex].NeedYmoney;
-            StageManager.AddStage(ref userStage, (((int)deserialized.MapId * 1000) + 1));
+            StageManager.AddStage(userStage, (((int)deserialized.MapId * 1000) + 1));
 
             userData.CurrentStageID = (((int)deserialized.MapId * 1000) + 1);
 
@@ -70,8 +68,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapUnLock.Logic
 
 
             GenerateFriendData.RefreshYwpUserFriend(deserialized.Level5UserID, -1, -1, userData!.PlayerName, -1, "");
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_data", userData);
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_stage", userStage.ToString());
+            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_data", userData);
+            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_stage", userStage.ToString());
             var res = new MapUnLockResponse(userData!);
             var resdict = JsonConvert.DeserializeObject<Dictionary<string, object>>(JsonConvert.SerializeObject(res))!;
             var marshalledResponse = JsonConvert.SerializeObject(resdict);

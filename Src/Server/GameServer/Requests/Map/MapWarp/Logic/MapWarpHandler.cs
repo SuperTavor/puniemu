@@ -24,11 +24,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapWarp.Logic
             var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             var deserialized = JsonConvert.DeserializeObject<MapWarpRequest>(requestJsonString!);
             ctx.Response.ContentType = "application/json";
-            var UserTables = await UserDataManager.Logic.UserDataManager.GetEntireUserData(deserialized!.Level5UserID!);
 
-            var userData = UserDataManager.Logic.UserDataManager.GetYwpUserFromJson<YwpUserData>("ywp_user_data", UserTables)!;
-            var userStage = new TableParser.Logic.TableParser(UserDataManager.Logic.UserDataManager.GetYwpUserFromJson<string>("ywp_user_stage", UserTables)!);
-            var userMap = new TableParser.Logic.TableParser(UserDataManager.Logic.UserDataManager.GetYwpUserFromJson<string>("ywp_user_map", UserTables)!);
+            var userData = await UserDataManager.Logic.DBService.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data");
+            var userStage = await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_stage");
+            var userMap = new TableParser.Logic.TableParser(await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_map"));
 
 
             var index = userMap.FindIndex([deserialized.MapId.ToString()]);
@@ -110,7 +109,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapWarp.Logic
 
             resdict!["ywp_user_stage"] = userStage.ToString();
             resdict!["ywp_user_map"] = userMap.ToString();
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_data", userData);
+            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_data", userData);
 
             await GeneralUtils.AddTablesToResponse(ywpKeys, resdict!, true, deserialized!.Level5UserID!);
             var marshalledResponse = JsonConvert.SerializeObject(resdict);

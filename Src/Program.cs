@@ -69,7 +69,7 @@ class Program
         app.UseRewriter(rewriteOptions);
 
         //Init database connection
-        UserDataManager.Logic.UserDataManager.Initialize();
+        UserDataManager.Logic.DBService.Initialize();
 
         app.UseHttpsRedirection();
         //Assign handlers

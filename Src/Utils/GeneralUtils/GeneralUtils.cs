@@ -26,7 +26,7 @@ namespace Puniemu.Src.Utils.GeneralUtils
 
             if(isDownloadOnce && gdkey != string.Empty)
             {
-                userTables = (await UserDataManager.Logic.UserDataManager.GetEntireUserData(gdkey))!;
+                userTables = (await UserDataManager.Logic.DBService.GetEntireUserData(gdkey))!;
             }
             foreach(var table in tables)
             {
@@ -40,7 +40,7 @@ namespace Puniemu.Src.Utils.GeneralUtils
                     }
                     else
                     {
-                        tableObj = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<object>(gdkey, table);
+                        tableObj = await UserDataManager.Logic.DBService.GetYwpUserAsync<object>(gdkey, table);
                     }
                 }
                 //Meaning it's constant

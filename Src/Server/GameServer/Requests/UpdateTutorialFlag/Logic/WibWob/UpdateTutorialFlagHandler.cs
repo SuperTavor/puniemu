@@ -21,13 +21,13 @@ namespace Puniemu.Src.Server.GameServer.Requests.UpdateTutorialFlag.Logic.WibWob
             ctx.Request.BodyReader.AdvanceTo(readResult.Buffer.End);
             var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             var deserialized = JsonConvert.DeserializeObject<UpdateTutorialFlagRequest>(requestJsonString!);
-            var tutorialList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<List<Tutorial>>(deserialized!.Level5UserId!, "ywp_user_tutorial_list");
+            var tutorialList = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<Tutorial>>(deserialized!.Level5UserId!, "ywp_user_tutorial_list");
             var tuto = tutorialList.Where(x => x.TutorialId == deserialized.TutorialId).FirstOrDefault();
             tuto.TutorialStatus = deserialized.TutorialStatus;
             tuto.TutorialType = deserialized.TutorialType;
 
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!,"ywp_user_tutorial_list",tutorialList);
-            var userdata = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized!.Level5UserId!, "ywp_user_data");
+            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserId!,"ywp_user_tutorial_list",tutorialList);
+            var userdata = await UserDataManager.Logic.DBService.GetYwpUserAsync<YwpUserData>(deserialized!.Level5UserId!, "ywp_user_data");
             var res = new UpdateTutorialFlagResponse(tutorialList, userdata!);
             await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(res)));
         }

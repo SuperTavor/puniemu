@@ -17,9 +17,9 @@ namespace Puniemu.Src.Server.L5ID.Requests.Active.Logic.WibWob
             var queryParams = ctx.Request.Query;
             ctx.Response.ContentType = "application/json";
             string udkey = queryParams["TICKET"]!;
-            if(!(await UserDataManager.Logic.UserDataManager.IsDeviceExists(udkey)))
+            if(!(await UserDataManager.Logic.DBService.IsDeviceExists(udkey)))
             {
-                await UserDataManager.Logic.UserDataManager.NewDeviceAsync(udkey);
+                await UserDataManager.Logic.DBService.NewDeviceAsync(udkey);
             }
             var res = await ActiveResponse.CreateAsync(udkey);
             var json = JsonConvert.SerializeObject(res);

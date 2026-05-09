@@ -12,7 +12,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
 {
     public class MstMapManager
     {
-        public static int GetMapIndex(ref List<YwpMstMap> parser, long mapId)
+        public static int GetMapIndex(List<YwpMstMap> parser, long mapId)
         {
             uint count = 0;
             foreach (YwpMstMap i in parser)

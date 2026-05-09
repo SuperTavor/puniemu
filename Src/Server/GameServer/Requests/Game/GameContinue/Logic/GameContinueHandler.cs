@@ -20,7 +20,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameContinue.Logic
             var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             var deserialized = JsonConvert.DeserializeObject<GameContinueRequest>(requestJsonString!);
             ctx.Response.ContentType = "application/json";
-            var userData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data");
+            var userData = await UserDataManager.Logic.DBService.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data");
             
             if (userData!.YMoney < 500)
             {
@@ -30,7 +30,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameContinue.Logic
             else
             {
                 userData.YMoney -= 500;
-                await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_data", userData);
+                await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_data", userData);
                 var renameResponse = new GameContinueResponse(userData!);
                 var marshalledResponse = JsonConvert.SerializeObject(renameResponse);
                 var encryptedResponse = NHNCrypt.Logic.NHNCrypt.EncryptResponse(marshalledResponse);

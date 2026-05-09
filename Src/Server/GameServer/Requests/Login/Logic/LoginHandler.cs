@@ -23,7 +23,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.Logic
             var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             var deserialized = JsonConvert.DeserializeObject<LoginRequest>(requestJsonString!)!;
 
-            var dbRes = (await UserDataManager.Logic.UserDataManager.SupabaseClient!.From<Account>().Where(x => x.Gdkey == deserialized.Gdkey).Get())!;
+            var dbRes = (await UserDataManager.Logic.DBService.SupabaseClient!.From<Account>().Where(x => x.Gdkey == deserialized.Gdkey).Get())!;
             var acc = dbRes.Model!;
             //Construct response
             CommonLoginResponse res = new CommonLoginResponse();

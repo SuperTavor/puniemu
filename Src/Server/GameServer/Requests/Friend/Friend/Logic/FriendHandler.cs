@@ -20,19 +20,19 @@ namespace Puniemu.Src.Server.GameServer.Requests.Friend.Logic
             var deserialized = JsonConvert.DeserializeObject<FriendsRequest>(requestJsonString!)!;
 
             var instance = new FriendsResponse();
-            instance.YwpUserFriendRequestRecv = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<List<FriendRequestEntry>>(deserialized.Level5UserID!, "ywp_user_friend_request_recv");
+            instance.YwpUserFriendRequestRecv = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<FriendRequestEntry>>(deserialized.Level5UserID!, "ywp_user_friend_request_recv");
             foreach (FriendRequestEntry item in instance.YwpUserFriendRequestRecv!)
             {
                 item.RequestDtSentence = GameServer.Logic.GenerateFriendData.GetTimeDifferenceString(item.RequestDt!);
             }
-            instance.YwpUserFriend = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<List<FriendEntry>>(deserialized.Level5UserID!, "ywp_user_friend");
+            instance.YwpUserFriend = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<FriendEntry>>(deserialized.Level5UserID!, "ywp_user_friend");
             foreach (FriendEntry item in instance.YwpUserFriend!)
             {
                 item.LastPlayDtSentence = GameServer.Logic.GenerateFriendData.GetTimeDifferenceString(item.LastPlayDt!);
             }
 
-            instance.YwpUserFriendStarRank = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<List<FriendRankEntry>>(deserialized.Level5UserID!, "ywp_user_friend_star_rank");
-            instance.YwpUserFriendRank = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<List<FriendRankEntry>>(deserialized.Level5UserID!, "ywp_user_friend_rank");
+            instance.YwpUserFriendStarRank = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<FriendRankEntry>>(deserialized.Level5UserID!, "ywp_user_friend_star_rank");
+            instance.YwpUserFriendRank = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<FriendRankEntry>>(deserialized.Level5UserID!, "ywp_user_friend_rank");
 
             var outDict = JsonConvert.DeserializeObject<Dictionary<string, object>>(JsonConvert.SerializeObject(instance));
             var outResponse = NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(outDict));

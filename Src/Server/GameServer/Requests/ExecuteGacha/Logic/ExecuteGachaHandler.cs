@@ -154,19 +154,19 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             var deserialized = JsonConvert.DeserializeObject<ExecuteGachaRequest>(requestJsonString!);
 
-            var userData = (await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<GameServer.DataClasses.YwpUserData>(deserialized!.Level5UserId!, "ywp_user_data"))!;
+            var userData = (await UserDataManager.Logic.DBService.GetYwpUserAsync<GameServer.DataClasses.YwpUserData>(deserialized!.Level5UserId!, "ywp_user_data"))!;
             //gacha info
             var GachaMstTable = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_gacha"]!)!["tableData"]);
-            var itmesListTable = new TableParser.Logic.TableParser(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_item")!);
+            var itmesListTable = new TableParser.Logic.TableParser(await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_item")!);
 
-            var DictionaryListTable = new TableParser.Logic.TableParser(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_dictionary")!);
-            var UserYoukaiTable = new TableParser<YwpUserYoukai>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_youkai")!);
+            var DictionaryListTable = new TableParser.Logic.TableParser(await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_dictionary")!);
+            var UserYoukaiTable = new TableParser<YwpUserYoukai>(await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_youkai")!);
 
-            var UserYoukaiSkillTable = new TableParser<YwpUserYoukaiSkill>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_youkai_skill")!);
+            var UserYoukaiSkillTable = new TableParser<YwpUserYoukaiSkill>(await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_youkai_skill")!);
             //var bonusMap = new TableParser.Logic.TableParser(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_youkai_bonus_effect")!);
             //var strongMap = new TableParser.Logic.TableParser(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_youkai_strong_skill")!);
 
-            var TutorialListTable = new TableParser<YwpUserTutorialList>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_tutorial_list")!);
+            var TutorialListTable = new TableParser<YwpUserTutorialList>(await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_tutorial_list")!);
             bool tutorial_changed = false;
             if (TutorialFlagManager.GetStatus(ref TutorialListTable, 2, 2) == 0)
             {
@@ -465,12 +465,12 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             resp.ResultType = 0;
             resp.NextScreenType = 0;
 
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_dictionary", DictionaryListTable.ToString());
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_youkai_skill", UserYoukaiSkillTable.ToString());
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_youkai", UserYoukaiTable.ToString());
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_data", userData);
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_item", itmesListTable.ToString());
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_tutorial_list", TutorialListTable.ToString());
+            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_dictionary", DictionaryListTable.ToString());
+            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_youkai_skill", UserYoukaiSkillTable.ToString());
+            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_youkai", UserYoukaiTable.ToString());
+            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_data", userData);
+            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_item", itmesListTable.ToString());
+            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_tutorial_list", TutorialListTable.ToString());
 
             var resdict = JsonConvert.DeserializeObject<Dictionary<string, object>>(JsonConvert.SerializeObject(resp))!;
             resdict["ywp_user_youkai"] = UserYoukaiTable.ToString();

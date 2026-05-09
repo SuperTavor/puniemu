@@ -23,19 +23,19 @@ namespace Puniemu.Src.Server.GameServer.Requests.FriendSearch.Logic
 
             var res = new FriendSearchResponse();
 
-            string targetGdkey = await UserDataManager.Logic.UserDataManager.GetGdkeyFromCharacterId(deserialized!.TargetCharacterID!)!;
+            string targetGdkey = await UserDataManager.Logic.DBService.GetGdkeyFromCharacterId(deserialized!.TargetCharacterID!)!;
 
             res.Friend = null;
             res.ResponseCode = 1;
             if (!targetGdkey.IsNullOrEmpty())
             {
-                YwpUserData? targetUserData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(targetGdkey!, "ywp_user_data");
+                YwpUserData? targetUserData = await UserDataManager.Logic.DBService.GetYwpUserAsync<YwpUserData>(targetGdkey!, "ywp_user_data");
                 if (targetUserData != null)
                 {
                     res.ResponseCode = 0;
                     res.Friend = new();
                     res.Friend.PlayerName = targetUserData.PlayerName;
-                    res.Friend.LastPlayDt = await UserDataManager.Logic.UserDataManager.GetLastLoginTime(targetGdkey);
+                    res.Friend.LastPlayDt = await UserDataManager.Logic.DBService.GetLastLoginTime(targetGdkey);
                     res.Friend.IconId = targetUserData.IconID;
                     res.Friend.YoukaiId = targetUserData.YoukaiId;
                     res.Friend.LastPlayDtSentence = "🥺​"; 

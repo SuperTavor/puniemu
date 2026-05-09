@@ -23,7 +23,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.LoginStamp.Logic
             var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             var deserialized = JsonConvert.DeserializeObject<LoginStampRequest>(requestJsonString!);
             ctx.Response.ContentType = "application/json";
-            var userData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data");
+            var userData = await UserDataManager.Logic.DBService.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data");
             List<string> LOGIN_STAMP_TABLES = new();
 
             var res = new LoginStampResponse();
@@ -31,15 +31,15 @@ namespace Puniemu.Src.Server.GameServer.Requests.LoginStamp.Logic
             // used to define variable
             var playerIconTable = new TableParser.Logic.TableParser("");
             var itmesListTable = new TableParser.Logic.TableParser("");
-            var userYoukaiTable = new TableParser<YwpUserYoukai>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserID!, "ywp_user_youkai")!);
-            var userYoukaiSkillTable = new TableParser<YwpUserYoukaiSkill>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserID!, "ywp_user_youkai_skill")!);
+            var userYoukaiTable = new TableParser<YwpUserYoukai>(await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Level5UserID!, "ywp_user_youkai")!);
+            var userYoukaiSkillTable = new TableParser<YwpUserYoukaiSkill>(await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Level5UserID!, "ywp_user_youkai_skill")!);
             var dictionaryYoukaiTable = new TableParser.Logic.TableParser("");
 
 
             var LoginStamp = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager!.GamedataCache["ywp_mst_login_stamp"]!)!["tableData"]);
             var LoginStampReward = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager!.GamedataCache["ywp_mst_login_stamp_reward"]!)!["tableData"]);
 
-            var LoginUserStamp = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserID!, "login_stamp");
+            var LoginUserStamp = await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Level5UserID!, "login_stamp");
             var LoginUserStampTable = new TableParser.Logic.TableParser(LoginUserStamp!);
 
             int LoginStamLenght = LoginStamp.Table.Count;
@@ -141,18 +141,18 @@ namespace Puniemu.Src.Server.GameServer.Requests.LoginStamp.Logic
             {
                 if (current_item_type == 1)
                 {
-                    var itemsList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserID!, "ywp_user_item");
+                    var itemsList = await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Level5UserID!, "ywp_user_item");
                     itmesListTable = ItemManager.AddItem(new TableParser.Logic.TableParser(itemsList!), current_item_id, current_item_count);
                     res.ItemPopupResult = new();
                     res.ItemPopupResult.IsLimitOver = 0;
                     res.ItemPopupResult.Count = current_item_count;
                     res.ItemPopupResult.ItemId = current_item_id;
-                    await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_item", itmesListTable.ToString());
+                    await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_item", itmesListTable.ToString());
                     LOGIN_STAMP_TABLES.Add("ywp_user_item");
                 }
                 if (current_item_type == 2)
                 {
-                    var dictionaryYoukai = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserID!, "ywp_user_dictionary");
+                    var dictionaryYoukai = await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Level5UserID!, "ywp_user_dictionary");
                     dictionaryYoukaiTable = DictionaryManager.EditDictionary(new TableParser.Logic.TableParser(dictionaryYoukai!), current_item_id, false, true);
                     YoukaiManager.AddYoukai(ref userYoukaiTable, current_item_id, ref userYoukaiSkillTable);
 
@@ -174,9 +174,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.LoginStamp.Logic
                     res.YoukaiPopupResult.LimitLevelAfter = 0; //IDK todo
                     res.YoukaiPopupResult.LimitLevelBefore = 0; //IDK todo
                     res.YoukaiPopupResult.ReleaseLevelType = 0; //IDK TODO
-                    await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_dictionary", dictionaryYoukaiTable.ToString());
-                    await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_youkai", userYoukaiTable.ToString());
-                    await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_youkai_skill", userYoukaiSkillTable!.ToString());
+                    await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_dictionary", dictionaryYoukaiTable.ToString());
+                    await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_youkai", userYoukaiTable.ToString());
+                    await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_youkai_skill", userYoukaiSkillTable!.ToString());
                     LOGIN_STAMP_TABLES.Add("ywp_user_youkai");
                     LOGIN_STAMP_TABLES.Add("ywp_user_dictionary");
                     LOGIN_STAMP_TABLES.Add("ywp_user_youkai_skill");
@@ -191,10 +191,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.LoginStamp.Logic
                 }
                 if (current_item_type == 12)
                 {
-                    var playerIcon = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserID!, "ywp_user_player_icon");
+                    var playerIcon = await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Level5UserID!, "ywp_user_player_icon");
                     playerIconTable = PlayerIconManager.AddIcon(new TableParser.Logic.TableParser(playerIcon!), (int)current_item_id);
                     
-                    await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_player_icon", playerIconTable.ToString());
+                    await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_player_icon", playerIconTable.ToString());
                     LOGIN_STAMP_TABLES.Add("ywp_user_player_icon");
                 }
             }
@@ -208,8 +208,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.LoginStamp.Logic
             res.StampDt = DateTime.Today.ToString("yyyy-MM-dd");
 
 
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_data", userData);
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "login_stamp", LoginUserStampTable.ToString());
+            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_data", userData);
+            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserID!, "login_stamp", LoginUserStampTable.ToString());
             res.UserData = userData;
             var resdict = JsonConvert.DeserializeObject<Dictionary<string, object>>(JsonConvert.SerializeObject(res));
 

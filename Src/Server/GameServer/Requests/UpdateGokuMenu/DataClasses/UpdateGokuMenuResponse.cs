@@ -94,10 +94,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.UpdateGokuMenu.DataClasses
             {
                 if (!string.IsNullOrEmpty(request?.DeviceId))
                 {
-                    var gdkeys = await Puniemu.Src.UserDataManager.Logic.UserDataManager.GetGdkeysFromUdkeyAsync(request.DeviceId);
+                    var gdkeys = await Puniemu.Src.UserDataManager.Logic.DBService.GetGdkeysFromUdkeyAsync(request.DeviceId);
                     if (gdkeys != null && gdkeys.Count > 0)
                     {
-                        var tables = (await Puniemu.Src.UserDataManager.Logic.UserDataManager.GetEntireUserData(gdkeys[0]))!;
+                        var tables = (await Puniemu.Src.UserDataManager.Logic.DBService.GetEntireUserData(gdkeys[0]))!;
                         if (tables != null && tables.ContainsKey("ywp_user_data"))
                         {
                             if (tables["ywp_user_data"] != null)
@@ -133,10 +133,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.UpdateGokuMenu.DataClasses
             {
                 if (!string.IsNullOrEmpty(request?.DeviceId))
                 {
-                    var gdkeys = await Puniemu.Src.UserDataManager.Logic.UserDataManager.GetGdkeysFromUdkeyAsync(request.DeviceId);
+                    var gdkeys = await Puniemu.Src.UserDataManager.Logic.DBService.GetGdkeysFromUdkeyAsync(request.DeviceId);
                     if (gdkeys != null && gdkeys.Count > 0)
                     {
-                        var tables = await Puniemu.Src.UserDataManager.Logic.UserDataManager.GetEntireUserData(gdkeys[0]);
+                        var tables = await Puniemu.Src.UserDataManager.Logic.DBService.GetEntireUserData(gdkeys[0]);
                         if (tables != null && tables.ContainsKey("ywp_user_goku_menu"))
                         {
                             var existing = tables["ywp_user_goku_menu"] as JArray ?? new JArray();
@@ -156,7 +156,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.UpdateGokuMenu.DataClasses
                             }
                         }
 
-                        await Puniemu.Src.UserDataManager.Logic.UserDataManager.SetYwpUserAsync(gdkeys[0], "ywp_user_goku_menu",
+                        await Puniemu.Src.UserDataManager.Logic.DBService.SetYwpUserAsync(gdkeys[0], "ywp_user_goku_menu",
                             userMenu.ToObject<List<object>>()!);
                     }
                 }
@@ -177,10 +177,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.UpdateGokuMenu.DataClasses
             {
                 if (!string.IsNullOrEmpty(request?.DeviceId))
                 {
-                    var gdkeys = await Puniemu.Src.UserDataManager.Logic.UserDataManager.GetGdkeysFromUdkeyAsync(request.DeviceId);
+                    var gdkeys = await Puniemu.Src.UserDataManager.Logic.DBService.GetGdkeysFromUdkeyAsync(request.DeviceId);
                     if (gdkeys != null && gdkeys.Count > 0)
                     {
-                        var tables = await Puniemu.Src.UserDataManager.Logic.UserDataManager.GetEntireUserData(gdkeys[0]);
+                        var tables = await Puniemu.Src.UserDataManager.Logic.DBService.GetEntireUserData(gdkeys[0]);
                         if (tables != null && tables.ContainsKey("ywp_user_goku_youkai_intro_release"))
                         {
                             introReleaseArray =
@@ -213,7 +213,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.UpdateGokuMenu.DataClasses
                                 });
                             }
 
-                            await Puniemu.Src.UserDataManager.Logic.UserDataManager.SetYwpUserAsync(gdkeys[0],
+                            await Puniemu.Src.UserDataManager.Logic.DBService.SetYwpUserAsync(gdkeys[0],
                                 "ywp_user_goku_youkai_intro_release",
                                 introReleaseArray.ToObject<List<object>>()!);
                         }

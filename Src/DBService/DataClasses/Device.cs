@@ -11,7 +11,7 @@ namespace Puniemu.Src.UserDataManager.DataClasses
         public string? UdKey { get; set; }
 
         [Column("gdkeys")]
-        public List<string>? Gdkeys { get; set; }
+        public List<string> Gdkeys { get; set; }
 
     }
 }

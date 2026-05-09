@@ -34,16 +34,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetGdkeyAccounts.DataClasses
         public static async Task<UdkeyPlayerItem?> ConstructAsync(string gdkey)
         {
             YwpUserData? userData;
-            try
-            {
-                userData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(gdkey, "ywp_user_data");
-            }
-            catch (UserDataManager.Logic.UserDataManager.TableNotFoundException)
-            {
-                return null;
-            }
-
-            var res = await UserDataManager.Logic.UserDataManager.SupabaseClient!.From<Account>().Where(x => x.Gdkey == gdkey).Get();
+            userData = await UserDataManager.Logic.DBService.GetYwpUserAsync<YwpUserData>(gdkey, "ywp_user_data");
+            var res = await UserDataManager.Logic.DBService.SupabaseClient!.From<Account>().Where(x => x.Gdkey == gdkey).Get();
             var account = res.Model!;
             UdkeyPlayerItem playerItem = new();
 

@@ -25,10 +25,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.InitGoku.Logic
             res.YwpMstGokuYoukaiIntro = JObject.Parse(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_goku_youkai_intro"])["data"]!.ToObject<List<Dictionary<string, object>>>()!;
             res.YwpMstGokuYoukaiIntroRelease = JObject.Parse(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_goku_youkai_intro_release"])["data"]!.ToObject<List<Dictionary<string, object>>>()!;
             
-            res.YwpUserIconBudge = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_icon_budge");
-            res.YwpUserGokuStory = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<List<Dictionary<string, object>>>(deserialized!.Level5UserId!, "ywp_user_goku_story");
-            res.YwpUserData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized!.Level5UserId!, "ywp_user_data");
-            res.YwpUserGokuYoukaiIntroRelease = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<List<YwpUserGokuYoukaiIntroReleaseEntry>>(deserialized!.Level5UserId!, "ywp_user_goku_youkai_intro_release")!;
+            res.YwpUserIconBudge = await UserDataManager.Logic.DBService.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_icon_budge");
+            res.YwpUserGokuStory = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<Dictionary<string, object>>>(deserialized!.Level5UserId!, "ywp_user_goku_story");
+            res.YwpUserData = await UserDataManager.Logic.DBService.GetYwpUserAsync<YwpUserData>(deserialized!.Level5UserId!, "ywp_user_data");
+            res.YwpUserGokuYoukaiIntroRelease = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<YwpUserGokuYoukaiIntroReleaseEntry>>(deserialized!.Level5UserId!, "ywp_user_goku_youkai_intro_release")!;
 
             bool found;
             foreach (Dictionary<string, object> item in res.YwpMstGokuYoukaiIntroRelease)
@@ -64,7 +64,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.InitGoku.Logic
                     res.YwpUserGokuYoukaiIntroRelease.Add(entry);
                 }
             }
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_goku_youkai_intro_release", res.YwpUserGokuYoukaiIntroRelease!);
+            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_goku_youkai_intro_release", res.YwpUserGokuYoukaiIntroRelease!);
             var outResponse = NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(res));
             await ctx.Response.WriteAsync(outResponse);
         }

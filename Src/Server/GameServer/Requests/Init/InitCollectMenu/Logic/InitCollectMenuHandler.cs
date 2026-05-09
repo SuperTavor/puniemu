@@ -20,7 +20,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.InitCollectMenu.Logic
             ctx.Request.BodyReader.AdvanceTo(readResult.Buffer.End);
             var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             var deserialized = JsonConvert.DeserializeObject<InitCollectMenuRequest>(requestJsonString!);
-            var userdata = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized!.Level5UserId!, "ywp_user_data");
+            var userdata = await UserDataManager.Logic.DBService.GetYwpUserAsync<YwpUserData>(deserialized!.Level5UserId!, "ywp_user_data");
 
             var YoukaiCollectRewardMst = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai_collect_reward"]!)!["tableData"]);
             var YoukaiIntroMst = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai_intro"]!)!["tableData"]);
@@ -32,8 +32,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.InitCollectMenu.Logic
             var YoukaiCollectRes = new TableParser.Logic.TableParser("");
             var YoukaiCollectEffectRes = new TableParser.Logic.TableParser("");
 
-            var UserYoukaiCollect = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<List<YokaiCollectEntry>>(deserialized!.Level5UserId!, "ywp_user_youkai_collect");
-            var UserYoukaiIntro = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<List<YokaiIntroEntry>>(deserialized!.Level5UserId!, "ywp_user_youkai_intro");
+            var UserYoukaiCollect = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<YokaiCollectEntry>>(deserialized!.Level5UserId!, "ywp_user_youkai_collect");
+            var UserYoukaiIntro = await UserDataManager.Logic.DBService.GetYwpUserAsync<List<YokaiIntroEntry>>(deserialized!.Level5UserId!, "ywp_user_youkai_intro");
             List<YokaiCollectEntry> res_yokai_collect_entry = new();
             List<YokaiIntroEntry> res_yokai_intro_entry = new();
             bool found = false;
@@ -116,8 +116,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.InitCollectMenu.Logic
             resdict["ywp_mst_youkai_collect_effect"] = YoukaiCollectEffectRes.ToString();
             resdict["ywp_user_youkai_collect"] = res_yokai_collect_entry;
             resdict["ywp_user_youkai_intro"] = res_yokai_intro_entry;
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_youkai_collect", UserYoukaiCollect!);
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_youkai_intro", UserYoukaiIntro!);
+            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_youkai_collect", UserYoukaiCollect!);
+            await UserDataManager.Logic.DBService.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_youkai_intro", UserYoukaiIntro!);
             await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(resdict)));
         }
     }

@@ -21,7 +21,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetGdkeyAccounts.DataClasses
                     var item = await UdkeyPlayerItem.ConstructAsync(gdkey);
                     if (item == null)
                     {
-                        await UserDataManager.Logic.UserDataManager.DeleteUser(udkey, gdkey);
+                        await UserDataManager.Logic.DBService.DeleteUser(udkey, gdkey);
                         return null;
                     }
                     playerItems.Add(item.Value);

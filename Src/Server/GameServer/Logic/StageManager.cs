@@ -12,10 +12,10 @@ namespace Puniemu.Src.Server.GameServer.Logic
 {
     public class StageManager
     {
-        public static void AddStage(ref TableParser<YwpUserStage> parser, long StageId)
+        public static void AddStage(TableParser<YwpUserStage> parser, long StageId)
         {
             var YoukaiMstTable = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager!.GamedataCache["ywp_mst_stage"]!)!["tableData"]);
-            var UserStageIndex = GetStageIndex(ref parser, StageId);
+            var UserStageIndex = GetStageIndex(parser, StageId);
             var MstStageIndex = YoukaiMstTable.FindIndex([StageId.ToString()]);
             if (UserStageIndex == -1 && MstStageIndex != -1)
             {
@@ -23,10 +23,10 @@ namespace Puniemu.Src.Server.GameServer.Logic
             }
         }
 
-        public static void EditStage(ref TableParser<YwpUserStage> parser, long StageId, int isClear, long score, int star1, int star2, int star3, int numClear)
+        public static void EditStage(TableParser<YwpUserStage> parser, long StageId, int isClear, long score, int star1, int star2, int star3, int numClear)
         {
             var YoukaiMstTable = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager!.GamedataCache["ywp_mst_stage"]!)!["tableData"]);
-            var UserStageIndex = GetStageIndex(ref parser, StageId);
+            var UserStageIndex = GetStageIndex(parser, StageId);
             var MstStageIndex = YoukaiMstTable.FindIndex([StageId.ToString()]);
             if (UserStageIndex != -1 && MstStageIndex != -1)
             {
@@ -57,7 +57,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
             }
         }
 
-        public static int GetStageIndex(ref TableParser<YwpUserStage> parser, long StageId)
+        public static int GetStageIndex(TableParser<YwpUserStage> parser, long StageId)
         {
             uint count = 0;
             foreach (YwpUserStage i in parser.Items)
