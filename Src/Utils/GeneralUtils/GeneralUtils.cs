@@ -22,21 +22,29 @@ namespace Puniemu.Src.Utils.GeneralUtils
             return output;
         }
 
-        public static async Task AddTablesToResponse(IEnumerable<string> tables, Dictionary<string,object?> resultDictionary, bool preloadUserTables, string gdkey = "")
+        public static async Task AddTablesToResponse(
+       IEnumerable<string> tables,
+       Dictionary<string, object?> resultDictionary,
+       bool preloadUserTables,
+       string gdkey = "")
         {
-            DBService.DataClasses.Account acc = null;
+            DBService.DataClasses.Account? acc = null;
 
-            if(preloadUserTables && gdkey != string.Empty)
+            if (preloadUserTables && !string.IsNullOrEmpty(gdkey))
             {
                 acc = await DBService.Logic.DBService.GetAccountObjectAsync(gdkey);
             }
-            foreach(var table in tables)
+
+            foreach (var table in tables)
             {
-                string? tableText = null!;
-                object? tableObj = new();
+                object? tableObj = null;
+
+                // -----------------------------
+                // USER TABLES (ywp_user_*)
+                // -----------------------------
                 if (table.StartsWith("ywp_user"))
                 {
-                    if(preloadUserTables && acc != null)
+                    if (preloadUserTables && acc != null)
                     {
                         tableObj = acc.GetFieldByJsonName<object>(table, true);
                     }
@@ -45,42 +53,48 @@ namespace Puniemu.Src.Utils.GeneralUtils
                         tableObj = await DBService.Logic.DBService.GetYwpUserAsync<object>(gdkey, table);
                     }
                 }
-                //Meaning it's constant
-                else tableText = DataManager.Logic.DataManager.GameDataManager!.GamedataCache[table];
-
-                if (tableText != null)
+                // -----------------------------
+                // STATIC GAME DATA
+                // -----------------------------
+                else
                 {
-                    //if we can't deserialize json it means it's not a json and we store it as is
-                    try
+                    string? tableText =
+                        DataManager.Logic.DataManager.GameDataManager!.GamedataCache[table];
+
+                    if (!string.IsNullOrEmpty(tableText))
                     {
-                        // If was cud structure, only send the data
-                        tableObj = JsonConvert.DeserializeObject<object>(tableText);
                         try
                         {
-                            var dict = ((JObject)tableObj!).ToObject<Dictionary<string, object>>()!;
+                            JToken token = JToken.Parse(tableText);
 
-                            if (dict!.ContainsKey("data"))
+                            if (token is JObject obj)
                             {
-                                tableObj = dict["data"];
+                                if (obj.TryGetValue("data", out JToken? data))
+                                {
+                                    tableObj = data;
+                                }
+                                else if (obj.TryGetValue("tableData", out JToken? tableData))
+                                {
+                                    tableObj = tableData;
+                                }
+                                else
+                                {
+                                    tableObj = obj;
+                                }
                             }
-                            else if (dict.ContainsKey("tableData"))
+                            else
                             {
-                                tableObj = dict["tableData"];
+                                tableObj = token;
                             }
-
                         }
                         catch
                         {
-                            //Just continue everything as normal if it's not a dict
+                            tableObj = tableText;
                         }
-                        
-                    }
-                    catch
-                    {
-                        tableObj = tableText;
                     }
                 }
-                resultDictionary[table] = tableObj!;
+
+                resultDictionary[table] = tableObj;
             }
         }
     }

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Puniemu.Src.Server.GameServer.DataClasses;
+using Puniemu.Src.Server.GameServer.Requests.UpdateTutorialFlag.DataClasses.WibWob;
 namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.DataClasses
 {
     public class CreateUserResponse : CommonResponse
@@ -11,7 +12,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.DataClasses
 
         // Table that dictates which tutorial flags the user has completed.
         [JsonProperty("ywp_user_tutorial_list")]
-        public string UserTutorialList { get; set; }
+        public object UserTutorialList { get; set; }
 
         // Basic user data.
         [JsonProperty("ywp_user_data")]
@@ -22,7 +23,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.DataClasses
         {
             RewardList = new List<object>();
             ResultCode = 0;
-            UserTutorialList = userTutorialList;
+            if (DataManager.Logic.DataManager.IsWibWob) UserTutorialList = JsonConvert.DeserializeObject<List<Tutorial>>(userTutorialList)!;
+            else UserTutorialList = userTutorialList;
             NextScreenType = 0;
             UserData = userData;
             ResultType = 0;

@@ -12,7 +12,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.UpdateTutorialFlag.Logic.WibWob
 {
     public class UpdateTutorialFlagHandler
     {
-
         public static async Task HandleAsync(HttpContext ctx)
         {
             ctx.Request.EnableBuffering();

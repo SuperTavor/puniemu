@@ -92,13 +92,12 @@ CREATE TABLE public.account (
     ywp_user_score_attack_point_trade JSONB,
     ywp_user_local_raid_boss_cutin_viewed JSONB,
     ywp_user_local_oni_cutin_viewed JSONB,
-
+    ywp_user_player_effect JSONB,
     ywp_user_present_box JSONB,
     ywp_user_mission JSONB,
-
     ywp_user_local_medal_trade_chked JSONB,
     ywp_user_local_event_trade_chked JSONB,
-
+    ywp_user_player_codename JSONB,
     ywp_user_local_player_icon_select JSONB,
     ywp_user_local_player_title_select JSONB,
 

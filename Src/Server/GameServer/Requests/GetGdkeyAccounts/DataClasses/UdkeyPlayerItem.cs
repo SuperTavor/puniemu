@@ -33,22 +33,30 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetGdkeyAccounts.DataClasses
         //because constructors cant be async
         public static async Task<UdkeyPlayerItem?> ConstructAsync(string gdkey)
         {
-            YwpUserData? userData;
-            userData = await DBService.Logic.DBService.GetYwpUserAsync<YwpUserData>(gdkey, "ywp_user_data");
-            var account = await DBService.Logic.DBService.GetAccountObjectAsync(gdkey);
-            UdkeyPlayerItem playerItem = new();
+            try
+            {
+                YwpUserData? userData;
+                userData = await DBService.Logic.DBService.GetYwpUserAsync<YwpUserData>(gdkey, "ywp_user_data");
+                var account = await DBService.Logic.DBService.GetAccountObjectAsync(gdkey);
+                UdkeyPlayerItem playerItem = new();
 
-            playerItem.IconID = (PlayerIcon)userData!.IconID;
-            playerItem.PlayerName = userData.PlayerName;
-            playerItem.PartnerYokaiID = userData.YoukaiId;
-            var startTimestamp = account.StartDate;
-            var startTimestampString = DateTimeOffset.FromUnixTimeMilliseconds(startTimestamp).DateTime.ToString("yyyy-MM-dd HH:mm:ss");
-            playerItem.StartDate = startTimestampString;
-            playerItem.LastUpdateDate = account.LastLoginTime; 
-            playerItem.TitleID = (PlayerTitle)userData.CharacterTitleID;
-            playerItem.GDKey = gdkey;
-            playerItem.UserID = userData.UserID;
-            return playerItem;
+                playerItem.IconID = (PlayerIcon)userData!.IconID;
+                playerItem.PlayerName = userData.PlayerName;
+                playerItem.PartnerYokaiID = userData.YoukaiId;
+                var startTimestamp = account.StartDate;
+                var startTimestampString = DateTimeOffset.FromUnixTimeMilliseconds(startTimestamp).DateTime.ToString("yyyy-MM-dd HH:mm:ss");
+                playerItem.StartDate = startTimestampString;
+                playerItem.LastUpdateDate = account.LastLoginTime;
+                playerItem.TitleID = (PlayerTitle)userData.CharacterTitleID;
+                playerItem.GDKey = gdkey;
+                playerItem.UserID = userData.UserID;
+                return playerItem;
+            }
+            catch(Exception)
+            {
+                return null;
+            }
+           
         }
     }
 }

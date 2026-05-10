@@ -1,5 +1,8 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Puniemu.Src.Server.GameServer.DataClasses;
+using Puniemu.Src.Server.GameServer.Requests.UpdateTutorialFlag.DataClasses.WibWob;
+using Puniemu.Src.TableParser.DataClasses;
 using Supabase.Postgrest.Attributes;
 using Supabase.Postgrest.Models;
 using System.Reflection;
@@ -38,6 +41,7 @@ namespace Puniemu.Src.DBService.DataClasses
         [Column("ywp_user_data")]
         public YwpUserData? YwpUserData { get; set; }
 
+        //just a table
         [Column("ywp_user_icon_budge")]
         public string? YwpUserIconBudge { get; set; }
 
@@ -309,6 +313,11 @@ namespace Puniemu.Src.DBService.DataClasses
         [Column("ywp_user_score_attack_point_trade")]
         public string? YwpUserScoreAttackPointTrade { get; set; }
 
+        [Column("ywp_user_player_effect")]
+        public string? YwpUserPlayerEffect { get; set; }
+
+        [Column("ywp_user_player_codename")]
+        public string? YwpUserPlayerCodename { get; set; }
         public PropertyInfo? GetFieldPropByJsonName(string fieldName)
         {
             if(!AccountPropertyCache.Cache.ContainsKey(fieldName))
@@ -334,25 +343,33 @@ namespace Puniemu.Src.DBService.DataClasses
 
         // isRaw = is not serialize object
 
-        public object? GetFieldByJsonName<T>(string fieldName, bool raw = false)
+        public T? GetFieldByJsonName<T>(string fieldName, bool raw = false)
         {
-            PropertyInfo? prop = GetFieldPropByJsonName(fieldName);
-            object? value = prop.GetValue(this);
+            var prop = GetFieldPropByJsonName(fieldName);
+            var json = prop.GetValue(this) as string;
 
             if (raw)
-                return value;
+                return (T?)prop.GetValue(this);
 
-            return JsonConvert.DeserializeObject<T>(value as string ?? "");
+            if (string.IsNullOrEmpty(json))
+                return default;
+
+            if (typeof(T) == typeof(object))
+            {
+                object token = JToken.Parse(json);
+                return (T)token;
+            }
+
+            return JsonConvert.DeserializeObject<T>(json);
         }
 
-       
+
         // isRaw = is not serialize object
         public void SetFieldByJsonName(string fieldName, object fieldVal, bool raw = false)
         {
             PropertyInfo? prop = GetFieldPropByJsonName(fieldName);
             object? finalVal = null;
-            if (fieldVal == null) finalVal = null;
-            else if(fieldVal.GetType() == typeof(string) && raw)
+            if(raw)
             {
                 finalVal = fieldVal;
             } 
