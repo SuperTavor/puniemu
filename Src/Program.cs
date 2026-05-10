@@ -126,7 +126,7 @@ class Program
             {
                 await Server.GameServer.Requests.UpdateTutorialFlag.Logic.WibWob.UpdateTutorialFlagHandler.HandleAsync(ctx);
             }
-            await Server.GameServer.Requests.UpdateTutorialFlag.Logic.Puni.UpdateTutorialFlagHandler.HandleAsync(ctx);
+            else await Server.GameServer.Requests.UpdateTutorialFlag.Logic.Puni.UpdateTutorialFlagHandler.HandleAsync(ctx);
         });
         app.MapPost("/getL5idStatus.nhn", async ctx =>
         {
