@@ -62,6 +62,7 @@ project.lock.json
 project.fragment.lock.json
 artifacts/
 appsettings.Development.json
+appsettings.Development - Copy.json
 # ASP.NET Scaffolding
 ScaffoldingReadMe.txt
 
@@ -400,6 +401,6 @@ FodyWeavers.xsd
 Resources
 Tools/DataDownload
 Tools/db.json
-Tools/sharedLogic/__pycache__
 Tools/eal
 Tools/ywp_mst_version_resource.json
+Tools/sharedLogic/__pycache__

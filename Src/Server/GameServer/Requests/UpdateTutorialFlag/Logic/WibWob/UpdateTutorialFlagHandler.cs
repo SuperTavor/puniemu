@@ -15,11 +15,17 @@ namespace Puniemu.Src.Server.GameServer.Requests.UpdateTutorialFlag.Logic.WibWob
 
         public static async Task HandleAsync(HttpContext ctx)
         {
+            ctx.Response.ContentType = "application/json";
             ctx.Request.EnableBuffering();
-            var readResult = await ctx.Request.BodyReader.ReadAsync();
-            var encRequest = Encoding.UTF8.GetString(readResult.Buffer.ToArray());
-            ctx.Request.BodyReader.AdvanceTo(readResult.Buffer.End);
-            var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
+            var buffer = new MemoryStream();
+            await ctx.Request.Body.CopyToAsync(buffer);
+            buffer.Seek(0, SeekOrigin.Begin);
+            string? requestJsonString;
+            using (var reader = new StreamReader(buffer, Encoding.UTF8))
+            {
+                var readResult = await reader.ReadToEndAsync();
+                requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(readResult);
+            }
             var deserialized = JsonConvert.DeserializeObject<UpdateTutorialFlagRequest>(requestJsonString!);
             var tutorialList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<List<Tutorial>>(deserialized!.Level5UserId!, "ywp_user_tutorial_list");
             var tuto = tutorialList.Where(x => x.TutorialId == deserialized.TutorialId).FirstOrDefault();
