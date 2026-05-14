@@ -9,7 +9,7 @@ using System.Buffers;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Puniemu.Src.Server.GameServer.Logic;
-namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic.Puni
+namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
 {
     public static class GameStartHandler
     {
@@ -96,7 +96,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic.Puni
 
 
             var UserDeck = new TableParser.Logic.TableParser(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai_deck"));
-            var tutorialList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_tutorial_list");
+            var tutorialList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<TutorialList>(deserialized!.Gdkey!, "ywp_user_tutorial_list");
 
             //get current stage info
             var jsonLevelData = JsonConvert.DeserializeObject<Dictionary<string, StageData>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["stage_data"]);
@@ -200,24 +200,23 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic.Puni
 
 
             // Edit tutorial flg
-            var tutorialListTable = new TableParser.Logic.TableParser(tutorialList!);
             if (LevelData.TutorialEdit != null && LevelData.TutorialEdit.TutorialReq != null)
             {
                 foreach (TutorialEntry item in LevelData.TutorialEdit.TutorialReq)
                 {
                     if (item.FirstClear == 0 || (item.FirstClear == 1 && res.IsFirstClear == 1))
                     {
-                        var index = tutorialListTable.FindIndex([item.TutorialType.ToString(), item.TutorialId.ToString()]);
+                        var index = tutorialList.GetTutorialFlgIndex(item.TutorialId, item.TutorialType);
                         if (index == -1)
                         {
-                            tutorialListTable.AddRow([item.TutorialType.ToString(), item.TutorialId.ToString(), item.TutorialStatus.ToString()]);
+                            tutorialList.Entries.Add(item);
                         }
                         //Set the tutorial status
-                        tutorialListTable.Table[index][2] = item.TutorialStatus.ToString();
+                        tutorialList.EditTutorialFlg(item.TutorialType, item.TutorialId, item.TutorialStatus);
                     }
                 }
             }
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_tutorial_list", tutorialListTable.ToString());
+            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_tutorial_list", tutorialList);
 
             //always seemingly OK on 0
             res.YoukaiHp = 0;

@@ -19,9 +19,9 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
     {
         // tutorial type
         [JsonProperty("id")]
-        public long id { get; set; }
+        public long Id { get; set; }
         [JsonProperty("value")]
-        public long value { get; set; }
+        public long Value { get; set; }
     }
     public class TutorialEntryRespRes
     {

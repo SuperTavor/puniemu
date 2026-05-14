@@ -12,7 +12,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.DeckEdit.Logic
 {
     public static class DeckEditHandler
     {
-
         public static async Task HandleAsync(HttpContext ctx)
         {
             ctx.Request.EnableBuffering();
@@ -23,16 +22,15 @@ namespace Puniemu.Src.Server.GameServer.Requests.DeckEdit.Logic
             var deserialized = JsonConvert.DeserializeObject<DeckEditRequest>(requestJsonString!);
 
             // tutorial handling
-            var tutorialList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_tutorial_list");
-            var tutorialListTable = new TableParser.Logic.TableParser<YwpUserTutorialList>(tutorialList!);
+            var tutorialList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<TutorialList>(deserialized!.Gdkey!, "ywp_user_tutorial_list");
 
-            if (TutorialFlagManager.GetStatus(ref tutorialListTable, 1000, 1) == 6)
+            if (tutorialList.GetStatus(1000, 1) == 6)
             {
-                TutorialFlagManager.EditTutorialFlg(ref tutorialListTable, 1, 1000, 7);
+                tutorialList.EditTutorialFlg(1, 1000, 7);
             }
-            if (TutorialFlagManager.GetStatus(ref tutorialListTable, 1, 2) == 0)
+            if (tutorialList.GetStatus(1, 2) == 0)
             {
-                TutorialFlagManager.EditTutorialFlg(ref tutorialListTable, 2, 1, 1);
+                tutorialList.EditTutorialFlg(2, 1, 1);
             }
 
             // Get Watch Id
@@ -54,8 +52,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.DeckEdit.Logic
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_youkai_deck", UserDeck.ToString());
 
             resdict["ywp_user_youkai_deck"] = UserDeck.ToString();
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_tutorial_list", tutorialListTable.ToString());
-            resdict["ywp_user_tutorial_list"] = tutorialListTable.ToString();
+            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_tutorial_list", tutorialList);
+            resdict["ywp_user_tutorial_list"] = JsonConvert.SerializeObject(tutorialList);
             userData!.YoukaiId = UserDeck.Items[0].MiddleYoukaiId;
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_data", userData);
             resdict["ywp_user_data"] = userData;

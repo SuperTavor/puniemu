@@ -45,9 +45,9 @@ using Puniemu.Src.Utils.GeneralUtils;
 using Puniemu.Src.Server.GameServer.Requests.FriendRequestAccept.Logic;
 using Puniemu.Src.Server.GameServer.Requests.GetRanking.Logic;
 using Puniemu.Src.Server.L5ID.Requests;
-using Puniemu.Src.Server.GameServer.Requests.UpdateTutorialFlag.Logic.Puni;
 using Puniemu.Src.DataManager.Logic;
-using Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic.Puni;
+using Puniemu.Src.Server.GameServer.Requests.UpdateTutorialFlag.Logic;
+using Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic;
 namespace Puniemu.Src;
 class Program
 {
@@ -122,11 +122,7 @@ class Program
         });
         app.MapPost("/updateTutorialFlg.nhn", async ctx =>
         {
-            if(DataManager.Logic.DataManager.IsWibWob)
-            {
-                await Server.GameServer.Requests.UpdateTutorialFlag.Logic.WibWob.UpdateTutorialFlagHandler.HandleAsync(ctx);
-            }
-            else await Server.GameServer.Requests.UpdateTutorialFlag.Logic.Puni.UpdateTutorialFlagHandler.HandleAsync(ctx);
+            await UpdateTutorialFlagHandler.HandleAsync(ctx);
         });
         app.MapPost("/getL5idStatus.nhn", async ctx =>
         {
@@ -162,10 +158,7 @@ class Program
         });
         app.MapPost("/gameStart.nhn", async ctx =>
         {
-            if(DataManager.Logic.DataManager.IsWibWob)
-            {
-                await Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic.WibWob.GameStartHandler.HandleAsync(ctx);
-            } else await Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic.Puni.GameStartHandler.HandleAsync(ctx);
+            await GameStartHandler.HandleAsync(ctx);
         });
         app.MapPost("/deckEdit.nhn", async ctx =>
         {

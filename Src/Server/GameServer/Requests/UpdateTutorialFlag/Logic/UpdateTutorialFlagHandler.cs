@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using Puniemu.Src.Server.GameServer.DataClasses;
-using Puniemu.Src.Server.GameServer.Requests.UpdateTutorialFlag.DataClasses.Puni;
 using Puniemu.Src.Server.GameServer.Requests.UpdateTutorialFlag.DataClasses;
 using Puniemu.Src.Server.GameServer.Logic;
 using Puniemu.Src.TableParser.DataClasses;
@@ -8,7 +7,7 @@ using Puniemu.Src.TableParser.Logic;
 using System.Buffers;
 using System.Text;
 
-namespace Puniemu.Src.Server.GameServer.Requests.UpdateTutorialFlag.Logic.Puni
+namespace Puniemu.Src.Server.GameServer.Requests.UpdateTutorialFlag.Logic
 {
     public class UpdateTutorialFlagHandler
     {
@@ -21,13 +20,11 @@ namespace Puniemu.Src.Server.GameServer.Requests.UpdateTutorialFlag.Logic.Puni
             ctx.Request.BodyReader.AdvanceTo(readResult.Buffer.End);
             var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             var deserialized = JsonConvert.DeserializeObject<UpdateTutorialFlagRequest>(requestJsonString!);
-            var tutorialList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_tutorial_list");
-            var tutorialListTable = new TableParser<YwpUserTutorialList>(tutorialList!);
-            TutorialFlagManager.EditTutorialFlg(ref tutorialListTable, deserialized.TutorialType, deserialized.TutorialId, deserialized.TutorialStatus);
-            var modifiedTutoList = tutorialListTable.ToString();
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!,"ywp_user_tutorial_list",modifiedTutoList);
+            var tutorialList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<TutorialList>(deserialized!.Level5UserId!, "ywp_user_tutorial_list");
+            tutorialList.EditTutorialFlg(deserialized.TutorialType, deserialized.TutorialId, deserialized.TutorialStatus);
+            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!,"ywp_user_tutorial_list",tutorialList);
             var userdata = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized!.Level5UserId!, "ywp_user_data");
-            var res = new UpdateTutorialFlagResponse(modifiedTutoList, userdata!);
+            var res = new UpdateTutorialFlagResponse(tutorialList, userdata!);
             await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(res)));
         }
     }

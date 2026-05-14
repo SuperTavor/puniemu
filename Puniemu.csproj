@@ -17,8 +17,15 @@
     </ItemGroup>
     
 	<ItemGroup>
-	  <Folder Include="Src\Server\GameServer\Requests\GameEnd\" />
+	  <Compile Remove="Src\Server\GameServer\Requests\GameEnd\**" />
+	  <Content Remove="Src\Server\GameServer\Requests\GameEnd\**" />
+	  <EmbeddedResource Remove="Src\Server\GameServer\Requests\GameEnd\**" />
+	  <None Remove="Src\Server\GameServer\Requests\GameEnd\**" />
 	</ItemGroup>
-  <ProjectExtensions><VisualStudio><UserProperties example_1cfg_1json__JsonSchema="https://alec016.github.io/Custom-Machinery/Json%20Schema/src/main/resources/schemas/custom_machinery_machine.json" /></VisualStudio></ProjectExtensions>
+    
+	<ItemGroup>
+	  <Folder Include="Database\" />
+	</ItemGroup>
+  <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
 
 </Project>

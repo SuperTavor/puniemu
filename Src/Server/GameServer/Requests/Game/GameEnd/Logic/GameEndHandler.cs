@@ -501,8 +501,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
             HandleUserYoukai(ref deserialized, ref res, ref userYoukaiTable, ref youkaiDiff);
 
             // edit tutorial
-            var tutorialList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_tutorial_list");
-            var tutorialListTable = new TableParser<YwpUserTutorialList>(tutorialList!);
+            var tutorialList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<TutorialList>(deserialized!.Gdkey!, "ywp_user_tutorial_list");
             
             if (LevelData.TutorialEdit != null && LevelData.TutorialEdit.TutorialResp != null)
             {
@@ -510,7 +509,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 {
                     if (item.FirstClear == 0 || (item.FirstClear == 1 && FirstClear == 1))
                     {
-                        TutorialFlagManager.EditTutorialFlg(ref tutorialListTable, item.TutorialType,(int) item.TutorialId, item.TutorialStatus);
+                        tutorialList.EditTutorialFlg(item.TutorialType,(int) item.TutorialId, item.TutorialStatus);
                     }
                 }
             }
@@ -526,13 +525,13 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                         var tmpIdx = 0;
                         foreach (string[] str in menufuncListTable.Table)
                         {
-                            if (str[0] == item.id.ToString())
+                            if (str[0] == item.Id.ToString())
                                 MenuIndex = tmpIdx;
                             tmpIdx++;
                         }
                         if (MenuIndex != -1)
                         {
-                            menufuncListTable.Table[MenuIndex][1] = item.value.ToString();
+                            menufuncListTable.Table[MenuIndex][1] = item.Value.ToString();
                         }
                     }
                 }
@@ -544,7 +543,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
             userData.YMoney += res.UserGameResultData.Money; // add money to user
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_data", userData);
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_menufunc", menufuncListTable.ToString());
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_tutorial_list", tutorialListTable.ToString());
+            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_tutorial_list", tutorialList);
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_dictionary", dictionaryYoukaiTable.ToString());
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_player_icon", playerIconTable.ToString());
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_map", ywpUserMap.ToString());

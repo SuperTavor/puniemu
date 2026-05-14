@@ -12,10 +12,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
 {
     public class ExecuteGachaHandler
     {
-        static (string, int) drop_yk(Dictionary<string, List<(float, int)>> bk_set)
+        static (string, int) DropYokai(Dictionary<string, List<(float, int)>> bk_set)
         {
-            Random rand = new Random();
-            double x = rand.NextDouble();
+            double x = Random.Shared.NextDouble();
             float sum = 0;
 
             foreach (var kvp in bk_set)
@@ -110,23 +109,22 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
                 return res;
             }
         }
-        static List<(int, int)> crank(Dictionary<string, List<(float, int)>> bk_set, List<(float, int)> ball_set, int n)
+        static List<(int, int)> Crank(Dictionary<string, List<(float, int)>> bk_set, List<(float, int)> ball_set, int n)
         {
-            Random rand = new Random();
-            List<(string, int)> dropped_yk = new List<(string, int)>();
+            List<(string, int)> droppedYokai = new List<(string, int)>();
 
             for (int i = 0; i < n; i++)
             {
-                dropped_yk.Add(drop_yk(bk_set));
+                droppedYokai.Add(DropYokai(bk_set));
             }
 
             List<(int, int)> List = new List<(int, int)>();
 
 
 
-            foreach (var tuple in dropped_yk)
+            foreach (var tuple in droppedYokai)
             {
-                double x = rand.NextDouble();
+                double x = Random.Shared.NextDouble();
                 float sum = 0f;
 
                 foreach (var ball_tuple in ball_set)
@@ -166,11 +164,11 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             //var bonusMap = new TableParser.Logic.TableParser(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_youkai_bonus_effect")!);
             //var strongMap = new TableParser.Logic.TableParser(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_youkai_strong_skill")!);
 
-            var TutorialListTable = new TableParser<YwpUserTutorialList>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_tutorial_list")!);
+            var tutorialList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<TutorialList>(deserialized.Level5UserId, "ywp_user_tutorial_list");
             bool tutorial_changed = false;
-            if (TutorialFlagManager.GetStatus(ref TutorialListTable, 2, 2) == 0)
+            if (tutorialList.GetStatus(2, 2) == 0)
             {
-                TutorialFlagManager.EditTutorialFlg(ref TutorialListTable, 2, 2, 1);
+                tutorialList.EditTutorialFlg(2, 2, 1);
                 tutorial_changed = true;
             }
             var itemsListMstTable = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_item"]!)!["tableData"]);
@@ -374,7 +372,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
 
             if (deserialized.RequestYoukaiId == 0)
             {
-                List<(int, int)> bk_result = crank(bk_set1, ball_set1, pullCount);
+                List<(int, int)> bk_result = Crank(bk_set1, ball_set1, pullCount);
                 foreach (var t in bk_result)
                 {
                     capsuleIds.Add(t.Item1);
@@ -470,7 +468,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_youkai", UserYoukaiTable.ToString());
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_data", userData);
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_item", itmesListTable.ToString());
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_tutorial_list", TutorialListTable.ToString());
+            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_tutorial_list", tutorialList);
 
             var resdict = JsonConvert.DeserializeObject<Dictionary<string, object>>(JsonConvert.SerializeObject(resp))!;
             resdict["ywp_user_youkai"] = UserYoukaiTable.ToString();
@@ -482,7 +480,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             //add to response
             if (tutorial_changed)
             {
-                resdict["ywp_user_tutorial_list"] = TutorialListTable.ToString();
+                resdict["ywp_user_tutorial_list"] = tutorialList;
             }
             await GeneralUtils.AddTablesToResponse(Consts.EXECUTE_GACHA_TABLES, resdict!, true, deserialized!.Level5UserId!);
             var outResponse = NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(resdict));
