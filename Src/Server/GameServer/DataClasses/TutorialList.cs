@@ -38,25 +38,7 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
         {  
             if (DataManager.Logic.DataManager.IsWibWob)
             {
-                writer.WriteStartArray();
-
-                foreach (TutorialEntry e in value.Entries)
-                {
-                    writer.WriteStartObject();
-
-                    writer.WritePropertyName("tutorialId");
-                    writer.WriteValue(e.TutorialId);
-
-                    writer.WritePropertyName("tutorialType");
-                    writer.WriteValue(e.TutorialType);
-
-                    writer.WritePropertyName("tutorialStatus");
-                    writer.WriteValue(e.TutorialStatus);
-
-                    writer.WriteEndObject();
-                }
-
-                writer.WriteEndArray();
+                serializer.Serialize(writer, value.Entries);
             }
             else
             {
