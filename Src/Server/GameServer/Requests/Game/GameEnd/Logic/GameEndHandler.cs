@@ -131,26 +131,12 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
         }
         public static void HandleStage(ref GameEndRequest deserialized, ref GameEndResponse res, ref int FirstClear, ref TableParser<YwpUserStage> ywpUserStage, ref TableParser<YwpUserMap> ywpUserMap)
         {
-            var ywpMstStage = new TableParser<PuniMstStageItem>(
-                JsonConvert.DeserializeObject<Dictionary<string, string>>(
-                    DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_stage"]!
-                    )!["tableData"]
-            );
             List<YwpMstMap> ywpMstMap = JsonConvert.DeserializeObject<List<YwpMstMap>>(
                 JsonConvert.DeserializeObject<Dictionary<string, object>>(
                     DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_map"]
                 )!["data"].ToString()!
             )!;
-            var ywpMstStageCondition = new TableParser<YwpMstStageCondition>(
-                JsonConvert.DeserializeObject<Dictionary<string, string>>(
-                    DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_stage_condition"]!
-                )!["tableData"],
-                "",
-                "^"
-            );
-
-
-            
+           
             var stageIndex = StageManager.GetStageIndex(ref ywpUserStage, deserialized.StageId);
             // create stage entry if it diden't exist yet
             if (stageIndex == -1)
@@ -181,34 +167,34 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 // compute the conditionId from stageId and conditionCount
                 int tempConditionId = (deserialized.StageId * 10) + conditionCount;
                 // get the array index of the computed conditionId in the table
-                int tempIndex = MstStageManager.GetStageConditionIndex(ref ywpMstStageCondition, tempConditionId);
+                int tempIndex = MasterStageData.GetStageConditionIndex(tempConditionId);
                 // if didn't exist we break cause this means we finished all conditions
                 if (tempIndex == -1)
                 {
                     break;
                 }
                 // we get the condition parameter
-                long param1 = ywpMstStageCondition.Items[tempIndex].Param1;
+                long param1 = MasterStageData.ConditionItems[tempIndex].ConditionVal1;
                 object sourceParam1 = 0;
-                if (ywpMstStageCondition.Items[tempIndex].ConditionType == ConditionType.MinScore)
+                if (MasterStageData.ConditionItems[tempIndex].ConditionType == ConditionType.MinScore)
                 {
                     sourceParam1 = deserialized.Score;
                 }
-                else if (ywpMstStageCondition.Items[tempIndex].ConditionType == ConditionType.MaxClearTime)
+                else if (MasterStageData.ConditionItems[tempIndex].ConditionType == ConditionType.MaxClearTime)
                 {
                     sourceParam1 = deserialized.ClearTimeSec;
                 }
-                else if (ywpMstStageCondition.Items[tempIndex].ConditionType == ConditionType.MinLinkSize)
+                else if (MasterStageData.ConditionItems[tempIndex].ConditionType == ConditionType.MinLinkSize)
                 {
                     sourceParam1 = deserialized.LinkSizeMax;
                 }
-                else if (ywpMstStageCondition.Items[tempIndex].ConditionType == ConditionType.UsedYoukai)
+                else if (MasterStageData.ConditionItems[tempIndex].ConditionType == ConditionType.UsedYoukai)
                 {
                     sourceParam1 = deserialized.UserYoukaiResultList!;
                 }
 
-                bool good = ConditionManager.ComputeCondition(ywpMstStageCondition.Items[tempIndex].ConditionType, sourceParam1, param1);
-                Console.WriteLine(tempConditionId.ToString() + " | " + good.ToString() + " | " + ywpMstStageCondition.Items[tempIndex].ConditionType.ToString());
+                bool good = ConditionManager.ComputeCondition(MasterStageData.ConditionItems[tempIndex].ConditionType, sourceParam1, param1);
+                Console.WriteLine(tempConditionId.ToString() + " | " + good.ToString() + " | " + MasterStageData.ConditionItems[tempIndex].ConditionType.ToString());
 
                 // 1-3 are generally the condition for stars, 4+ are generally locked levels condition
                 if (conditionCount == 1)
@@ -227,8 +213,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 {
                     // will store the unlocked stageId
                     long newAddedStage = -1;
-                    bool isFinalStageMap = (MstStageManager.GetNextStage(ref ywpMstStage, deserialized.StageId) == -1);
-                    Console.WriteLine(MstStageManager.GetNextStage(ref ywpMstStage, deserialized.StageId).ToString());
+                    bool isFinalStageMap = MasterStageData.GetNextStage(deserialized.StageId) == -1;
+                    Console.WriteLine(MasterStageData.GetNextStage(deserialized.StageId).ToString());
                     var MapIndex = MstMapManager.GetMapIndex(ref ywpMstMap, (int)Math.Floor(deserialized.StageId / 1000.0));
                     if (isFinalStageMap && ywpMstMap[MapIndex].ReverseMapId != 0)
                     {
@@ -252,7 +238,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                     }
                     else
                     {
-                        long newStageId = MstStageManager.GetUnlockedSecretStage(ref ywpMstStage, ref ywpMstStageCondition, deserialized.StageId, secretStageSkipp);
+                        long newStageId = MasterStageData.GetUnlockedSecretStage(deserialized.StageId, secretStageSkipp);
                         if (newStageId != -1)
                         {
                             int newStageIdIndex = StageManager.GetStageIndex(ref ywpUserStage, newStageId);
@@ -268,9 +254,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                         var secretStageItem = new LockedStageResultList()
                         {
                             StageId = newAddedStage,
-                            Title = ywpMstStageCondition.Items[tempIndex].Title,
-                            ConditionType = (int)ywpMstStageCondition.Items[tempIndex].ConditionType,
-                            Description = ywpMstStageCondition.Items[tempIndex].Description,
+                            Title = MasterStageData.ConditionItems[tempIndex].Title,
+                            ConditionType = (int)MasterStageData.ConditionItems[tempIndex].ConditionType,
+                            Description = MasterStageData.ConditionItems[tempIndex].Description,
                             OriginStageId = 0,
                         };
                         res.LockedStageResultList.Add(secretStageItem);
@@ -284,7 +270,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
 
             // beta might only work for few maps
             bool mapLocked = false;
-            long nextStage = MstStageManager.GetNextStage(ref ywpMstStage, deserialized.StageId);
+            long nextStage = MasterStageData.GetNextStage(deserialized.StageId);
             if (nextStage == -1) // new map
             {
                 var OgMapIndex = MstMapManager.GetMapIndex(ref ywpMstMap, (int)Math.Floor(deserialized.StageId / 1000.0));

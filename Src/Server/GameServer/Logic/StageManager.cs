@@ -14,9 +14,8 @@ namespace Puniemu.Src.Server.GameServer.Logic
     {
         public static void AddStage(ref TableParser<YwpUserStage> parser, long StageId)
         {
-            var YoukaiMstTable = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager!.GamedataCache["ywp_mst_stage"]!)!["tableData"]);
             var UserStageIndex = GetStageIndex(ref parser, StageId);
-            var MstStageIndex = YoukaiMstTable.FindIndex([StageId.ToString()]);
+            var MstStageIndex = MasterStageData.StageItems.FindIndex(x => x.StageId == StageId);
             if (UserStageIndex == -1 && MstStageIndex != -1)
             {
                 parser.AddItem(new YwpUserStage { StageId = StageId, IsClear = 0, Score = 0, Star1 = 0, Star2 = 0, Star3 = 0, NumClear = 0, Unk2 = 0 });
@@ -25,9 +24,8 @@ namespace Puniemu.Src.Server.GameServer.Logic
 
         public static void EditStage(ref TableParser<YwpUserStage> parser, long StageId, int isClear, long score, int star1, int star2, int star3, int numClear)
         {
-            var YoukaiMstTable = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager!.GamedataCache["ywp_mst_stage"]!)!["tableData"]);
             var UserStageIndex = GetStageIndex(ref parser, StageId);
-            var MstStageIndex = YoukaiMstTable.FindIndex([StageId.ToString()]);
+            var MstStageIndex = MasterStageData.StageItems.FindIndex(x => x.StageId == StageId);
             if (UserStageIndex != -1 && MstStageIndex != -1)
             {
                 if (score > parser.Items[UserStageIndex].Score)

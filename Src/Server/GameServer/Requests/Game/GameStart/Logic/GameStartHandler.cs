@@ -100,7 +100,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
 
             //get current stage info
             var jsonLevelData = JsonConvert.DeserializeObject<Dictionary<string, StageData>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["stage_data"]);
-            var stageInfoIdx = MasterStageData.Items.FindIndex(x => x.StageId == deserialized.StageId);
+            var stageInfoIdx = MasterStageData.StageItems.FindIndex(x => x.StageId == deserialized.StageId);
 
             // Throw error if stage dosent have config info
             if (stageInfoIdx == -1 || (jsonLevelData == null || !(jsonLevelData.ContainsKey(deserialized.StageId.ToString()))))
@@ -221,8 +221,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
             //always seemingly OK on 0
             res.YoukaiHp = 0;
 
-            res.StageType = MasterStageData.Items[stageInfoIdx].StageType; //maybe, not sure
-            res.BattleType = MasterStageData.Items[stageInfoIdx].BattleType; //maybe, not sure
+            res.StageType = MasterStageData.StageItems[stageInfoIdx].StageType; //maybe, not sure
+            res.BattleType = MasterStageData.StageItems[stageInfoIdx].BattleType; //maybe, not sure
 
 
             // save userdata and send response

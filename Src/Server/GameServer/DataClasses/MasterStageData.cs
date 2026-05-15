@@ -14,32 +14,68 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
     }
     public static class MasterStageData
     {
-        private static List<NecessaryMasterStageDataItem> _items = new();
+        private static List<NecessaryMasterStageDataItem> _stageItems = new();
 
-        public static List<NecessaryMasterStageDataItem> Items
+        private static List<StageConditionItem> _conditionItems = new();
+        public static List<NecessaryMasterStageDataItem> StageItems
         {
             get
             {
-                if (!_attemptedInit)
-                    Init(DataManager.Logic.DataManager.GameDataManager!.GamedataCache["ywp_mst_stage"]);
+                if (!_isInitStage)
+                    InitStage();
 
-                return _items;
+                return _stageItems;
             }
         }
-        private static bool _attemptedInit = false;
-        private static void Init(string data)
+
+        public static List<StageConditionItem> ConditionItems
         {
-            _attemptedInit = true;
+            get
+            {
+                if (!_isInitCond)
+                    InitCond();
+
+                return _conditionItems;
+            }
+            set { }
+        }
+        private static bool _isInitStage = false;
+        private static bool _isInitCond = false;
+        private static void InitCond()
+        {
+            var data = DataManager.Logic.DataManager.GameDataManager!.GamedataCache["ywp_mst_stage_condition"];
+            _isInitCond = true;
             var obj = JObject.Parse(data);
+            //puni
+            if (obj["tableData"] != null)
+            {
+                var tbl = new TableParser<StageConditionItem>(obj["tableData"]!.ToString(), delimiter:"^");
+                ConditionItems = tbl.Items;
+            }
+            else if (obj["data"] is JArray arr)
+            {
+                var condList = arr.ToObject<List<StageConditionItem>>();
+                ConditionItems = condList;
+            }
+            else
+            {
+                throw new InvalidDataException("Bad ywp_mst_stage_condition");
+            }
+        }
+        private static void InitStage()
+        {
+            var ywpMstStage = DataManager.Logic.DataManager.GameDataManager!.GamedataCache["ywp_mst_stage"];
+            _isInitStage = true;
+            var obj = JObject.Parse(ywpMstStage);
             //Puni
             if (obj["tableData"] != null)
             {
                 var tblStr = obj["tableData"]!.ToString();
-                var prsr = new TableParser.Logic.TableParser<PuniMstStageItem>(tblStr);
+                var prsr = new TableParser<PuniMstStageItem>(tblStr);
 
                 foreach (var item in prsr.Items)
                 {
-                    Items.Add(new NecessaryMasterStageDataItem
+                    StageItems.Add(new NecessaryMasterStageDataItem
                     {
                         StageId = item.StageId,
                         StageType = item.StageType,
@@ -55,7 +91,7 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
 
                 foreach (var item in stageList)
                 {
-                    Items.Add(new NecessaryMasterStageDataItem
+                    StageItems.Add(new NecessaryMasterStageDataItem
                     {
                         StageId = item.StageID,
                         StageType = item.StageType,
@@ -64,6 +100,96 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
                 }
                 
             }
+
+            else
+            {
+                throw new InvalidDataException("Bad ywp_mst_stage");
+            }
+        }
+
+        public static int GetStageConditionIndex(long ConditionId)
+        {
+            uint count = 0;
+            foreach (StageConditionItem i in ConditionItems)
+            {
+                if (i.ConditionId == ConditionId)
+                {
+                    return (int)count;
+                }
+                count += 1;
+            }
+            return -1;
+        }
+        public static long GetNextStage(long StageId)
+        {
+            int mapId = (int)Math.Floor(StageId / 1000.0);
+            int count = ((int)StageId % 1000) + 1;
+            while (true)
+            {
+                int stageIndex = StageItems.FindIndex(x => x.StageId == (mapId * 1000) + count);
+                if (stageIndex == -1)
+                {
+                    break;
+                }
+                if (StageItems[stageIndex].StageType == 1)
+                {
+                    return StageItems[stageIndex].StageId;
+                }
+                count++;
+            }
+            return -1;
+        }
+
+        // guesse the unlocked secret stage based on stageId
+        public static long GetUnlockedSecretStage(long StageId, int _skipp)
+        {
+            int mapId = (int)Math.Floor(StageId / 1000.0);
+            int maxStageId = (int)StageId % 1000;
+            int skipp = 0;
+            int count = 1;
+            while (true)
+            {
+                int stageIndex = StageItems.FindIndex(x => x.StageId == (mapId * 1000) + count);
+                if (stageIndex == -1)
+                {
+                    break;
+                }
+                if (count < maxStageId)
+                {
+                    int _count = 4; // cond before 4 (1,2,3) are stars flg
+                    while (true)
+                    {
+                        int condIndex = GetStageConditionIndex((((mapId * 1000) + count) * 10) + _count);
+                        if (condIndex == -1)
+                        {
+                            break;
+                        }
+                        skipp++;
+                        _count++;
+                    }
+                }
+                else
+                {
+                    if (StageItems[stageIndex].StageType == 2) // secret stage
+                    {
+                        if (skipp > 0)
+                        {
+                            skipp--;
+                        }
+                        else if (_skipp > 0)
+                        {
+                            _skipp--;
+                        }
+                        else
+                        {
+                            return StageItems[stageIndex].StageId;
+                        }
+                    }
+                }
+                count++;
+            }
+            return -1;
+
         }
     }
 }
