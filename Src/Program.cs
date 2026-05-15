@@ -48,6 +48,7 @@ using Puniemu.Src.Server.L5ID.Requests;
 using Puniemu.Src.DataManager.Logic;
 using Puniemu.Src.Server.GameServer.Requests.UpdateTutorialFlag.Logic;
 using Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic;
+using Newtonsoft.Json;
 namespace Puniemu.Src;
 class Program
 {
@@ -151,6 +152,10 @@ class Program
         app.MapPost("/buyHitodama.nhn", async ctx =>
         {
             await BuyHitodamaHandler.HandleAsync(ctx);
+        });
+        app.MapPost("/getLimitHitodama.nhn", async ctx =>
+        {
+            await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(new Puniemu.Src.Server.GameServer.DataClasses.CommonResponse())));
         });
         app.MapPost("/initBilling.nhn", async ctx =>
         {

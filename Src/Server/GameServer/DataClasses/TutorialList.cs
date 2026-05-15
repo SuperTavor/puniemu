@@ -1,8 +1,5 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
-using Puniemu.Src.DataManager.Logic;
-using Puniemu.Src.TableParser.DataClasses;
 using Puniemu.Src.TableParser.Logic;
 
 namespace Puniemu.Src.Server.GameServer.DataClasses
