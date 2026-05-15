@@ -254,7 +254,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                         var secretStageItem = new LockedStageResultList()
                         {
                             StageId = newAddedStage,
-                            Title = MasterStageData.ConditionItems[tempIndex].Title,
+                            Title = MasterStageData.ConditionItems[tempIndex].OpenStageIdList,
                             ConditionType = (int)MasterStageData.ConditionItems[tempIndex].ConditionType,
                             Description = MasterStageData.ConditionItems[tempIndex].Description,
                             OriginStageId = 0,
