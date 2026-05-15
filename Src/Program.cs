@@ -155,7 +155,8 @@ class Program
         });
         app.MapPost("/getLimitHitodama.nhn", async ctx =>
         {
-            await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(new Puniemu.Src.Server.GameServer.DataClasses.CommonResponse())));
+            //an empty response works. seems to be unused, also a wibwob exclusive request.
+            await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse("{}"));
         });
         app.MapPost("/initBilling.nhn", async ctx =>
         {

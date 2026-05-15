@@ -131,7 +131,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
         }
         public static void HandleStage(ref GameEndRequest deserialized, ref GameEndResponse res, ref int FirstClear, ref TableParser<YwpUserStage> ywpUserStage, ref TableParser<YwpUserMap> ywpUserMap)
         {
-            var ywpMstStage = new TableParser<YwpMstStage>(
+            var ywpMstStage = new TableParser<PuniMstStageItem>(
                 JsonConvert.DeserializeObject<Dictionary<string, string>>(
                     DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_stage"]!
                     )!["tableData"]

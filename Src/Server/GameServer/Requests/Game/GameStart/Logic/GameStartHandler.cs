@@ -87,7 +87,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
             var res = new GameStartResponse(userData);
 
             // Get mst and user table
-            var stagesInfo = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager!.GamedataCache["ywp_mst_stage"]!)!["tableData"]);
+            
             var enemyParams = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai_enemy_param"]!)!["tableData"]);
             
                 
@@ -100,7 +100,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
 
             //get current stage info
             var jsonLevelData = JsonConvert.DeserializeObject<Dictionary<string, StageData>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["stage_data"]);
-            var stageInfoIdx = stagesInfo.FindIndex([deserialized.StageId.ToString()]);
+            var stageInfoIdx = MasterStageData.Items.FindIndex(x => x.StageId == deserialized.StageId);
 
             // Throw error if stage dosent have config info
             if (stageInfoIdx == -1 || (jsonLevelData == null || !(jsonLevelData.ContainsKey(deserialized.StageId.ToString()))))
@@ -221,8 +221,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
             //always seemingly OK on 0
             res.YoukaiHp = 0;
 
-            res.StageType = int.Parse(stagesInfo.Table[stageInfoIdx][3]); //maybe, not sure
-            res.BattleType = int.Parse(stagesInfo.Table[stageInfoIdx][7]); //maybe, not sure
+            res.StageType = MasterStageData.Items[stageInfoIdx].StageType; //maybe, not sure
+            res.BattleType = MasterStageData.Items[stageInfoIdx].BattleType; //maybe, not sure
 
 
             // save userdata and send response

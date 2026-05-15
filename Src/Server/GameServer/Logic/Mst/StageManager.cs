@@ -25,10 +25,10 @@ namespace Puniemu.Src.Server.GameServer.Logic
             }
             return -1;
         }
-        public static int GetStageIndex(ref TableParser<YwpMstStage> parser, long StageId)
+        public static int GetStageIndex(ref TableParser<PuniMstStageItem> parser, long StageId)
         {
             uint count = 0;
-            foreach (YwpMstStage i in parser.Items)
+            foreach (PuniMstStageItem i in parser.Items)
             {
                 if (i.StageId == StageId)
                 {
@@ -39,7 +39,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
             return -1;
         }
 
-        public static long GetNextStage(ref TableParser<YwpMstStage> parser, long StageId)
+        public static long GetNextStage(ref TableParser<PuniMstStageItem> parser, long StageId)
         {
             int mapId = (int)Math.Floor(StageId / 1000.0);
             int count = ((int)StageId % 1000) + 1;
@@ -60,7 +60,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
         }
 
         // guesse the unlocked secret stage based on stageId
-        public static long GetUnlockedSecretStage(ref TableParser<YwpMstStage> parser, ref TableParser<YwpMstStageCondition> parser2, long StageId, int _skipp)
+        public static long GetUnlockedSecretStage(ref TableParser<PuniMstStageItem> parser, ref TableParser<YwpMstStageCondition> parser2, long StageId, int _skipp)
         {
             int mapId = (int)Math.Floor(StageId / 1000.0);
             int maxStageId = (int)StageId % 1000;
