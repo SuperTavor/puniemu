@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Puniemu.Src.Server.GameServer.DataClasses
 {
@@ -25,7 +26,7 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
         //Seems to represent yokai befriend chances.
         //table
         [JsonProperty("lotYoukaiInfoList")]
-        public string LotYoukaiInfoList = string.Empty;
+        public LotYoukaiInfoList LotYoukaiInfoList = new(); 
 
         //no idea
         [JsonProperty("actionTurn")]

@@ -167,11 +167,11 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
                     };
                     if (i.DefaultBefriends == 1 && res.IsFirstClear == 1)
                     {
-                        item.LotYoukaiInfoList = "00000|1111"; //todo
+                        item.LotYoukaiInfoList.Entries.Add(new LotYoukaiInfo { LotPattern = "00000", LotResult = "1111" }); //todo
                     }
                     else
                     {
-                        item.LotYoukaiInfoList = "00000|0000"; //todo
+                        item.LotYoukaiInfoList.Entries.Add(new LotYoukaiInfo { LotPattern = "00000", LotResult = "0000" }); //todo
                     }
                     res.EnemyYoukaiList.Add(item);
                 }
