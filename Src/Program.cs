@@ -113,6 +113,10 @@ class Program
         {
             await GetMasterHandler.HandleAsync(ctx);
         });
+        app.MapPost("/ageConfirm.nhn", async ctx =>
+        {
+            await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(new Src.Server.GameServer.DataClasses.MsgBoxResponse("Puniemu does not support\npaid content.", "Support NHN"))));
+        });
         app.MapPost("/createUser.nhn", async ctx =>
         {
             await CreateUserHandler.HandleAsync(ctx);
