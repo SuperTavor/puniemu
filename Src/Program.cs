@@ -20,7 +20,6 @@ using Puniemu.Src.Server.GameServer.Requests.GameUseItem.Logic;
 using Puniemu.Src.Server.GameServer.Requests.GameContinue.Logic;
 using Puniemu.Src.Server.GameServer.Requests.GameRetire.Logic;
 using Puniemu.Src.Server.GameServer.Requests.LoginStamp.Logic;
-using Puniemu.Src.Server.GameServer.Requests.InitGacha.Logic;
 using Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic;
 using Puniemu.Src.Server.GameServer.Requests.InitCollectMenu.Logic;
 using Puniemu.Src.Server.GameServer.Requests.Friend.Logic;
@@ -49,6 +48,8 @@ using Puniemu.Src.DataManager.Logic;
 using Puniemu.Src.Server.GameServer.Requests.UpdateTutorialFlag.Logic;
 using Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic;
 using Newtonsoft.Json;
+using Puniemu.Src.Server.GameServer.Requests.Init.InitGacha.Logic.Puni;
+using Puniemu.Src.Server.GameServer.Requests.Init.InitGacha.Logic.WibWob;
 namespace Puniemu.Src;
 class Program
 {
@@ -200,7 +201,8 @@ class Program
         });
         app.MapPost("/initGacha.nhn", async ctx =>
         {
-            await InitGachaHandler.HandleAsync(ctx);
+            if(DataManager.Logic.DataManager.IsWibWob) await Src.Server.GameServer.Requests.Init.InitGacha.Logic.WibWob.InitGachaHandler.HandleAsync(ctx);
+            else await Src.Server.GameServer.Requests.Init.InitGacha.Logic.Puni.InitGachaHandler.HandleAsync(ctx);
         });
         app.MapPost("/executeGacha.nhn", async ctx =>
         {

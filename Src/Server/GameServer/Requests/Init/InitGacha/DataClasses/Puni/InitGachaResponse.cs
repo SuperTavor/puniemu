@@ -1,12 +1,11 @@
 ﻿using Newtonsoft.Json;
-
 using Puniemu.Src.Server.GameServer.DataClasses;
 using Puniemu.Src.Server.GameServer.DataClasses.Gacha;
 using Puniemu.Src.Server.GameServer.DataClasses.Gacha.GachaStamp;
 using Puniemu.Src.TableParser.Logic;
 using Puniemu.Src.Utils.GeneralUtils;
 
-namespace Puniemu.Src.Server.GameServer.Requests.InitGacha.DataClasses
+namespace Puniemu.Src.Server.GameServer.Requests.Init.InitGacha.DataClasses.Puni
 {
     public class InitGachaResponse : CommonResponse
     {

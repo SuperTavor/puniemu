@@ -10,6 +10,7 @@ using Supabase.Postgrest;
 using System.Buffers;
 using System.Text;
 using Puniemu.Src.Server.GameServer.Logic;
+using Puniemu.Src.Server.GameServer.Requests.Init.InitGacha.DataClasses.WibWob;
 
 namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
 {
@@ -51,7 +52,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
             tables.Add("ywp_user_event_ranking_reward", new List<object> {});
             tables.Add("ywp_user_event_tutorial", new List<object> {});
             tables.Add("ywp_user_friend_stage", new List<object> {});
-            tables.Add("ywp_user_gacha", new List<object> {});
+            if (DataManager.Logic.DataManager.IsWibWob) tables.Add("ywp_user_gacha", new List<WibWobUserGachaEntry> { new WibWobUserGachaEntry { GachaType = 3, FeverPctg = 0 } });
+            else tables.Add("ywp_user_gacha", new List<object> {});
             tables.Add("ywp_user_medal_point_trade", new List<object> {});
             tables.Add("ywp_user_mini_game_map", new List<object> {});
             tables.Add("ywp_user_mini_game_map_friend", new List<object> {});
