@@ -182,7 +182,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
             for (int i = 1; i < 1 + 5; i++)
             {
                 //get index of yokai info in general ywpuseryokai table
-                var yokaiInfoIndex = YoukaiManager.GetYoukaiIndex(ref YwpUserYoukaiTab, int.Parse(UserDeck.Table[0][i]));
+                var yokaiInfoIndex = YoukaiManager.GetYoukaiIndex(YwpUserYoukaiTab, int.Parse(UserDeck.Table[0][i]));
                 var YwpUserYoukaiSkillIndex = YwpUserYoukaiSkillTab.FindIndex([UserDeck.Table[0][i]]);
                 var YwpUserYoukaiSSkillIndex = YwpUserYoukaiSSkillTab.FindIndex([UserDeck.Table[0][i]]);
                 var item = new UserYoukaiItem()

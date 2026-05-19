@@ -22,15 +22,15 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
             TableParser<YwpUserYoukai> value = new("");
             TableParser<YwpUserYoukaiSkill> value2 = new("");
 
-            YoukaiManager.AddYoukai(ref value, 2157000, ref value2);
-            YoukaiManager.AddYoukai(ref value, 2213000, ref value2);
-            YoukaiManager.AddYoukai(ref value, 2231000, ref value2);
-            YoukaiManager.AddYoukai(ref value, 2235000, ref value2);
-            YoukaiManager.AddYoukai(ref value, 2281000, ref value2);
+            YoukaiManager.AddYoukai(value, 2157000, value2);
+            YoukaiManager.AddYoukai(value, 2213000, value2);
+            YoukaiManager.AddYoukai(value, 2231000, value2);
+            YoukaiManager.AddYoukai(value, 2235000, value2);
+            YoukaiManager.AddYoukai(value, 2281000, value2);
 
             return new Tuple<string, string> (value.ToString(), value2.ToString());
         }
-        public static void CreateSave(ref Dictionary<string, object?> tables, YwpUserData generatedUserData)
+        public static void CreateSave(Dictionary<string, object?> tables, YwpUserData generatedUserData)
         {
             tables.Add("ywp_user_data", generatedUserData);
 
@@ -147,7 +147,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
         private static async Task RegisterDefaultTables(CreateUserRequest deserialized,YwpUserData generatedUserData)
         {
             Dictionary<string,object?> tables = new Dictionary<string,object?>();
-            CreateSave(ref tables, generatedUserData);
+            CreateSave(tables, generatedUserData);
 
             tables["opening_tutorial_flg"] = false;
             foreach (var userTable in Consts.LOGIN_TABLES_PUNI.Where(x => x.Contains("ywp_user") && x != "ywp_user_data"))

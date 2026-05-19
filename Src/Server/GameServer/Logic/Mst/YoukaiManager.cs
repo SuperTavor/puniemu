@@ -12,7 +12,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
 {
     public class MstYoukaiManager
     {
-        public static int GetYoukaiIndex(ref TableParser<YwpMstYoukai> parser, long YoukaiId)
+        public static int GetYoukaiIndex(TableParser<YwpMstYoukai> parser, long YoukaiId)
         {
             uint count = 0;
             foreach (YwpMstYoukai i in parser.Items)
@@ -25,7 +25,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
             }
             return -1;
         }
-        public static int GetYoukaiLevelIndex(ref TableParser<YwpMstYoukaiLevel> parser, int LevelTtype, int Level)
+        public static int GetYoukaiLevelIndex(TableParser<YwpMstYoukaiLevel> parser, int LevelTtype, int Level)
         {
             uint count = 0;
             foreach (YwpMstYoukaiLevel i in parser.Items)
@@ -39,7 +39,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
             return -1;
         }
 
-        public static int GetYoukaiLevelOpenIndex(ref TableParser<YwpMstYoukaiLevelOpen> parser, int beforeLevel, int afterLevel, int RarityType)
+        public static int GetYoukaiLevelOpenIndex(TableParser<YwpMstYoukaiLevelOpen> parser, int beforeLevel, int afterLevel, int RarityType)
         {
             int res = -1;
             uint count = 0;

@@ -38,9 +38,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapUnLock.Logic
                 )!["data"].ToString()!
             )!;
 
-            var userMapIndex = MapManager.GetMapIndex(ref userMap, deserialized.MapId);
-            var mstMapIndex = MstMapManager.GetMapIndex(ref mstMap, deserialized.MapId);
-            var userStageIndex = StageManager.GetStageIndex(ref userStage, (((int)deserialized.MapId * 1000) + 1));
+            var userMapIndex = MapManager.GetMapIndex(userMap, deserialized.MapId);
+            var mstMapIndex = MstMapManager.GetMapIndex(mstMap, deserialized.MapId);
+            var userStageIndex = StageManager.GetStageIndex(userStage, (((int)deserialized.MapId * 1000) + 1));
             if (userMapIndex == -1 || mstMapIndex == -1)
             {
                 var errSession = new MsgBoxResponse("Map don't exist or unknown", "Error");
@@ -61,7 +61,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapUnLock.Logic
                 return;
             }
             userData.YMoney -= (int)mstMap[mstMapIndex].NeedYmoney;
-            StageManager.AddStage(ref userStage, (((int)deserialized.MapId * 1000) + 1));
+            StageManager.AddStage(userStage, (((int)deserialized.MapId * 1000) + 1));
 
             userData.CurrentStageID = (((int)deserialized.MapId * 1000) + 1);
 

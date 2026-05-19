@@ -77,10 +77,21 @@ class Program
         //Add shutdown async from userdatadb
         app.Lifetime.ApplicationStopping.Register(() =>
         {
-            Console.WriteLine("server died: flushing all accounts");
-            Puniemu.Src.UserDataManager.Logic.UserDataManager.ShutdownAsync().GetAwaiter().GetResult();
+            Console.WriteLine("server stopping: flushing accounts");
 
-            Console.WriteLine("w flush");
+            try
+            {
+                Task.Run(async () =>
+                {
+                    await UserDataManager.Logic.UserDataManager.ShutdownAsync();
+                }).GetAwaiter().GetResult();
+
+                Console.WriteLine("flush complete");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
         });
 
         app.UseHttpsRedirection();

@@ -62,9 +62,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             return points;
         }
 
-        static SkillResult? compute_skill_pctg(ref TableParser<YwpUserYoukaiSkill> youkaiList, long YoukaiId)
+        static SkillResult? compute_skill_pctg(TableParser<YwpUserYoukaiSkill> youkaiList, long YoukaiId)
         {
-            var UserYoukaiIndex = YoukaiManager.GetYoukaiSkillIndex(ref youkaiList, YoukaiId);
+            var UserYoukaiIndex = YoukaiManager.GetYoukaiSkillIndex(youkaiList, YoukaiId);
             if (UserYoukaiIndex == -1)
             {
                 return null;
@@ -392,15 +392,15 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
 
                 int getType = DUPLICATE_GETTYPE;
 
-                if (YoukaiManager.GetYoukaiIndex(ref UserYoukaiTable, youkaiId) < 0)
+                if (YoukaiManager.GetYoukaiIndex(UserYoukaiTable, youkaiId) < 0)
                 {
                     getType = NEW_GETTYPE;
                 }
 
 
-                SkillResult? skill = compute_skill_pctg(ref UserYoukaiSkillTable, youkaiId);
+                SkillResult? skill = compute_skill_pctg(UserYoukaiSkillTable, youkaiId);
 
-                YoukaiManager.AddYoukai(ref UserYoukaiTable, youkaiId, ref UserYoukaiSkillTable);
+                YoukaiManager.AddYoukai(UserYoukaiTable, youkaiId, UserYoukaiSkillTable);
                 
                 DictionaryListTable = DictionaryManager.EditDictionary(DictionaryListTable, youkaiId, false, true);
 

@@ -25,15 +25,15 @@
         {
             for(int i = 0; i < Youkai.Count; i++)
             {
-                var tableItemRef = Table[i];
+                var tableItem = Table[i];
                 var yokai = Youkai[i];
                 //Set all the values back
-                tableItemRef[0] = yokai.YoukaiId.ToString();
-                tableItemRef[1] = yokai.SkillLevel.ToString();
-                tableItemRef[2] = yokai.SSkillLevel.ToString();
-                tableItemRef[3] = yokai.Hp.ToString();
-                tableItemRef[4] = yokai.AttackPower.ToString();
-                tableItemRef[9] = yokai.BefriendTimestamp.ToString();
+                tableItem[0] = yokai.YoukaiId.ToString();
+                tableItem[1] = yokai.SkillLevel.ToString();
+                tableItem[2] = yokai.SSkillLevel.ToString();
+                tableItem[3] = yokai.Hp.ToString();
+                tableItem[4] = yokai.AttackPower.ToString();
+                tableItem[9] = yokai.BefriendTimestamp.ToString();
             }
         }
     }

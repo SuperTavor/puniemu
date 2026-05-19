@@ -11,6 +11,7 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
         public int StageType;
         //unused in wibwob
         public int BattleType;
+        public long[] StarCondIDs = new long[3];
     }
     public static class MasterStageData
     {
@@ -37,7 +38,10 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
 
                 return _conditionItems;
             }
-            set { }
+            set
+            {
+                _conditionItems = value;
+            }
         }
         private static bool _isInitStage = false;
         private static bool _isInitCond = false;
@@ -79,7 +83,8 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
                     {
                         StageId = item.StageId,
                         StageType = item.StageType,
-                        BattleType = item.BattleType
+                        BattleType = item.BattleType,
+                        StarCondIDs = [item.StarCond1, item.StarCond2, item.StarCond3]
                     });
                 }
                 
@@ -95,12 +100,12 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
                     {
                         StageId = item.StageID,
                         StageType = item.StageType,
-                        BattleType = 0
+                        BattleType = 0,
+                        StarCondIDs = [item.StarCond1, item.StarCond2, item.StarCond3]
                     });
                 }
                 
             }
-
             else
             {
                 throw new InvalidDataException("Bad ywp_mst_stage");

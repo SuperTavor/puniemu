@@ -27,12 +27,13 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapWarp.Logic
 
             var userData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data")!;
             var userStage = new TableParser.Logic.TableParser<YwpUserStage>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_stage")!);
-            var userMap = new TableParser.Logic.TableParser(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_map")!);
+            var userMap = new TableParser.Logic.TableParser<YwpUserMap>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_map")!);
 
 
             var index = userMap.FindIndex([deserialized.MapId.ToString()]);
             if (index == -1)
             {
+                MapManager.AddMap(userMap, deserialized.MapId);
                 var errSession = new MsgBoxResponse("Error", "Error");
                 await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(errSession)));
                 return;
@@ -42,14 +43,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapWarp.Logic
             //Add stage if doesnt exist
 
             var stageId = long.Parse(deserialized.MapId.ToString() + "001");
-            index = userStage.FindIndex([stageId.ToString()]);
 
             if (index == -1)
             {
-                //Add stage
-                var stage = new YwpUserStage();
-                stage.StageId = stageId;
-                userStage.Items.Add(stage);
+                StageManager.AddStage(userStage, stageId);
             }
 
 

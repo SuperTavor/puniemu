@@ -39,11 +39,11 @@ namespace Puniemu.Src.Server.GameServer.Logic
             return points;
         }
 
-        public static void AddYoukai(ref TableParser<YwpUserYoukai> parser, long YoukaiId, ref TableParser<YwpUserYoukaiSkill> parser2)
+        public static void AddYoukai(TableParser<YwpUserYoukai> parser, long YoukaiId, TableParser<YwpUserYoukaiSkill> parser2)
         {
             var YoukaiMstTable = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager!.GamedataCache["ywp_mst_youkai"]!)!["tableData"]);
             var YoukaiLevelMstTable = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai_level"]!)!["tableData"]);
-            var UserYoukaiIndex = GetYoukaiIndex(ref parser, YoukaiId);
+            var UserYoukaiIndex = GetYoukaiIndex(parser, YoukaiId);
             var MstYoukaiIndex = YoukaiMstTable.FindIndex([YoukaiId.ToString()]);
             if (UserYoukaiIndex == -1)
             {
@@ -63,7 +63,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
         }
         public static void AddYoukaiSkill(ref TableParser<YwpUserYoukaiSkill> youkaiList, long YoukaiId)
         {
-            var UserYoukaiIndex = GetYoukaiSkillIndex(ref youkaiList, YoukaiId);
+            var UserYoukaiIndex = GetYoukaiSkillIndex(youkaiList, YoukaiId);
             if (UserYoukaiIndex == -1)
             {
                 youkaiList.AddItem(new YwpUserYoukaiSkill { YoukaiId = YoukaiId, Level = 1, Points = 0, PercentageDenominator = 1000, PercentageNumerator = 0, Percentage = 0 });
@@ -87,7 +87,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
             youkaiList.Items[UserYoukaiIndex].PercentageNumerator = numerator;
             youkaiList.Items[UserYoukaiIndex].Percentage = percentage;
         }
-        public static int GetYoukaiSkillIndex(ref TableParser<YwpUserYoukaiSkill> parser, long YoukaiId)
+        public static int GetYoukaiSkillIndex(TableParser<YwpUserYoukaiSkill> parser, long YoukaiId)
         {
             uint count = 0;
             foreach (YwpUserYoukaiSkill i in parser.Items)
@@ -100,7 +100,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
             }
             return -1;
         }
-        public static int GetYoukaiIndex(ref TableParser<YwpUserYoukai> parser, long YoukaiId)
+        public static int GetYoukaiIndex(TableParser<YwpUserYoukai> parser, long YoukaiId)
         {
             uint count = 0;
             foreach (YwpUserYoukai i in parser.Items)

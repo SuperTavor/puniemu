@@ -17,7 +17,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
 {
     public static class GameEndHandler
     {
-        public static void HandleUserYoukai(ref GameEndRequest deserialized, ref GameEndResponse res, ref TableParser<YwpUserYoukai> userYoukaiTable, ref TableParser<YwpUserYoukai> userYoukaiTableDiff)
+        public static void HandleUserYoukai(GameEndRequest deserialized, GameEndResponse res, TableParser<YwpUserYoukai> userYoukaiTable, TableParser<YwpUserYoukai> userYoukaiTableDiff)
         {
             var YoukaiMstTable = new TableParser<YwpMstYoukai>(
                 JsonConvert.DeserializeObject<Dictionary<string, string>>(
@@ -38,7 +38,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
             foreach (UserYoukaiResultListReq i in deserialized!.UserYoukaiResultList!)
             {
                 var youkaiIDx = userYoukaiTable.FindIndex([i.YoukaiId.ToString()]);
-                var YoukaiMstIndex = MstYoukaiManager.GetYoukaiIndex(ref YoukaiMstTable, i.YoukaiId);
+                var YoukaiMstIndex = MstYoukaiManager.GetYoukaiIndex(YoukaiMstTable, i.YoukaiId);
                 if (youkaiIDx < 0 || YoukaiMstIndex < 0)
                 {
                     continue;
@@ -71,7 +71,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                     // get new level for youkai
                     while (LevelIndex != -1)
                     {
-                        LevelIndex = MstYoukaiManager.GetYoukaiLevelIndex(ref YoukaiLevelMstTable, YoukaiMstTable.Items[YoukaiMstIndex].LevelType, Level);
+                        LevelIndex = MstYoukaiManager.GetYoukaiLevelIndex(YoukaiLevelMstTable, YoukaiMstTable.Items[YoukaiMstIndex].LevelType, Level);
                         Level++;
                         if (LevelIndex == -1)
                             break;
@@ -86,12 +86,12 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                         break;
                     }
 
-                    int YoukaiLevelOpenIndex = MstYoukaiManager.GetYoukaiLevelOpenIndex(ref YoukaiLevelOpenMstTable, item.Before.Level, item.After.Level, YoukaiMstTable.Items[YoukaiMstIndex].YoukaiRarity);
+                    int YoukaiLevelOpenIndex = MstYoukaiManager.GetYoukaiLevelOpenIndex(YoukaiLevelOpenMstTable, item.Before.Level, item.After.Level, YoukaiMstTable.Items[YoukaiMstIndex].YoukaiRarity);
                     if (YoukaiLevelOpenIndex != -1)
                     {
                         item.After.Level = YoukaiLevelOpenMstTable.Items[YoukaiLevelOpenIndex].Level;
                         userYoukaiTable.Items[youkaiIDx].IsLockedLevel = 1;
-                        int tmpindex = MstYoukaiManager.GetYoukaiLevelIndex(ref YoukaiLevelMstTable, YoukaiMstTable.Items[YoukaiMstIndex].LevelType, item.After.Level);
+                        int tmpindex = MstYoukaiManager.GetYoukaiLevelIndex(YoukaiLevelMstTable, YoukaiMstTable.Items[YoukaiMstIndex].LevelType, item.After.Level);
                         if (tmpindex != -1)
                         {
                             item.After.ExpBar.Denominator = (YoukaiLevelMstTable.Items[tmpindex].MaxExp + 1) - YoukaiLevelMstTable.Items[tmpindex].BaseExp;
@@ -129,7 +129,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 res.UserYoukaiResultList.Add(item);
             }
         }
-        public static void HandleStage(ref GameEndRequest deserialized, ref GameEndResponse res, ref int FirstClear, ref TableParser<YwpUserStage> ywpUserStage, ref TableParser<YwpUserMap> ywpUserMap)
+        public static void HandleStage(GameEndRequest deserialized, GameEndResponse res, int FirstClear, TableParser<YwpUserStage> ywpUserStage, TableParser<YwpUserMap> ywpUserMap)
         {
             List<YwpMstMap> ywpMstMap = JsonConvert.DeserializeObject<List<YwpMstMap>>(
                 JsonConvert.DeserializeObject<Dictionary<string, object>>(
@@ -137,12 +137,12 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 )!["data"].ToString()!
             )!;
            
-            var stageIndex = StageManager.GetStageIndex(ref ywpUserStage, deserialized.StageId);
+            var stageIndex = StageManager.GetStageIndex(ywpUserStage, deserialized.StageId);
             // create stage entry if it diden't exist yet
             if (stageIndex == -1)
             {
                 FirstClear = 1;
-                StageManager.AddStage(ref ywpUserStage, deserialized.StageId);
+                StageManager.AddStage(ywpUserStage, deserialized.StageId);
             }
             // check if it's first clear
             if (ywpUserStage.Items[stageIndex].IsClear == 0)
@@ -156,26 +156,25 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 res.UserGameResultData.ScoreUpdateFlg = 1;
             }
 
-            // conditionCount aka conditionIndex
-            // start at 1, cause conditionIds index always start with 1
-            int conditionCount = 1;
-
-            while (true)
+            for (int i = 0; i < 3 ; i++)
             {
                 // used to differentiate locked levels from one same map
                 int secretStageSkipp = 0;
+
                 // compute the conditionId from stageId and conditionCount
-                int tempConditionId = (deserialized.StageId * 10) + conditionCount;
+                long currentCondId = MasterStageData.StageItems[stageIndex].StarCondIDs[i];
+
                 // get the array index of the computed conditionId in the table
-                int tempIndex = MasterStageData.GetStageConditionIndex(tempConditionId);
+                int tempIndex = MasterStageData.GetStageConditionIndex(currentCondId);
+
                 // if didn't exist we break cause this means we finished all conditions
                 if (tempIndex == -1)
-                {
                     break;
-                }
+
                 // we get the condition parameter
                 long param1 = MasterStageData.ConditionItems[tempIndex].ConditionVal1;
                 object sourceParam1 = 0;
+
                 if (MasterStageData.ConditionItems[tempIndex].ConditionType == ConditionType.MinScore)
                 {
                     sourceParam1 = deserialized.Score;
@@ -193,79 +192,105 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                     sourceParam1 = deserialized.UserYoukaiResultList!;
                 }
 
-                bool good = ConditionManager.ComputeCondition(MasterStageData.ConditionItems[tempIndex].ConditionType, sourceParam1, param1);
-                Console.WriteLine(tempConditionId.ToString() + " | " + good.ToString() + " | " + MasterStageData.ConditionItems[tempIndex].ConditionType.ToString());
+                bool good = ConditionManager.ComputeCondition(
+                    MasterStageData.ConditionItems[tempIndex].ConditionType,
+                    sourceParam1,
+                    param1);
+
+                Console.WriteLine($"{currentCondId} | {good} | {MasterStageData.ConditionItems[tempIndex].ConditionType}");
 
                 // 1-3 are generally the condition for stars, 4+ are generally locked levels condition
-                if (conditionCount == 1)
+                if (i == 1)
                 {
-                    res.UserGameResultData.StarGetFlg1 = (good ? 1 : 0);
+                    res.UserGameResultData.StarGetFlg1 = good ? 1 : 0;
                 }
-                else if (conditionCount == 2)
+                else if (i == 2)
                 {
-                    res.UserGameResultData.StarGetFlg2 = (good ? 1 : 0);
+                    res.UserGameResultData.StarGetFlg2 = good ? 1 : 0;
                 }
-                else if (conditionCount == 3)
+                else if (i == 3)
                 {
-                    res.UserGameResultData.StarGetFlg3 = (good ? 1 : 0);
+                    res.UserGameResultData.StarGetFlg3 = good ? 1 : 0;
                 }
-                else if (conditionCount >= 4 && (good ? 1 : 0) == 1)
+                else if (i >= 4 && good)
                 {
-                    // will store the unlocked stageId
                     long newAddedStage = -1;
-                    bool isFinalStageMap = MasterStageData.GetNextStage(deserialized.StageId) == -1;
-                    Console.WriteLine(MasterStageData.GetNextStage(deserialized.StageId).ToString());
-                    var MapIndex = MstMapManager.GetMapIndex(ref ywpMstMap, (int)Math.Floor(deserialized.StageId / 1000.0));
-                    if (isFinalStageMap && ywpMstMap[MapIndex].ReverseMapId != 0)
+
+                    bool isFinalStageMap =
+                        MasterStageData.GetNextStage(deserialized.StageId) == -1;
+
+                    Console.WriteLine(MasterStageData.GetNextStage(deserialized.StageId));
+
+                    var mapIndex = MstMapManager.GetMapIndex(
+                        ywpMstMap,
+                        (int)Math.Floor(deserialized.StageId / 1000.0));
+
+                    if (isFinalStageMap && ywpMstMap[mapIndex].ReverseMapId != 0)
                     {
-                        var MapIndex2 = MstMapManager.GetMapIndex(ref ywpMstMap, ywpMstMap[MapIndex].ReverseMapId);
-                        if (MapIndex2 != -1)
+                        var mapIndex2 = MstMapManager.GetMapIndex(
+                            ywpMstMap,
+                            ywpMstMap[mapIndex].ReverseMapId);
+
+                        if (mapIndex2 != -1)
                         {
-                            int newMapIndex = MapManager.GetMapIndex(ref ywpUserMap, ywpMstMap[MapIndex2].MapId);
+                            int newMapIndex = MapManager.GetMapIndex(
+                                ywpUserMap,
+                                ywpMstMap[mapIndex2].MapId);
+
                             if (newMapIndex == -1)
                             {
-                                MapManager.AddMap(ref ywpUserMap, ywpMstMap[MapIndex2].MapId);
+                                MapManager.AddMap(ywpUserMap, ywpMstMap[mapIndex2].MapId);
                             }
-                            MapManager.UpdateMap(ref ywpUserMap, ywpMstMap[MapIndex2].MapId, 1);
 
-                            int newStageIdIndex = StageManager.GetStageIndex(ref ywpUserStage, (ywpMstMap[MapIndex2].MapId * 1000) + 1);
+                            MapManager.UpdateMap(ywpUserMap, ywpMstMap[mapIndex2].MapId, 1);
+
+                            int newStageIdIndex = StageManager.GetStageIndex(
+                                ywpUserStage,
+                                (ywpMstMap[mapIndex2].MapId * 1000) + 1);
+
                             if (newStageIdIndex == -1)
                             {
-                                StageManager.AddStage(ref ywpUserStage, (ywpMstMap[MapIndex2].MapId * 1000) + 1);
-                                newAddedStage = (ywpMstMap[MapIndex2].MapId * 1000) + 1;
+                                StageManager.AddStage(
+                                    ywpUserStage,
+                                    (ywpMstMap[mapIndex2].MapId * 1000) + 1);
+
+                                newAddedStage = (ywpMstMap[mapIndex2].MapId * 1000) + 1;
                             }
                         }
                     }
                     else
                     {
-                        long newStageId = MasterStageData.GetUnlockedSecretStage(deserialized.StageId, secretStageSkipp);
+                        long newStageId =
+                            MasterStageData.GetUnlockedSecretStage(deserialized.StageId, secretStageSkipp);
+
                         if (newStageId != -1)
                         {
-                            int newStageIdIndex = StageManager.GetStageIndex(ref ywpUserStage, newStageId);
+                            int newStageIdIndex = StageManager.GetStageIndex(ywpUserStage, newStageId);
+
                             if (newStageIdIndex == -1)
                             {
-                                StageManager.AddStage(ref ywpUserStage, newStageId);
+                                StageManager.AddStage(ywpUserStage, newStageId);
                                 newAddedStage = newStageId;
                             }
                         }
                     }
+
                     if (newAddedStage != -1)
                     {
-                        var secretStageItem = new LockedStageResultList()
+                        res.LockedStageResultList.Add(new LockedStageResultList
                         {
                             StageId = newAddedStage,
                             Title = MasterStageData.ConditionItems[tempIndex].OpenStageIdList,
                             ConditionType = (int)MasterStageData.ConditionItems[tempIndex].ConditionType,
                             Description = MasterStageData.ConditionItems[tempIndex].Description,
                             OriginStageId = 0,
-                        };
-                        res.LockedStageResultList.Add(secretStageItem);
+                        });
                     }
+
                     secretStageSkipp++;
                 }
-                conditionCount++;
             }
-            StageManager.EditStage(ref ywpUserStage, deserialized.StageId, 1, deserialized.Score, res.UserGameResultData.StarGetFlg1, res.UserGameResultData.StarGetFlg2, res.UserGameResultData.StarGetFlg3, ywpUserStage.Items[stageIndex].NumClear + 1);
+            StageManager.EditStage(ywpUserStage, deserialized.StageId, 1, deserialized.Score, res.UserGameResultData.StarGetFlg1, res.UserGameResultData.StarGetFlg2, res.UserGameResultData.StarGetFlg3, ywpUserStage.Items[stageIndex].NumClear + 1);
 
 
             // beta might only work for few maps
@@ -273,28 +298,28 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
             long nextStage = MasterStageData.GetNextStage(deserialized.StageId);
             if (nextStage == -1) // new map
             {
-                var OgMapIndex = MstMapManager.GetMapIndex(ref ywpMstMap, (int)Math.Floor(deserialized.StageId / 1000.0));
+                var OgMapIndex = MstMapManager.GetMapIndex(ywpMstMap, (int)Math.Floor(deserialized.StageId / 1000.0));
                 if (OgMapIndex != -1 && ywpMstMap[OgMapIndex].NextMapId != 0)
                 {
-                    int NewMstMapIndex = MstMapManager.GetMapIndex(ref ywpMstMap, ywpMstMap[OgMapIndex].NextMapId);
+                    int NewMstMapIndex = MstMapManager.GetMapIndex(ywpMstMap, ywpMstMap[OgMapIndex].NextMapId);
                     if (NewMstMapIndex != -1)
                     {
-                        int newMapIndex = MapManager.GetMapIndex(ref ywpUserMap, ywpMstMap[NewMstMapIndex].MapId);
+                        int newMapIndex = MapManager.GetMapIndex(ywpUserMap, ywpMstMap[NewMstMapIndex].MapId);
                         if (newMapIndex == -1)
                         {
                             mapLocked = !ywpMstMap[NewMstMapIndex].TextUnlock.IsNullOrEmpty();
-                            MapManager.AddMap(ref ywpUserMap, ywpMstMap[NewMstMapIndex].MapId);
+                            MapManager.AddMap(ywpUserMap, ywpMstMap[NewMstMapIndex].MapId);
                         }
-                        MapManager.UpdateMap(ref ywpUserMap, ywpMstMap[NewMstMapIndex].MapId, 1);
+                        MapManager.UpdateMap(ywpUserMap, ywpMstMap[NewMstMapIndex].MapId, 1);
                         nextStage = (ywpMstMap[NewMstMapIndex].MapId * 1000) + 1;
                     }
                 }
             }
-            if (nextStage != -1 && StageManager.GetStageIndex(ref ywpUserStage, nextStage) == -1)
+            if (nextStage != -1 && StageManager.GetStageIndex(ywpUserStage, nextStage) == -1)
             {
                 if (mapLocked == false) // we don't create stage placeholder if the new map is locked
                 {
-                    StageManager.AddStage(ref ywpUserStage, nextStage);
+                    StageManager.AddStage(ywpUserStage, nextStage);
                 }
                 var nextStageItem = new LockedStageResultList()
                 {
@@ -379,7 +404,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_map")
             );
             int FirstClear = 0;
-            HandleStage(ref deserialized, ref res, ref FirstClear, ref ywpUserStage, ref ywpUserMap);
+            HandleStage(deserialized, res, FirstClear, ywpUserStage, ywpUserMap);
 
 
 
@@ -409,8 +434,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                             dictionaryYoukaiTable = DictionaryManager.EditDictionary(dictionaryYoukaiTable, YoukaiId, false, true);
                             dictionaryDiff = DictionaryManager.EditDictionary(dictionaryDiff, YoukaiId, false, true);
                             res.UserGameResultData.RewardYoukaiId = YoukaiId;
-                            YoukaiManager.AddYoukai(ref userYoukaiTable, YoukaiId, ref userYoukaiSkillTable);
-                            YoukaiManager.AddYoukai(ref youkaiDiff, YoukaiId, ref youkaiSkillDiff);
+                            YoukaiManager.AddYoukai(userYoukaiTable, YoukaiId, userYoukaiSkillTable);
+                            YoukaiManager.AddYoukai(youkaiDiff, YoukaiId, youkaiSkillDiff);
 
                             res.YoukaiPopupResult = new();
                             res.YoukaiPopupResult.IsWBonusEffectOpen = false; //IDK : TODO
@@ -484,7 +509,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
             }
 
             // yokai user list
-            HandleUserYoukai(ref deserialized, ref res, ref userYoukaiTable, ref youkaiDiff);
+            HandleUserYoukai(deserialized, res, userYoukaiTable, youkaiDiff);
 
             // edit tutorial
             var tutorialList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<TutorialList>(deserialized!.Gdkey!, "ywp_user_tutorial_list");

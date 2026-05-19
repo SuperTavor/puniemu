@@ -70,13 +70,13 @@ namespace Puniemu.Src.TableParser.DataClasses
         public int StageType { get; set; }
 
         [JsonProperty("starGetConditionId1")]
-        public int StarCond1 { get; set; }
+        public long StarCond1 { get; set; }
 
         [JsonProperty("starGetConditionId2")]
-        public int StarCond2 { get; set; }
+        public long StarCond2 { get; set; }
 
         [JsonProperty("starGetConditionId3")]
-        public int StarCond3 { get; set; }
+        public long StarCond3 { get; set; }
 
         [JsonProperty("storeReviewFlg")]
         public int StoreReviewFlag { get; set; }
@@ -100,9 +100,9 @@ namespace Puniemu.Src.TableParser.DataClasses
         public long Unk2 { get; set; }
         public long Unk3 { get; set; }
         public int BattleType { get; set; }
-        public long Unk5 { get; set; }
-        public long Unk6 { get; set; }
-        public long Unk7 { get; set; }
+        public long StarCond1 { get; set; }
+        public long StarCond2 { get; set; }
+        public long StarCond3 { get; set; }
         public long Unk8 { get; set; }
         public long Unk9 { get; set; }
         public long Unk10 { get; set; }
