@@ -137,20 +137,20 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 )!["data"].ToString()!
             )!;
            
-            var stageIndex = StageManager.GetStageIndex(ywpUserStage, deserialized.StageId);
+            var userStageIdx = StageManager.GetStageIndex(ywpUserStage, deserialized.StageId);
             // create stage entry if it diden't exist yet
-            if (stageIndex == -1)
+            if (userStageIdx == -1)
             {
                 FirstClear = 1;
                 StageManager.AddStage(ywpUserStage, deserialized.StageId);
             }
             // check if it's first clear
-            if (ywpUserStage.Items[stageIndex].IsClear == 0)
+            if (ywpUserStage.Items[userStageIdx].IsClear == 0)
             {
                 FirstClear = 1;
             }
             // check if it's a new record
-            res.UserGameResultData.PrevScore = (int)ywpUserStage.Items[stageIndex].Score;
+            res.UserGameResultData.PrevScore = (int)ywpUserStage.Items[userStageIdx].Score;
             if (deserialized.Score > res.UserGameResultData.PrevScore)
             {
                 res.UserGameResultData.ScoreUpdateFlg = 1;
@@ -162,7 +162,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 int secretStageSkipp = 0;
 
                 // compute the conditionId from stageId and conditionCount
-                long currentCondId = MasterStageData.StageItems[stageIndex].StarCondIDs[i];
+                long currentCondId = MasterStageData.StageItems.Where(x => x.StageId == deserialized.StageId).First().StarCondIDs[i];
 
                 // get the array index of the computed conditionId in the table
                 int tempIndex = MasterStageData.GetStageConditionIndex(currentCondId);
@@ -290,7 +290,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                     secretStageSkipp++;
                 }
             }
-            StageManager.EditStage(ywpUserStage, deserialized.StageId, 1, deserialized.Score, res.UserGameResultData.StarGetFlg1, res.UserGameResultData.StarGetFlg2, res.UserGameResultData.StarGetFlg3, ywpUserStage.Items[stageIndex].NumClear + 1);
+            StageManager.EditStage(ywpUserStage, deserialized.StageId, 1, deserialized.Score, res.UserGameResultData.StarGetFlg1, res.UserGameResultData.StarGetFlg2, res.UserGameResultData.StarGetFlg3, ywpUserStage.Items[userStageIdx].NumClear + 1);
 
 
             // beta might only work for few maps
