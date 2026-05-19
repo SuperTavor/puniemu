@@ -73,6 +73,15 @@ class Program
         //Init database connection
         UserDataManager.Logic.UserDataManager.Initialize();
 
+        //Add shutdown async from userdatadb
+        app.Lifetime.ApplicationStopping.Register(() =>
+        {
+            Console.WriteLine("server died: flushing all accounts");
+            Puniemu.Src.UserDataManager.Logic.UserDataManager.ShutdownAsync().GetAwaiter().GetResult();
+
+            Console.WriteLine("w flush");
+        });
+
         app.UseHttpsRedirection();
         //Assign handlers
         AssignL5IDHandlers(app);

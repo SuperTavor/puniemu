@@ -1,4 +1,5 @@
-﻿using Supabase.Postgrest.Attributes;
+﻿using Newtonsoft.Json;
+using Supabase.Postgrest.Attributes;
 using Supabase.Postgrest.Models;
 
 namespace Puniemu.Src.UserDataManager.DataClasses
@@ -27,5 +28,9 @@ namespace Puniemu.Src.UserDataManager.DataClasses
 
         [Column("opening_tutorial_flag")]
         public bool OpeningTutorialFlag { get; set; }
+
+        [JsonIgnore]
+        //used for the account cache
+        public bool IsDirty { get; set; } = false; 
     }
 }

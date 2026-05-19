@@ -3,8 +3,10 @@ using Newtonsoft.Json.Linq;
 using Puniemu.Src.UserDataManager.DataClasses;
 using Supabase;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.ComponentModel;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+
 namespace Puniemu.Src.UserDataManager.Logic
 {
     public static class UserDataManager
@@ -16,7 +18,14 @@ namespace Puniemu.Src.UserDataManager.Logic
 
         public static Supabase.Client? SupabaseClient;
 
-        //Check credentials and connect to the Firestore database.
+        private static ConcurrentDictionary<string, Account> _accountCache = new();
+
+        // Timer variables for background flushing
+        private static PeriodicTimer? _flushTimer;
+        private static Task? _flushTask;
+        private static CancellationTokenSource _cts = new();
+
+        // connect to supbase
         public static void Initialize()
         {
             try
@@ -26,6 +35,11 @@ namespace Puniemu.Src.UserDataManager.Logic
                 {
                     AutoRefreshToken = true,
                 });
+
+                // Start the 5-minute background flush loop
+                _flushTimer = new PeriodicTimer(TimeSpan.FromMinutes(5));
+                _flushTask = FlushLoopAsync(_cts.Token);
+                Console.WriteLine("db service started");
             }
             catch
             {
@@ -34,7 +48,76 @@ namespace Puniemu.Src.UserDataManager.Logic
             }
         }
 
-        // returns the udkey of the newly created device
+        private static async Task FlushLoopAsync(CancellationToken token)
+        {
+            try
+            {
+                while (await _flushTimer!.WaitForNextTickAsync(token))
+                {
+                    await FlushAllDirtyAccountsAsync();
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                Console.WriteLine("bg flush stopped gracefully");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in background flush loop: {ex.Message}");
+            }
+        }
+
+        private static async Task FlushAllDirtyAccountsAsync()
+        {
+            foreach (var kvp in _accountCache)
+            {
+                await FlushAccount(kvp.Key);
+            }
+        }
+
+        private static async Task FlushAccount(string gdkey)
+        {
+            var account = _accountCache[gdkey];
+
+            if (account.IsDirty)
+            {
+                account.IsDirty = false;
+
+                try
+                {
+                    await account.Update<Account>();
+                }
+                catch (Exception ex)
+                {
+                    account.IsDirty = true;
+                    Console.WriteLine($"Failed to flush account {gdkey}: {ex.Message}");
+                }
+            }
+        }
+        public static async Task ShutdownAsync()
+        {
+            _cts.Cancel(); 
+            await FlushAllDirtyAccountsAsync();
+        }
+
+        private static async Task<Account> GetAccountFromGdkeyAsync(string gdkey)
+        {
+            if (_accountCache.TryGetValue(gdkey, out Account? acc))
+            {
+                return acc;
+            }
+            else
+            {
+                var response = await SupabaseClient!.From<Account>().Where(a => a.Gdkey == gdkey).Get();
+                var account = response.Models.FirstOrDefault();
+                if (account != null)
+                {
+                    _accountCache[gdkey] = account;
+                }
+                return account!;
+            }
+        }
+
         public static async Task<string> NewDeviceAsync(string? udkey = null)
         {
             Device dev = new Device();
@@ -49,7 +132,7 @@ namespace Puniemu.Src.UserDataManager.Logic
             return newDevice.UdKey!;
         }
 
-        //checks if udkey exists
+        // checks if udkey exists
         public static async Task<bool> IsDeviceExists(string udkey)
         {
             var response = await SupabaseClient!
@@ -59,6 +142,7 @@ namespace Puniemu.Src.UserDataManager.Logic
 
             return response > 0;
         }
+
         // returns the gdkey of the newly created account
         public static async Task<string> NewAccountAsync()
         {
@@ -69,36 +153,50 @@ namespace Puniemu.Src.UserDataManager.Logic
                 LastLoginTime = "",
                 CharacterId = ""
             };
-            //response is saved to get the generated id
             var response = await SupabaseClient!.From<Account>().Insert(acc);
             var newAcc = response.Models.First();
+
+            // Immediately cache the new account
+            _accountCache[newAcc.Gdkey!] = newAcc;
             return newAcc.Gdkey!;
         }
-        //Gets user data from specific account
+
+        // Sets user data for specific account
         public static async Task SetYwpUserAsync(string gdkey, string tableId, object data)
         {
-            var response = await SupabaseClient!.From<Account>().Where(a => a.Gdkey == gdkey).Get();
-            var account = response.Models.FirstOrDefault();
-            account!.YwpUserTables![tableId] = data;
-            await account.Update<Account>();
+            var account = await GetAccountFromGdkeyAsync(gdkey);
+            account.YwpUserTables![tableId] = data;
+
+            // Mark as dirty instead of updating database immediately
+            account.IsDirty = true;
         }
 
         public static async Task SetYwpUserDictAsync(string gdkey, Dictionary<string, object?> data)
         {
-            var response = await SupabaseClient!.From<Account>().Where(a => a.Gdkey == gdkey).Get();
-            var account = response.Models.FirstOrDefault()!;
+            var account = await GetAccountFromGdkeyAsync(gdkey);
             foreach (var kvp in data)
             {
                 account.YwpUserTables![kvp.Key] = kvp.Value!;
             }
 
-            await account.Update<Account>();
+            // Mark as dirty instead of updating database immediately
+            account.IsDirty = true;
+        }
+
+        public static async Task SetEntireUserData(string gdkey, Dictionary<string, object?> data)
+        {
+            var account = await GetAccountFromGdkeyAsync(gdkey);
+            account.YwpUserTables = data;
+
+            account.IsDirty = true;
         }
 
         public static async Task DeleteUser(string udkey, string gdkey)
         {
             await RemoveGdkeyFromUdkey(udkey, gdkey);
             await SupabaseClient!.From<Account>().Where(a => a.Gdkey == gdkey).Delete();
+
+            _accountCache.TryRemove(gdkey, out _);
         }
 
         private static async Task RemoveGdkeyFromUdkey(string udkey, string gdkey)
@@ -108,18 +206,19 @@ namespace Puniemu.Src.UserDataManager.Logic
             device.Gdkeys!.Remove(gdkey);
             await device.Update<Device>();
         }
-        //Sets user data for specific account
+
+        // Gets user data from specific account
         public static async Task<T?> GetYwpUserAsync<T>(string gdkey, string tableId)
         {
-            var response = await SupabaseClient!.From<Account>().Where(a => a.Gdkey == gdkey).Get();
-            var account = response.Models.FirstOrDefault()!;
+            var account = await GetAccountFromGdkeyAsync(gdkey);
             var tbl = account.YwpUserTables![tableId];
             if (tbl == null)
                 return default;
             JToken token = JToken.FromObject(tbl);
             return token.ToObject<T>();
         }
-        public static T? GetYwpUserFromJson<T>(string tableId, Dictionary<string,object?> YwpUserTables)
+
+        public static T? GetYwpUserFromJson<T>(string tableId, Dictionary<string, object?> YwpUserTables)
         {
             var tbl = YwpUserTables[tableId];
             if (tbl == null)
@@ -127,55 +226,48 @@ namespace Puniemu.Src.UserDataManager.Logic
             JToken token = JToken.FromObject(tbl);
             return token.ToObject<T>();
         }
-        public static async Task<Dictionary<string,object?>> GetEntireUserData(string gdkey)
+
+        public static async Task<Dictionary<string, object?>> GetEntireUserData(string gdkey)
         {
-            var response = await SupabaseClient!.From<Account>().Where(a => a.Gdkey == gdkey).Get();
-            var account = response.Models.FirstOrDefault()!;
+            var account = await GetAccountFromGdkeyAsync(gdkey);
             return account.YwpUserTables!;
         }
+        
         public static async Task<string> GetGdkeyFromCharacterId(string charId)
         {
             var response = await SupabaseClient!.From<Account>().Where(a => a.CharacterId == charId).Get();
-
             var account = response.Models.FirstOrDefault();
             return account?.Gdkey ?? string.Empty;
         }
+
         public static async Task<string> GetGdkeyFromUserId(string userId)
         {
             var response = await SupabaseClient!.From<Account>().Where(a => a.UserId == userId).Get();
-
             var account = response.Models.FirstOrDefault();
             return account?.Gdkey ?? string.Empty;
         }
+
         public static async Task<string> GetLastLoginTime(string gdkey)
         {
-            var response = await SupabaseClient!.From<Account>().Where(a => a.Gdkey == gdkey).Get();
-
-            var account = response.Models.FirstOrDefault();
+            var account = await GetAccountFromGdkeyAsync(gdkey); // Pull from cache first
             return account?.LastLoginTime!;
         }
-        public static async Task SetEntireUserData(string gdkey, Dictionary<string,object?> data)
-        {
-            var response = await SupabaseClient!.From<Account>().Where(a => a.Gdkey == gdkey).Get();
-            var account = response.Models.FirstOrDefault();
-            account!.YwpUserTables = data;
-            await account.Update<Account>();
-        }
-        //Gets all corresponding GDKeys from under a specified UDKey.
+
+        // Gets all corresponding GDKeys from under a specified UDKey.
         public static async Task<List<string>> GetGdkeysFromUdkeyAsync(string udkey)
         {
             var response = await SupabaseClient!.From<Device>().Where(d => d.UdKey == udkey).Get();
             var device = response.Models.FirstOrDefault();
             return device?.Gdkeys!;
         }
-        //Add a gdkey association to a udkey
+
+        // Add a gdkey association to a udkey
         public static async Task AddAccountToDevice(string udkey, string gdkey)
         {
-            // get the correct device
             var response = await SupabaseClient!.From<Device>().Where(d => d.UdKey == udkey).Get();
             var device = response.Models.FirstOrDefault()!;
-            if(device.Gdkeys == null) device.Gdkeys = new List<string>();
-            device.Gdkeys.Add(gdkey); 
+            if (device.Gdkeys == null) device.Gdkeys = new List<string>();
+            device.Gdkeys.Add(gdkey);
             await device.Update<Device>();
         }
     }
