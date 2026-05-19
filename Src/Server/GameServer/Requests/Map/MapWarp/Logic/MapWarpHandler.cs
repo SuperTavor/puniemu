@@ -9,12 +9,12 @@ using Puniemu.Src.Server.GameServer.Logic;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
 using Puniemu.Src.Utils.GeneralUtils;
+using Puniemu.Src.TableParser.DataClasses;
 
 namespace Puniemu.Src.Server.GameServer.Requests.MapWarp.Logic
 {
     public class MapWarpHandler
     {
-        //Puni puni now have a new profile system (with plate, effect and codename) but for some reason in the private server it's always the old app
         public static async Task HandleAsync(HttpContext ctx)
         {
             ctx.Request.EnableBuffering();
@@ -24,11 +24,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapWarp.Logic
             var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             var deserialized = JsonConvert.DeserializeObject<MapWarpRequest>(requestJsonString!);
             ctx.Response.ContentType = "application/json";
-            var UserTables = await UserDataManager.Logic.UserDataManager.GetEntireUserData(deserialized!.Level5UserID!);
 
-            var userData = UserDataManager.Logic.UserDataManager.GetYwpUserFromJson<YwpUserData>("ywp_user_data", UserTables)!;
-            var userStage = new TableParser.Logic.TableParser(UserDataManager.Logic.UserDataManager.GetYwpUserFromJson<string>("ywp_user_stage", UserTables)!);
-            var userMap = new TableParser.Logic.TableParser(UserDataManager.Logic.UserDataManager.GetYwpUserFromJson<string>("ywp_user_map", UserTables)!);
+            var userData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data")!;
+            var userStage = new TableParser.Logic.TableParser<YwpUserStage>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_stage")!);
+            var userMap = new TableParser.Logic.TableParser(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_map")!);
 
 
             var index = userMap.FindIndex([deserialized.MapId.ToString()]);
@@ -39,14 +38,21 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapWarp.Logic
                 return;
             }
 
-            /*index = userStage.FindIndex([deserialized.MapId.ToString() + "001"]);
+
+            //Add stage if doesnt exist
+
+            var stageId = long.Parse(deserialized.MapId.ToString() + "001");
+            index = userStage.FindIndex([stageId.ToString()]);
 
             if (index == -1)
             {
-                var errSession = new MsgBoxResponse("Error", "Error");
-                await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(errSession)));
-                return;
-            }*/
+                //Add stage
+                var stage = new YwpUserStage();
+                stage.StageId = stageId;
+                userStage.Items.Add(stage);
+            }
+
+
             userData.CurrentStageID = int.Parse(deserialized.MapId.ToString() + "001");
 
 
@@ -111,7 +117,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapWarp.Logic
             resdict!["ywp_user_stage"] = userStage.ToString();
             resdict!["ywp_user_map"] = userMap.ToString();
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_data", userData);
-
+            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_stage", userStage.ToString());
             await GeneralUtils.AddTablesToResponse(ywpKeys, resdict!, true, deserialized!.Level5UserID!);
             var marshalledResponse = JsonConvert.SerializeObject(resdict);
             var encryptedResponse = NHNCrypt.Logic.NHNCrypt.EncryptResponse(marshalledResponse);
