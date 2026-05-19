@@ -50,6 +50,7 @@ using Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic;
 using Newtonsoft.Json;
 using Puniemu.Src.Server.GameServer.Requests.Init.InitGacha.Logic.Puni;
 using Puniemu.Src.Server.GameServer.Requests.Init.InitGacha.Logic.WibWob;
+using Puniemu.Src.Server.GameServer.Requests.BuyItem.Logic;
 namespace Puniemu.Src;
 class Program
 {
@@ -166,6 +167,10 @@ class Program
         app.MapPost("/buyHitodama.nhn", async ctx =>
         {
             await BuyHitodamaHandler.HandleAsync(ctx);
+        });
+        app.MapPost("/buyItem.nhn", async ctx =>
+        {
+            await BuyItemHandler.HandleAsync(ctx);
         });
         app.MapPost("/getLimitHitodama.nhn", async ctx =>
         {

@@ -72,6 +72,7 @@ namespace Puniemu.Src.UserDataManager.Logic
             foreach (var kvp in _accountCache)
             {
                 await FlushAccount(kvp.Key);
+                Console.WriteLine($"Saved account. gdkey:" + kvp.Key);
             }
         }
 
