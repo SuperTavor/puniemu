@@ -1,5 +1,6 @@
 ﻿using Puniemu.Src.Server.GameServer.DataClasses;
 using Puniemu.Src.Server.GameServer.Logic;
+using Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.DataClasses;
 using Puniemu.Src.TableParser.DataClasses;
 using Puniemu.Src.TableParser.Logic;
 
@@ -7,28 +8,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
 {
     public static class GachaService
     {
-        private static (string, int) DropYokai(Dictionary<string, List<(float, int)>> bk_set)
-        {
-            double x = Random.Shared.NextDouble();
-            float sum = 0;
-
-            foreach (var kvp in bk_set)
-            {
-                string rank = kvp.Key;
-                List<(float, int)> liste = kvp.Value;
-
-                foreach (var tuple in liste)
-                {
-                    sum += tuple.Item1;
-                    if (sum > x)
-                    {
-                        return (rank, tuple.Item2);
-                    }
-                }
-            }
-
-            return ("Uz", 9002294);
-        }
 
         private static int SoulLevelFormula(int n)
         {
@@ -104,35 +83,31 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
                 return res;
             }
         }
-        public static List<(int, int)> Crank(Dictionary<string, List<(float, int)>> bk_set, List<(float, int)> ball_set, int n)
+
+        public static List<(int CapsuleID, YokaiGachaResult Result)> Crank(int gachaId, int pullCount)
         {
-            List<(string, int)> droppedYokai = new List<(string, int)>();
+            List<YokaiGachaResult> droppedYokai = new();
 
-            for (int i = 0; i < n; i++)
+            for (int i = 0; i < pullCount; i++)
             {
-                droppedYokai.Add(DropYokai(bk_set));
-            }
-
-            List<(int, int)> List = new List<(int, int)>();
-
-            foreach (var tuple in droppedYokai)
-            {
-                double x = Random.Shared.NextDouble();
-                float sum = 0f;
-
-                foreach (var ball_tuple in ball_set)
+                var yokai = GachaPoolManager.GetYokai(gachaId);
+                if(yokai == null)
                 {
-                    sum += ball_tuple.Item1;
-                    if (sum >= x) // >= au lieu de >
-                    {
-                        List.Add((ball_tuple.Item2, tuple.Item2));
-                        break;
-                    }
+                    throw new Exception("Error while rolling yokai");
                 }
+                droppedYokai.Add(yokai.Value);
             }
 
+            List<(int CapsuleID, YokaiGachaResult Result)> resultList = new List<(int, YokaiGachaResult)>();
 
-            return List;
+            //PLACEHOLDER: Currently 6 which is gray ( i think) but should be according to rank. Check notes on ExecuteGachaHandler for mroe info
+            int capsuleColor = 6;
+            foreach (var yokaiData in droppedYokai)
+            {
+                resultList.Add((capsuleColor, yokaiData));
+            }
+
+            return resultList;
         }
     }
 }

@@ -120,119 +120,16 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             }
             var resp = new ExecuteGachaResponse();
 
+
             // MAIN HANDLER
 
-            // Configuration du système de gacha
-            var bk_set1 = new Dictionary<string, List<(float, int)>>()
-            {
-                ["Uz+"] = new List<(float, int)>
-                {
-                    (50.0f, 9002630)
-                },
-                /*["Uz"] = new List<(float, int)>
-                {
-                    (0.005f, 9002321),
-                    (0.005f, 9002320)
-                },
-                ["ZZZ"] = new List<(float, int)>
-                {
-                    (0.01f, 9002324),
-                    (0.01f, 9002323)
-                },
-                ["ZZ"] = new List<(float, int)>
-                {
-                    (0.025f, 9001603),
-                    (0.025f, 9001490),
-                    (0.025f, 9001729),
-                    (0.025f, 9001771),
-                    (0.025f, 9001619),
-                    (0.025f, 9001854),
-                    (0.025f, 9001778),
-                    (0.025f, 9001687)
-                },
-                ["Z"] = new List<(float, int)>
-                {
-                    (0.0167f, 9001511),
-                    (0.0167f, 9001915),
-                    (0.0167f, 9000866),
-                    (0.0167f, 9000598),
-                    (0.0167f, 9000727),
-                    (0.0167f, 9001242),
-                    (0.0167f, 9001691),
-                    (0.0167f, 9001697),
-                    (0.0167f, 9001878),
-                    (0.0167f, 9000853),
-                    (0.0167f, 9002004),
-                    (0.0167f, 9001466),
-                    (0.0167f, 9001894),
-                    (0.0167f, 9000760),
-                    (0.0167f, 9001772)
-                },
-                ["SSS"] = new List<(float, int)>
-                {
-                    (0.0194f, 9001053),
-                    (0.0194f, 9001151),
-                    (0.0194f, 9001468),
-                    (0.0194f, 9000581),
-                    (0.0194f, 9000763),
-                    (0.0194f, 9000814),
-                    (0.0194f, 9000943),
-                    (0.0194f, 9001433),
-                    (0.0194f, 9000668),
-                    (0.0194f, 9000726),
-                    (0.0194f, 9000944),
-                    (0.0194f, 9001179),
-                    (0.0194f, 9000706),
-                    (0.0194f, 9001469),
-                    (0.0194f, 9001497),
-                    (0.0194f, 9000645),
-                    (0.0194f, 9000870),
-                    (0.0194f, 9001677)
-                },
-                ["SS"] = new List<(float, int)>
-                {
-                    (0.0267f, 9000421),
-                }*/
-            };
-            // bk_set1["UZ+"] = new List<(float, int)>();
-            // bk_set1["UZ"] = new List<(float, int)>();
-            // bk_set1["ZZZ"] = new List<(float, int)>();
-
-            // // Ajout des yokais avec leurs probabilités
-
-            // bk_set1["ZZZ"].Add((0.3f, 9002354));
-            // bk_set1["UZ"].Add((0.2f, 9002294));
-            // bk_set1["UZ"].Add((0.2f, 9002354));
-            // bk_set1["UZ"].Add((0.2f, 9002294));
-            // bk_set1["UZ+"].Add((0.1f, 9002294));
-
-            // Points requis pour chaque niveau d’amultime (exemple : ajustable si tu trouves les vraies valeurs)
-            // int[] AMU_REQUIREMENTS = { 
-            //     2000, // Amu1 -> 2
-            //     4000, // Amu2 -> 3
-            //     6000, // Amu3 -> 4
-            //     8000, // Amu4 -> 5
-            //     10000,// Amu5 -> 6
-            //     12000 // Amu6 -> 7
-            // };
-
-
-            // Configuration des couleurs de capsules
-            List<(float, int)> ball_set1 = new List<(float, int)>
-            {
-                /*(0.6f, 1),
-                (0.5f, 2),
-                (0.4f, 3),
-                (0.3f, 4),
-                (0.2f, 5),*/
-                (1.0f, 6),
-            };
-
-
+            // Capsules should be:
+            // blue - b
+            // red - a
+            // gold - S/SS/Pass
             var prizes = new List<GachaPrize>();
-            var youkaiIds = new List<int>();
+            var yokais = new List<YokaiGachaResult>();
             var capsuleIds = new List<int>();
-            // Tous les yo-kai déjà possédés
 
 
             const int NEW_GETTYPE = 10;           // valeur observée dans ta sauvegarde pour "nouveau"
@@ -243,37 +140,37 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
 
             if (deserialized.RequestYoukaiId == 0)
             {
-                List<(int, int)> bk_result = GachaService.Crank(bk_set1, ball_set1, pullCount);
-                foreach (var t in bk_result)
+                List<(int CapsuleID, YokaiGachaResult Result)> crankResults = GachaService.Crank(deserialized.GachaId, pullCount);
+                foreach (var t in crankResults)
                 {
-                    capsuleIds.Add(t.Item1);
-                    youkaiIds.Add(t.Item2);
+                    capsuleIds.Add(t.CapsuleID);
+                    yokais.Add(t.Result);
                 }
             }
             else
             {
-                youkaiIds.Add(deserialized.RequestYoukaiId);
+                yokais.Add(new() { YokaiID = deserialized.RequestYoukaiId, YokaiRank = 0 });
                 capsuleIds.Add(5);
                 pullCount = 1;
             }
 
             for (int i = 0; i < pullCount; i++)
             {
-                int youkaiId = youkaiIds[i];
+                var yokai = yokais[i];
 
                 int getType = DUPLICATE_GETTYPE;
 
-                if (YoukaiManager.GetYoukaiIndex(UserYoukaiTable, youkaiId) < 0)
+                if (YoukaiManager.GetYoukaiIndex(UserYoukaiTable, yokai.YokaiID) < 0)
                 {
                     getType = NEW_GETTYPE;
                 }
 
 
-                SkillResult? skill = GachaService.CompureSkillPctg(UserYoukaiSkillTable, youkaiId);
+                SkillResult? skill = GachaService.CompureSkillPctg(UserYoukaiSkillTable, yokai.YokaiID);
 
-                YoukaiManager.AddYoukai(UserYoukaiTable, youkaiId, UserYoukaiSkillTable);
+                YoukaiManager.AddYoukai(UserYoukaiTable, yokai.YokaiID, UserYoukaiSkillTable);
                 
-                DictionaryListTable = DictionaryManager.EditDictionary(DictionaryListTable, youkaiId, false, true);
+                DictionaryListTable = DictionaryManager.EditDictionary(DictionaryListTable, yokai.YokaiID, false, true);
 
                 //bonusMap[youkaiId] = new[] { youkaiId.ToString(), "1", "0", "0" };
                 //strongMap[youkaiId] = new[] { youkaiId.ToString(), "1", "0", "1000", "0", "0" 
@@ -298,7 +195,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
                         LevelAfter = 1,
                         LevelBefore = 1,
                         GetTypes = getType,
-                        YoukaiId = youkaiIds[i],
+                        YoukaiId = yokai.YokaiID,
                         ReleaseType = 0,
                         Skill = skill,
                         ExchgYmoney = 0,
@@ -308,7 +205,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
                         ReleaseLevelType = 0
 
                     },
-                    RarityType = RarityType.RaritySS,
+                    RarityType = yokai.YokaiRank,
                     ConvertItemInfo = null
 
                 });
@@ -316,18 +213,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             }
 
             resp.GachaPrizeList = prizes.ToArray();
-
-
-            /*
-            var updates = new Dictionary<string, string>
-            {
-                ["ywp_user_dictionary"] = SupabaseManager.BuildRawFromMap(dictMap),
-                ["ywp_user_youkai_skill"] = SupabaseManager.BuildRawFromMap(skillMap),
-                ["ywp_user_youkai_bonus_effect"] = SupabaseManager.BuildRawFromMap(bonusMap),
-                ["ywp_user_youkai_strong_skill"] = SupabaseManager.BuildRawFromMap(strongMap)
-            };
-
-            await SupabaseManager.UpdateYwpFields(userId, updates);*/
 
             resp.EffectType = 1;
             resp.ResultCode = 0;

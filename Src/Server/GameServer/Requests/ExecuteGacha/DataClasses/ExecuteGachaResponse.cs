@@ -1,17 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using Puniemu.Src.Server.GameServer.DataClasses;
-using System.Net.Http;
-using System.Text;
-using Supabase;
-using Newtonsoft.Json.Linq;
-using System.Linq;
-using System.Text.RegularExpressions;
-
-
 
 namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.DataClasses
 {
