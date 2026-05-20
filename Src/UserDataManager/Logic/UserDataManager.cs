@@ -94,6 +94,10 @@ namespace Puniemu.Src.UserDataManager.Logic
                     Console.WriteLine($"Failed to flush account {gdkey}: {ex.Message}");
                 }
             }
+            else
+            {
+                _accountCache.TryRemove(gdkey, out _);
+            }
         }
         public static async Task ShutdownAsync()
         {
