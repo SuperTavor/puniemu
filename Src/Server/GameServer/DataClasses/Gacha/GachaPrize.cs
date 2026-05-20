@@ -23,7 +23,7 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
         public YokaiWonPopup? Youkai { get; set; }
 
         [JsonProperty("rarityType")]
-        public int RarityType { get; set; }
+        public RarityType RarityType { get; set; }
 
         [JsonProperty("convertItemInfo")]
         public object? ConvertItemInfo { get; set; }

@@ -30,8 +30,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapWarp.Logic
             var userMap = new TableParser.Logic.TableParser<YwpUserMap>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_map")!);
 
 
-            var index = userMap.FindIndex([deserialized.MapId.ToString()]);
-            if (index == -1)
+            var mapIdx = userMap.FindIndex([deserialized.MapId.ToString()]);
+            if (mapIdx == -1)
             {
                 MapManager.AddMap(userMap, deserialized.MapId);
                 var errSession = new MsgBoxResponse("Error", "Error");
@@ -41,12 +41,14 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapWarp.Logic
 
 
             //Add stage if doesnt exist
-
             var stageId = long.Parse(deserialized.MapId.ToString() + "001");
-
-            if (index == -1)
+            
+            if (userStage.FindIndex([stageId.ToString()]) == -1)
             {
-                StageManager.AddStage(userStage, stageId);
+                userStage.Items.Add(new YwpUserStage
+                {
+                    StageId = stageId
+                });
             }
 
 
@@ -110,11 +112,11 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapWarp.Logic
                 return;
             }
             resdict["ywp_mst_map"] = maps;
-
-            resdict!["ywp_user_stage"] = userStage.ToString();
+            var compiledUserStage = userStage.ToString();
+            resdict!["ywp_user_stage"] = compiledUserStage;
             resdict!["ywp_user_map"] = userMap.ToString();
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_data", userData);
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_stage", userStage.ToString());
+            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_stage", compiledUserStage);
             await GeneralUtils.AddTablesToResponse(ywpKeys, resdict!, true, deserialized!.Level5UserID!);
             var marshalledResponse = JsonConvert.SerializeObject(resdict);
             var encryptedResponse = NHNCrypt.Logic.NHNCrypt.EncryptResponse(marshalledResponse);
