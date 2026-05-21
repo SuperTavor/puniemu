@@ -129,7 +129,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 res.UserYoukaiResultList.Add(item);
             }
         }
-        public static void HandleStage(GameEndRequest deserialized, GameEndResponse res, int FirstClear, TableParser<YwpUserStage> ywpUserStage, TableParser<YwpUserMap> ywpUserMap)
+        public static void HandleStage(GameEndRequest deserialized, GameEndResponse res, ref int FirstClear, TableParser<YwpUserStage> ywpUserStage, TableParser<YwpUserMap> ywpUserMap)
         {
             List<YwpMstMap> ywpMstMap = JsonConvert.DeserializeObject<List<YwpMstMap>>(
                 JsonConvert.DeserializeObject<Dictionary<string, object>>(
@@ -378,7 +378,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_map")
             );
             int FirstClear = 0;
-            HandleStage(deserialized, res, FirstClear, ywpUserStage, ywpUserMap);
+            HandleStage(deserialized, res, ref FirstClear, ywpUserStage, ywpUserMap);
 
 
 

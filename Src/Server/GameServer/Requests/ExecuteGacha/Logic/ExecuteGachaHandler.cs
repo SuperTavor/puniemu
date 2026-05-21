@@ -145,7 +145,16 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
 
             if (deserialized.RequestYoukaiId == 0)
             {
-                List<(int CapsuleID, YokaiGachaResult Result)> crankResults = GachaService.Crank(deserialized.GachaId, pullCount);
+                List<(int CapsuleID, YokaiGachaResult Result)> crankResults = new();
+                try
+                {
+                    crankResults = GachaService.Crank(deserialized.GachaId, pullCount);
+                }
+                catch
+                {
+                    await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(new MsgBoxResponse($"This coin/crank is not supported!\nGachaId: {gachaId}","Error"))));
+                    return;
+                }
                 foreach (var t in crankResults)
                 {
                     capsuleIds.Add(t.CapsuleID);
