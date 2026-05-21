@@ -106,8 +106,6 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
         };
         public static readonly List<string> EXECUTE_GACHA_TABLES = new List<string>
         {
-            "ywp_mst_youkai_pos_effect_exclude",
-            "ywp_user_data",
             "ywp_mst_event_youkai_assist_disp",
             "ywp_user_icon_budge",
             "ywp_user_gacha_stamp",

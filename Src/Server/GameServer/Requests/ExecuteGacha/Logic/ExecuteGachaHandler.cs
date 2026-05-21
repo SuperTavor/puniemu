@@ -1,12 +1,14 @@
-﻿using System.Buffers;
-using Newtonsoft.Json;
-using System.Text;
-using Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.DataClasses;
-using Puniemu.Src.Server.GameServer.Logic;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Puniemu.Src.DataManager.Logic;
 using Puniemu.Src.Server.GameServer.DataClasses;
-using Puniemu.Src.Utils.GeneralUtils;
+using Puniemu.Src.Server.GameServer.Logic;
+using Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.DataClasses;
 using Puniemu.Src.TableParser.DataClasses;
 using Puniemu.Src.TableParser.Logic;
+using Puniemu.Src.Utils.GeneralUtils;
+using System.Buffers;
+using System.Text;
 
 namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
 {
@@ -51,7 +53,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             var userId = deserialized.UserId;
 
             int gachaIndex = GetTableIndex.GetIndex(GachaMstTable, new List<Tuple<int, string>>{Tuple.Create(0, deserialized.GachaId.ToString())});
-            pullCount = int.Parse(GachaMstTable.Table[gachaIndex][11]); ;
+
+            if (DataManager.Logic.DataManager.IsWibWob) pullCount = 1;
+                else pullCount = int.Parse(GachaMstTable.Table[gachaIndex][11]); 
+
             int priceType = int.Parse(GachaMstTable.Table[gachaIndex][3]);
             long priceId = long.Parse(GachaMstTable.Table[gachaIndex][4]);
             int priceNum = int.Parse(GachaMstTable.Table[gachaIndex][5]);
@@ -225,8 +230,11 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_data", userData);
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_item", itmesListTable.ToString());
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_tutorial_list", tutorialList);
-
-            var resdict = JsonConvert.DeserializeObject<Dictionary<string, object>>(JsonConvert.SerializeObject(resp))!;
+            var converter = new ExecuteGachaResponseConverter();
+            var settings = new JsonSerializerSettings();
+            settings.Converters.Add(converter);
+            var serialized = JsonConvert.SerializeObject(resp,settings);
+            var resdict = JsonConvert.DeserializeObject<Dictionary<string, object>>(serialized)!;
             resdict["ywp_user_youkai"] = UserYoukaiTable.ToString();
             resdict["ywp_user_data"] = userData;
             resdict["ywp_user_dictionary"] = DictionaryListTable.ToString();
@@ -238,6 +246,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             {
                 resdict["ywp_user_tutorial_list"] = tutorialList;
             }
+           
             await GeneralUtils.AddTablesToResponse(Consts.EXECUTE_GACHA_TABLES, resdict!, true, deserialized!.Level5UserId!);
             var outResponse = NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(resdict));
             await ctx.Response.WriteAsync(outResponse);

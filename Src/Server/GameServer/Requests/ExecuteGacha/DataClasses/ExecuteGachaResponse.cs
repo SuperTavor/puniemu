@@ -6,6 +6,7 @@ using Puniemu.Src.Server.GameServer.DataClasses;
 
 namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.DataClasses
 {
+    //[JsonConverter(typeof(ExecuteGachaResponseConverter))]
     public class ExecuteGachaResponse : CommonResponse
     {
         [JsonProperty("ywp_user_tutorial_list")]

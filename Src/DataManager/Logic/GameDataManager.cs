@@ -1,12 +1,12 @@
-﻿using System.Reflection;
+﻿using System.Collections.Concurrent;
+using System.Reflection;
 using System.Text;
 
 namespace Puniemu.Src.DataManager.Logic;
 
 public class GameDataManager
 {
-
-    public Dictionary<string, string> GamedataCache = new();
+    public ConcurrentDictionary<string, string> GamedataCache = new();
     public GameDataManager()
     {
         CacheGamedataFromResources();

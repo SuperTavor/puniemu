@@ -233,6 +233,10 @@ class Program
         {
             await ExecuteGachaHandler.HandleAsync(ctx);
         });
+        app.MapPost("/gacha.nhn", async ctx =>
+        {
+            await ExecuteGachaHandler.HandleAsync(ctx);
+        });
         app.MapPost("/friend.nhn", async ctx =>
         {
             await FriendsHandler.HandleAsync(ctx);

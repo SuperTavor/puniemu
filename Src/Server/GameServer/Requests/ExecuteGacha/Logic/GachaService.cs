@@ -100,8 +100,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
 
             List<(int CapsuleID, YokaiGachaResult Result)> resultList = new List<(int, YokaiGachaResult)>();
 
-            //PLACEHOLDER: Currently 6 which is gray ( i think) but should be according to rank. Check notes on ExecuteGachaHandler for mroe info
-            int capsuleColor = 6;
+            //PLACEHOLDER: Currently 1 which is gray but should be according to rank. Check notes on ExecuteGachaHandler for mroe info
+            int capsuleColor = 1;
             foreach (var yokaiData in droppedYokai)
             {
                 resultList.Add((capsuleColor, yokaiData));

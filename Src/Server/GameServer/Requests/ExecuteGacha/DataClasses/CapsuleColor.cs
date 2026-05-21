@@ -3,6 +3,6 @@
     //Placeholder only gray is available currently
     public enum CapsuleColor
     {
-        Gray = 6,
+        Gray = 1,
     }
 }
