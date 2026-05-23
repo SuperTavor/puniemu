@@ -25,10 +25,17 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             var deserialized = JsonConvert.DeserializeObject<ExecuteGachaRequest>(requestJsonString!);
 
+            GachaPoolManager.EnsureLoaded();
+            if(!GachaPoolManager.Gachas.ContainsKey(deserialized.GachaId))
+            {
+                var errSession = new MsgBoxResponse($"No pool data exists for:\ngachaId:{deserialized.GachaId}", "Error");
+                await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(errSession)));
+                return;
+            }
             var userData = (await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<GameServer.DataClasses.YwpUserData>(deserialized!.Level5UserId!, "ywp_user_data"))!;
             //gacha info
             var GachaMstTable = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_gacha"]!)!["tableData"]);
-            var itmesListTable = new TableParser.Logic.TableParser(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_item")!);
+            var userItemtable = new TableParser.Logic.TableParser<YwpUserItemEntry>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_item")!);
 
             var dictionaryListTable = new TableParser.Logic.TableParser(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_dictionary")!);
             var userYokaiTable = new TableParser<YwpUserYoukai>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_youkai")!);
@@ -84,21 +91,22 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
                 int number = 0;
                 if (itemIdAction == 81) // Ymoney
                 {
-                    int tmp_price = priceNum;
+                    int price = priceNum;
                     foreach(string[] item in itemsListMstTable.Table)
                     {
                         if (int.Parse(item[1]) == itemIdAction)
                         {
-                            int tmp = ItemManager.GetItemCount(itmesListTable, int.Parse(item[0]));
-                            number += tmp;
-                            if (tmp_price - tmp <= 0)
+                            
+                            int userItemCount = userItemtable.Items.Where(x => x.ItemId == int.Parse(item[0])).First().Count;
+                            number += userItemCount;
+                            if (price - userItemCount <= 0)
                             {
-                                itmesListTable = ItemManager.RemoveItem(itmesListTable, int.Parse(item[0]), tmp_price);
+                                userItemtable = ItemManager.RemoveItem(userItemtable, int.Parse(item[0]), price);
                                 break;
                             } else
                             {
-                                tmp_price -= tmp;
-                                itmesListTable = ItemManager.RemoveItem(itmesListTable, int.Parse(item[0]), tmp);
+                                price -= userItemCount;
+                                userItemtable = ItemManager.RemoveItem(userItemtable, int.Parse(item[0]), userItemCount);
                             }
                         }
                     }
@@ -111,14 +119,14 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
                 }
                 else
                 {
-                    number = ItemManager.GetItemCount(itmesListTable, priceId);
+                    number = userItemtable.Items.Where(x => x.ItemId == priceId).First().Count;
                     if ((number - priceNum) < 0)
                     {
                         var errSession = new MsgBoxResponse("Error occured", "Error");
                         await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(errSession)));
                         return;
                     }
-                    itmesListTable = ItemManager.RemoveItem(itmesListTable, priceId, priceNum);
+                    userItemtable = ItemManager.RemoveItem(userItemtable, priceId, priceNum);
                 }
 
                 //res = await ExecuteGachaResponse.BuildAsync(priceNum, pullCount, userId, userData.YMoney - priceNum, true);
@@ -144,7 +152,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             {
                for(int i = 0; i < pullCount; i++)
                {
-                    prizes.Add(GachaPoolManager.CrankReward(gachaId, userYokaiTable, userSkillTable, dictionaryListTable));
+                    prizes.Add(GachaPoolManager.CrankReward(gachaId, userYokaiTable, userSkillTable, dictionaryListTable, userItemtable));
                }
             }
             else
@@ -162,10 +170,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_youkai_skill", userSkillTable.ToString());
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_youkai", userYokaiTable.ToString());
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_data", userData);
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_item", itmesListTable.ToString());
+            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_item", userItemtable.ToString());
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_tutorial_list", tutorialList);
-            var converter = new ExecuteGachaResponseConverter();
             var settings = new JsonSerializerSettings();
+            var converter = new ExecuteGachaResponseConverter();
             settings.Converters.Add(converter);
             var serialized = JsonConvert.SerializeObject(resp,settings);
             var resdict = JsonConvert.DeserializeObject<Dictionary<string, object>>(serialized)!;

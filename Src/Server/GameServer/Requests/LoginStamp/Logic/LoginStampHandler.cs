@@ -30,7 +30,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.LoginStamp.Logic
             
             // used to define variable
             var playerIconTable = new TableParser.Logic.TableParser("");
-            var itmesListTable = new TableParser.Logic.TableParser("");
             var userYoukaiTable = new TableParser<YwpUserYoukai>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserID!, "ywp_user_youkai")!);
             var userYoukaiSkillTable = new TableParser<YwpUserYoukaiSkill>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserID!, "ywp_user_youkai_skill")!);
             var dictionaryYoukaiTable = new TableParser.Logic.TableParser("");
@@ -142,12 +141,13 @@ namespace Puniemu.Src.Server.GameServer.Requests.LoginStamp.Logic
                 if (current_item_type == 1)
                 {
                     var itemsList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserID!, "ywp_user_item");
-                    itmesListTable = ItemManager.AddItem(new TableParser.Logic.TableParser(itemsList!), current_item_id, current_item_count);
+                    var userItemTable = new TableParser<YwpUserItemEntry>(itemsList!);
+                    userItemTable = ItemManager.AddItem(userItemTable, current_item_id, current_item_count);
                     res.ItemPopupResult = new();
                     res.ItemPopupResult.IsLimitOver = 0;
                     res.ItemPopupResult.Count = current_item_count;
                     res.ItemPopupResult.ItemId = current_item_id;
-                    await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_item", itmesListTable.ToString());
+                    await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_item", userItemTable.ToString());
                     LOGIN_STAMP_TABLES.Add("ywp_user_item");
                 }
                 if (current_item_type == 2)

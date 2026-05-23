@@ -4,6 +4,8 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
 {
     public class SkillResult
     {
+        [JsonProperty("skillId")]
+        public long SkillID = 0;
         // Max level flg, iirc it's 7
         [JsonProperty("isMaxLevel")]
         public bool isMaxLevel = false;

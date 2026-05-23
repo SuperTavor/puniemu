@@ -6,6 +6,7 @@ using Puniemu.Src.Server.GameServer.DataClasses;
 using System.Text;
 using System.Buffers;
 using Puniemu.Src.Server.GameServer.Logic;
+using Puniemu.Src.TableParser.DataClasses;
 
 namespace Puniemu.Src.Server.GameServer.Requests.GameUseItem.Logic
 {
@@ -23,7 +24,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameUseItem.Logic
             ctx.Response.ContentType = "application/json";
             var userData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data");
             var playerItem = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_item");
-            var playerItemTable = new TableParser.Logic.TableParser(playerItem!);
+            var playerItemTable = new TableParser.Logic.TableParser<YwpUserItemEntry>(playerItem!);
 
             playerItemTable = ItemManager.RemoveItem(playerItemTable,(int) deserialized.ItemId!, 1);
 

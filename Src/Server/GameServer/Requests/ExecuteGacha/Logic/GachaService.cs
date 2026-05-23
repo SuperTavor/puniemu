@@ -47,6 +47,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             {
                 int amuLevel = youkaiList.Items[UserYoukaiIndex].Level;
                 SkillResult? res = new();
+                res.SkillID = YoukaiId;
                 res.isMaxLevel = false;
                 res.Before.Level = amuLevel;
                 res.Before.Exp = youkaiList.Items[UserYoukaiIndex].Points;

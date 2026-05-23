@@ -365,7 +365,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
 
             // items data
             var itemsList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_item");
-            var itmesListTable = new TableParser.Logic.TableParser(itemsList!);
+            var userItemTable = new TableParser.Logic.TableParser<YwpUserItemEntry>(itemsList!);
 
 
             //edit stage data
@@ -442,7 +442,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                     val.FirstRewardFlg = 0;
                     val.NewFlg = 0;
                     val.ThemeBonusFlg = 0;
-                    itmesListTable = ItemManager.AddItem(itmesListTable , i.DropItemId, 1);
+                    userItemTable = ItemManager.AddItem(userItemTable , i.DropItemId, 1);
                     res.UserItemResultList.Add(val);
                 }
             }
@@ -462,7 +462,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                     val.ThemeBonusFlg = 0;
                     if (entry.ItemType == 1)
                     {
-                        itmesListTable = ItemManager.AddItem(itmesListTable, entry.ItemId, entry.ItemCount);
+                        userItemTable = ItemManager.AddItem(userItemTable, entry.ItemId, entry.ItemCount);
                     }
                     else if (entry.ItemType == 4)
                     {
@@ -524,7 +524,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_requestid", "");
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_stage", ywpUserStage.ToString());
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_youkai", userYoukaiTable.ToString());
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_item", itmesListTable.ToString());
+            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_item", userItemTable.ToString());
             userData.YMoney += res.UserGameResultData.Money; // add money to user
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_data", userData);
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_menufunc", menufuncListTable.ToString());

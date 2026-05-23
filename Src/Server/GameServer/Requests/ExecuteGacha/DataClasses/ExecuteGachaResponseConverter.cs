@@ -13,7 +13,7 @@ public class ExecuteGachaResponseConverter : JsonConverter<ExecuteGachaResponse>
 
         if (DataManager.IsWibWob &&
             value.GachaPrizeList != null &&
-            value.GachaPrizeList.Count == 1)
+            value.GachaPrizeList.Count == 1 && value.GachaPrizeList[0] != null)
         {
             //Wibwob can only have one prize and its gachaPrize properties are in the root of the response
             JObject firstPrize = JObject.FromObject(value.GachaPrizeList[0], serializer);
@@ -42,7 +42,7 @@ public class ExecuteGachaResponseConverter : JsonConverter<ExecuteGachaResponse>
 
             responseObj.Remove("gachaPrizeList");
         }
-
+    normalWrite:
         responseObj.WriteTo(writer);
     }
 

@@ -13,7 +13,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.DataClasses
     public static class GachaPoolManager
     {
         //GachaId, rates
-        private static Dictionary<int, GachaPoolItem> _gachas = new();
+        public static Dictionary<int, GachaPoolItem> Gachas = new();
 
         private static bool _isLoaded = false;
 
@@ -23,7 +23,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.DataClasses
         private const int NEW_GETTYPE = 10;           
         private const int DUPLICATE_GETTYPE = 2;
 
-        private static void EnsureLoaded()
+        public static void EnsureLoaded()
         {
             if (_isLoaded)
                 return;
@@ -31,7 +31,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.DataClasses
             var gachaTxt =
                 DataManager.Logic.DataManager.GameDataManager.GamedataCache["gacha_pool"];
 
-            _gachas =
+            Gachas =
                 JsonConvert.DeserializeObject<Dictionary<int, GachaPoolItem>>(gachaTxt)
                 ?? throw new InvalidDataException("Bad gacha_pool.json");
 
@@ -93,12 +93,12 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.DataClasses
             };
         }
         //returns null if gacha id doesnt exist, else return yokai id and rarity (Rank)
-        public static GachaPrize? CrankReward(int gachaId, TableParser<YwpUserYoukai> userYokaiTable, TableParser<YwpUserYoukaiSkill> userSkillTable, TableParser.Logic.TableParser dictionaryListTable)
+        public static GachaPrize? CrankReward(int gachaId, TableParser<YwpUserYoukai> userYokaiTable, TableParser<YwpUserYoukaiSkill> userSkillTable, TableParser.Logic.TableParser dictionaryListTable, TableParser<YwpUserItemEntry> userItemTable)
         {
             EnsureLoaded();
             //PLACEHOLDER. Will be decided based on rarity
             var capsule = CapsuleColor.Gray;
-            if(_gachas.TryGetValue(gachaId, out GachaPoolItem? gacha))
+            if(Gachas.TryGetValue(gachaId, out GachaPoolItem? gacha))
             {
 
                 var pool = RollPool(gacha.Weights, gachaId);
@@ -108,7 +108,20 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.DataClasses
                     var itemsToRoll = gacha.Items[pool];
                     var roll = Random.Shared.Next(itemsToRoll.Count);
                     var resultItem = itemsToRoll[roll];
-
+                    //Register item
+                    var idx = userItemTable.FindIndex([resultItem.ToString()]);
+                    if(idx == -1)
+                    {
+                        userItemTable.Items.Add(new YwpUserItemEntry
+                        {
+                            ItemId = resultItem,
+                            Count = 1,
+                        });
+                    }
+                    else
+                    {
+                        userItemTable.Items[idx].Count += 1;
+                    }
                     return new GachaPrize
                     {
                         Youkai = null,
