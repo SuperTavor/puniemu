@@ -9,9 +9,12 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.DataClasses
         public int GachaId { get; set; }
 
         [JsonProperty("weights")]
-        public Dictionary<RarityType, double> Weights { get; set; }
+        public Dictionary<string, double> Weights { get; set; }
 
         [JsonProperty("youkai")]
-        public Dictionary<RarityType, List<long>> Yokais { get; set; }
+        public Dictionary<string, List<long>> Yokais { get; set; }
+
+        [JsonProperty("items")]
+        public Dictionary<string, List<long>> Items { get; set; }
     }
 }

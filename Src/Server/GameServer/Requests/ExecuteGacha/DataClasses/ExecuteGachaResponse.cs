@@ -19,7 +19,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.DataClasses
         public string? CanPossessionItemList { get; set; }
 
         [JsonProperty("gachaPrizeList")]
-        public GachaPrize[]? GachaPrizeList { get; set; }
+        public List<GachaPrize>? GachaPrizeList { get; set; }
 
         [JsonProperty("effectType")]
         public int EffectType { get; set; }

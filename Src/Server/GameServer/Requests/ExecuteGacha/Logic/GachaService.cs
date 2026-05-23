@@ -83,31 +83,5 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
                 return res;
             }
         }
-
-        public static List<(int CapsuleID, YokaiGachaResult Result)> Crank(int gachaId, int pullCount)
-        {
-            List<YokaiGachaResult> droppedYokai = new();
-
-            for (int i = 0; i < pullCount; i++)
-            {
-                var yokai = GachaPoolManager.GetYokai(gachaId);
-                if(yokai == null)
-                {
-                    throw new Exception("Error while rolling yokai");
-                }
-                droppedYokai.Add(yokai.Value);
-            }
-
-            List<(int CapsuleID, YokaiGachaResult Result)> resultList = new List<(int, YokaiGachaResult)>();
-
-            //PLACEHOLDER: Currently 1 which is gray but should be according to rank. Check notes on ExecuteGachaHandler for mroe info
-            int capsuleColor = 1;
-            foreach (var yokaiData in droppedYokai)
-            {
-                resultList.Add((capsuleColor, yokaiData));
-            }
-
-            return resultList;
-        }
     }
 }

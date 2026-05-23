@@ -13,7 +13,7 @@ public class ExecuteGachaResponseConverter : JsonConverter<ExecuteGachaResponse>
 
         if (DataManager.IsWibWob &&
             value.GachaPrizeList != null &&
-            value.GachaPrizeList.Length == 1)
+            value.GachaPrizeList.Count == 1)
         {
             //Wibwob can only have one prize and its gachaPrize properties are in the root of the response
             JObject firstPrize = JObject.FromObject(value.GachaPrizeList[0], serializer);
@@ -23,10 +23,21 @@ public class ExecuteGachaResponseConverter : JsonConverter<ExecuteGachaResponse>
                 responseObj[prop.Name] = prop.Value;
             }
             //Also stuff inside `youkai` is in the root ALONG with being in the youkai object or else it crashes
-            var yokaiWonInfo = JObject.FromObject(value.GachaPrizeList[0].Youkai!);
-            foreach (var prop in yokaiWonInfo.Properties())
+            if (value.GachaPrizeList[0].Youkai != null)
             {
-                responseObj[prop.Name] = prop.Value;
+                var yokaiWonInfo = JObject.FromObject(value.GachaPrizeList[0].Youkai!);
+                foreach (var prop in yokaiWonInfo.Properties())
+                {
+                    responseObj[prop.Name] = prop.Value;
+                }
+            }
+            if (value.GachaPrizeList[0].Item != null)
+            {
+                var itemWonInfo = JObject.FromObject(value.GachaPrizeList[0].Item!);
+                foreach (var prop in itemWonInfo.Properties())
+                {
+                    responseObj[prop.Name] = prop.Value;
+                }
             }
 
             responseObj.Remove("gachaPrizeList");
