@@ -41,13 +41,13 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
             if (stageIdx == -1)
             {
                 
-                UserStage.AddItem(new YwpUserStage { StageId = stageId, IsClear = 0, Star1 = 0, Star2 = 0, Star3 = 0, Score = 0, NumClear = 0, Unk2 = 0 });
+                UserStage.AddItem(new YwpUserStage { StageId = stageId, StageStatus = 0, Star1 = 0, Star2 = 0, Star3 = 0, Score = 0, NumClear = 0, Unk2 = 0 });
                 await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(gdkey, "ywp_user_stage", UserStage.ToString());
                 return true;
             }
             else
             {
-                if (UserStage.Items[stageIdx].IsClear == 0)
+                if (UserStage.Items[stageIdx].StageStatus == 0)
                 {
                     return true;
                 }

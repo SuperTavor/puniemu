@@ -145,7 +145,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 StageManager.AddStage(ywpUserStage, deserialized.StageId);
             }
             // check if it's first clear
-            if (ywpUserStage.Items[stageIndex].IsClear == 0)
+            if (ywpUserStage.Items[stageIndex].StageStatus == 0)
             {
                 FirstClear = 1;
             }

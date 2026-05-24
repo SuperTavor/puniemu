@@ -28,15 +28,17 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapWarp.Logic
             var userData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data")!;
             var userStage = new TableParser.Logic.TableParser<YwpUserStage>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_stage")!);
             var userMap = new TableParser.Logic.TableParser<YwpUserMap>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_map")!);
+            var mstMapObj = JsonConvert.DeserializeObject<Dictionary<string, object>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_map"]);
 
-
+            var mstMap = ((Newtonsoft.Json.Linq.JArray)mstMapObj["data"])
+                .ToObject<List<YwpMstMap>>();
             var mapIdx = userMap.FindIndex([deserialized.MapId.ToString()]);
             if (mapIdx == -1)
             {
                 MapManager.AddMap(userMap, deserialized.MapId);
-                var errSession = new MsgBoxResponse("Error", "Error");
-                await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(errSession)));
-                return;
+                //var errSession = new MsgBoxResponse("Error", "Error");
+                //await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(errSession)));
+                //return;
             }
 
 
@@ -45,9 +47,17 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapWarp.Logic
             
             if (userStage.FindIndex([stageId.ToString()]) == -1)
             {
+                var map = mstMap.Where(x => x.MapId == deserialized.MapId).First();
+                int status = 2;
+                //needs no unlock
+                if (map.NeedYmoney == 0 && map.NeedYoukaiId == 0 && map.NeedYoukaiLevel == 0 && map.NeedFriendPoint == 0)
+                {
+                    status = 0;
+                }
                 userStage.Items.Add(new YwpUserStage
                 {
-                    StageId = stageId
+                    StageId = stageId,
+                    StageStatus = status
                 });
             }
 

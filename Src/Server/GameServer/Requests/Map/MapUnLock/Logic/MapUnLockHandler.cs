@@ -11,6 +11,7 @@ using Puniemu.Src.TableParser.Logic;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
 using Puniemu.Src.Utils.GeneralUtils;
+using Puniemu.Src.UserDataManager.Logic;
 
 namespace Puniemu.Src.Server.GameServer.Requests.MapUnLock.Logic
 {
@@ -48,9 +49,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapUnLock.Logic
                 return;
             }
 
-            if (mstMap[mstMapIndex].TextUnlock.IsNullOrEmpty() || userStageIndex != -1)
+            if (mstMap[mstMapIndex].TextUnlock.IsNullOrEmpty())
             {
-                var errSession = new MsgBoxResponse("This map is not or already unlocked", "Not locked");
+                var errSession = new MsgBoxResponse("This map is not unlockable", "Error");
                 await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(errSession)));
                 return;
             }
@@ -61,19 +62,34 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapUnLock.Logic
                 return;
             }
             userData.YMoney -= (int)mstMap[mstMapIndex].NeedYmoney;
-            StageManager.AddStage(userStage, (((int)deserialized.MapId * 1000) + 1));
-
-            userData.CurrentStageID = (((int)deserialized.MapId * 1000) + 1);
-
-
-
-
-
+            //unlcok stage
+            if(userStageIndex == -1)
+            {
+                var errSession = new MsgBoxResponse("You don't have enough Y-money", "Not enough Y-money");
+                await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(errSession)));
+                return;
+            }
             GenerateFriendData.RefreshYwpUserFriend(deserialized.Level5UserID, -1, -1, userData!.PlayerName, -1, "");
+            if(userStageIndex == -1)
+            {
+                var errSession = new MsgBoxResponse("Stage not found in userStage", "Error");
+                await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(errSession)));
+                return;
+            }
+            else
+            {
+                userStage.Items[userStageIndex].StageStatus = 0;
+            }
+            userMap.Items[userMapIndex].IsUnlocked = 1;
+            var compiledUserStage = userStage.ToString();
+            var compiledUserMap = userMap.ToString();
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_data", userData);
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_stage", userStage.ToString());
+            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_stage", compiledUserStage);
+            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_map", compiledUserMap);
             var res = new MapUnLockResponse(userData!);
             var resdict = JsonConvert.DeserializeObject<Dictionary<string, object>>(JsonConvert.SerializeObject(res))!;
+            resdict["ywp_user_map"] = compiledUserMap;
+            resdict["ywp_user_stage"] = compiledUserStage;
             var marshalledResponse = JsonConvert.SerializeObject(resdict);
             var encryptedResponse = NHNCrypt.Logic.NHNCrypt.EncryptResponse(marshalledResponse);
             await ctx.Response.WriteAsync(encryptedResponse);

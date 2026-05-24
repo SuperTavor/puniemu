@@ -18,7 +18,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
             var MstStageIndex = MasterStageData.StageItems.FindIndex(x => x.StageId == StageId);
             if (UserStageIndex == -1 && MstStageIndex != -1)
             {
-                parser.AddItem(new YwpUserStage { StageId = StageId, IsClear = 0, Score = 0, Star1 = 0, Star2 = 0, Star3 = 0, NumClear = 0, Unk2 = 0 });
+                parser.AddItem(new YwpUserStage { StageId = StageId, StageStatus = 0, Score = 0, Star1 = 0, Star2 = 0, Star3 = 0, NumClear = 0, Unk2 = 0 });
             }
         }
 
@@ -32,9 +32,9 @@ namespace Puniemu.Src.Server.GameServer.Logic
                 {
                     parser.Items[UserStageIndex].Score = score;
                 }
-                if (isClear == 1 && parser.Items[UserStageIndex].IsClear == 0)
+                if (isClear == 1 && parser.Items[UserStageIndex].StageStatus == 0)
                 {
-                    parser.Items[UserStageIndex].IsClear = 1;
+                    parser.Items[UserStageIndex].StageStatus = 1;
                 }
                 if (star1 == 1 && parser.Items[UserStageIndex].Star1 == 0)
                 {

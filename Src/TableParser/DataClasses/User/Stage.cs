@@ -7,7 +7,7 @@ namespace Puniemu.Src.TableParser.DataClasses
     public class YwpUserStage
     {
         public long StageId { get; set; }
-        public int IsClear { get; set; }
+        public int StageStatus { get; set; }
         public int Star1 { get; set; }
         public int Star2 { get; set; }
         public int Star3 { get; set; }
