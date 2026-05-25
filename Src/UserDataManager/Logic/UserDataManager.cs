@@ -26,7 +26,7 @@ namespace Puniemu.Src.UserDataManager.Logic
         private static Task? _flushTask;
         private static CancellationTokenSource _cts = new();
 
-        // connect to supbase
+        // connect to supabase
         public static void Initialize()
         {
             try
@@ -106,7 +106,7 @@ namespace Puniemu.Src.UserDataManager.Logic
             await FlushAllDirtyAccountsAsync();
         }
 
-        private static async Task<Account> GetAccountFromGdkeyAsync(string gdkey)
+        public static async Task<Account> GetAccountFromGdkeyAsync(string gdkey)
         {
             if (_accountCache.TryGetValue(gdkey, out Account? acc))
             {

@@ -123,8 +123,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
             ctx.Response.ContentType = "application/json";
             var generatedUserData = new YwpUserData((PlayerIcon)deserialized.IconID, (PlayerTitle)deserialized.IconID, deserialized.Level5UserID, deserialized.PlayerName);
             acc.StartDate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            generatedUserData.CharacterID = acc.CharacterId!;
+            generatedUserData.CharacterID = acc.CharacterId;
+            generatedUserData.UserID = System.IO.Hashing.Crc32.HashToUInt32(System.Text.Encoding.UTF8.GetBytes(generatedUserData.CharacterID)).ToString();
             acc.UserId = generatedUserData.UserID;
+            acc.IsDirty = true;
             await acc.Update<Account>();
             try
             {
