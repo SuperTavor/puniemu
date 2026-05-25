@@ -62,11 +62,11 @@ class Program
         DataManager.Logic.DataManager.StaticInit(builder.Configuration);
 
         var app = builder.Build();
-        //Rewrite to redirect mainly all .NHN requests to .NHN/, as ASP.NET Core thinks it's static serving otherwise or something
+        //Rewrite to redirect mainly all .NHN requests to .NHN/, as ASP.NET Core thinks it's static serving otherwise or something 
         //second rewrite is in case it's for example /////////////////////init.nhn it makes it /init.nhn
         var rewriteOptions = new RewriteOptions()
-              .AddRewrite(@"^/+(.+)$", "/$1", skipRemainingRules: false)
-              .AddRewrite(@"(.*\..*)$", "$1/", skipRemainingRules: true);
+           .AddRewrite(@"^/+(.+)$", "/$1", skipRemainingRules: false)
+           .AddRewrite(@"^(.+\.nhn)$", "$1/", skipRemainingRules: false);
 
 
         app.UseRewriter(rewriteOptions);
@@ -96,12 +96,52 @@ class Program
 
         app.UseHttpsRedirection();
         //Assign handlers
+        AssignDataDownloadHandler(app);
         AssignL5IDHandlers(app);
         AssignGameServerHandlers(app);
         AssignDefault(app);
         app.Run();
     }
 
+    static void AssignDataDownloadHandler(WebApplication app)
+    {
+        app.MapGet("/eal/{*filePath}", async (HttpContext ctx, string filePath) =>
+        {
+            Console.WriteLine(filePath);
+            while(filePath.EndsWith('/'))
+                filePath = filePath.Trim('/');
+            if (string.IsNullOrEmpty(filePath))
+            {
+                ctx.Response.StatusCode = 400;
+                await ctx.Response.WriteAsync("no file bro");
+                return;
+            }
+
+            string storageRoot = Path.Combine(Directory.GetCurrentDirectory(), "dataDownload");
+
+            string fullPath = Path.GetFullPath(Path.Combine(storageRoot, filePath));
+
+            if (!fullPath.StartsWith(storageRoot, StringComparison.OrdinalIgnoreCase) || !File.Exists(fullPath))
+            {
+                ctx.Response.StatusCode = 404;
+                await ctx.Response.WriteAsync("404 ");
+                return;
+            }
+
+            var provider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
+            if (!provider.TryGetContentType(fullPath, out string? contentType))
+            {
+                contentType = "application/octet-stream"; 
+            }
+
+            string fileName = Path.GetFileName(fullPath);
+            ctx.Response.ContentType = contentType;
+
+            ctx.Response.Headers.Append("Content-Disposition", $"attachment; filename=\"{fileName}\"");
+
+            await ctx.Response.SendFileAsync(fullPath);
+        });
+    }
     static void AssignL5IDHandlers(WebApplication app)
     {
         const string L5ID_BASE = "/api/v1/";

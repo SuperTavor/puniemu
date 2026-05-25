@@ -23,12 +23,16 @@ namespace Puniemu.Src.DataManager.Logic
 
         //Specifies if the current run is meant for WibWob or Puni
         public static bool IsWibWob { get; set; }
+
+        //is the data download built in?
+        public static bool BuiltInDownload { get; set; }
         public static void StaticInit(IConfiguration config)
         {
             SupabaseKey = config["SupabaseKey"];
             SupabaseURL = config["SupabaseURL"];
             GameVersion = config["GameVersion"];
             ServerName = config["ServerName"];
+            BuiltInDownload = bool.Parse(config["BuiltInDownload"])!;
             if (bool.TryParse(config["IsWibWob"], out bool isWib))
             {
                 IsWibWob = isWib;
