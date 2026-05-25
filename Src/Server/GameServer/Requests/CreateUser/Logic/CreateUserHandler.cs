@@ -123,7 +123,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
             ctx.Response.ContentType = "application/json";
             var generatedUserData = new YwpUserData((PlayerIcon)deserialized.IconID, (PlayerTitle)deserialized.IconID, deserialized.Level5UserID, deserialized.PlayerName);
             acc.StartDate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            acc.CharacterId = generatedUserData.CharacterID;
+            generatedUserData.CharacterID = acc.CharacterId!;
             acc.UserId = generatedUserData.UserID;
             await acc.Update<Account>();
             try

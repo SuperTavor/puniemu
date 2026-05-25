@@ -95,6 +95,17 @@ class Program
         });
 
         app.UseHttpsRedirection();
+        app.Use(async (ctx, next) =>
+        {
+            var path = ctx.Request.Path.Value;
+
+            if (path != null && path.StartsWith("/eal/") && path.EndsWith("/"))
+            {
+                ctx.Request.Path = path.TrimEnd('/');
+            }
+
+            await next();
+        });
         //Assign handlers
         AssignDataDownloadHandler(app);
         AssignL5IDHandlers(app);
@@ -108,8 +119,7 @@ class Program
         app.MapGet("/eal/{*filePath}", async (HttpContext ctx, string filePath) =>
         {
             Console.WriteLine(filePath);
-            while(filePath.EndsWith('/'))
-                filePath = filePath.Trim('/');
+
             if (string.IsNullOrEmpty(filePath))
             {
                 ctx.Response.StatusCode = 400;

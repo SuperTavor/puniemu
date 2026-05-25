@@ -5,6 +5,7 @@ using Supabase;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.ComponentModel;
+using System.Security.Cryptography;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Puniemu.Src.UserDataManager.Logic
@@ -156,7 +157,7 @@ namespace Puniemu.Src.UserDataManager.Logic
                 Gdkey = Guid.NewGuid().ToString(),
                 YwpUserTables = new(),
                 LastLoginTime = "",
-                CharacterId = ""
+                CharacterId = GenerateFriendCode()
             };
             var response = await SupabaseClient!.From<Account>().Insert(acc);
             var newAcc = response.Models.First();
@@ -164,6 +165,24 @@ namespace Puniemu.Src.UserDataManager.Logic
             // Immediately cache the new account
             _accountCache[newAcc.Gdkey!] = newAcc;
             return newAcc.Gdkey!;
+        }
+
+        private static string GenerateFriendCode()
+        {
+            char[] LetterBytes = "abcdefghijklmnopqrstuvwxyz0123456789".ToCharArray();
+            const int CodeLength = 8;
+            var code = new char[CodeLength];
+
+            byte[] buffer = new byte[CodeLength];
+
+            RandomNumberGenerator.Fill(buffer);
+
+            for (int i = 0; i < code.Length; i++)
+            {
+                code[i] = LetterBytes[buffer[i] % LetterBytes.Length];
+            }
+
+            return new string(code);
         }
 
         // Sets user data for specific account

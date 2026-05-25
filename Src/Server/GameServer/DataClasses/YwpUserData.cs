@@ -150,7 +150,7 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
             this.ChargeYmoney = 0;
             this.CrystalCollectCount = 0;
             this.EventPointUpItemID = 0;
-            this.CharacterID = GenerateFriendCode();
+            this.CharacterID = "";
             this.LimitTimeSaleRemainSec = 0;
             this.TotMedalPoint = 0;
             this.EventPointUpItemRemainSec = 0;
@@ -164,23 +164,6 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
             this.EquipWatchID = 10101;
             this.PlateID = 1;
             this.EffectID = 1;
-        }
-        private static string GenerateFriendCode()
-        {
-            char[] LetterBytes = "abcdefghijklmnopqrstuvwxyz0123456789".ToCharArray();
-            const int CodeLength = 8;
-            var code = new char[CodeLength];
-
-            byte[] buffer = new byte[CodeLength];
-
-            RandomNumberGenerator.Fill(buffer);
-
-            for (int i = 0; i < code.Length; i++)
-            {
-                code[i] = LetterBytes[buffer[i] % LetterBytes.Length];
-            }
-
-            return new string(code);
         }
 
         private int GetRemainingSecondsInDay()
