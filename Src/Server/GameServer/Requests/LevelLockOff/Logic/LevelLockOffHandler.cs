@@ -45,6 +45,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.LevelLockOff.Logic
             res.UserYoukaiBonusEffect = userYokaiBonusEff;
             res.UserYoukaiStrongSkill = userYokaiStrongSkill;
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_youkai", res.UserYoukai);
+            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_data", res.UserData);
             var marshalledResponse = JsonConvert.SerializeObject(res);
             var encryptedResponse = NHNCrypt.Logic.NHNCrypt.EncryptResponse(marshalledResponse);
             await ctx.Response.WriteAsync(encryptedResponse);
