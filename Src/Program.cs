@@ -52,6 +52,7 @@ using Puniemu.Src.Server.GameServer.Requests.Init.InitGacha.Logic.Puni;
 using Puniemu.Src.Server.GameServer.Requests.Init.InitGacha.Logic.WibWob;
 using Puniemu.Src.Server.GameServer.Requests.BuyItem.Logic;
 using Puniemu.Src.Server.GameServer.Requests.Map.Map.Logic;
+using Puniemu.Src.Server.GameServer.Requests.LevelLockOff.Logic;
 namespace Puniemu.Src;
 class Program
 {
@@ -225,6 +226,10 @@ class Program
         app.MapPost("/login.nhn", async ctx =>
         {
             await LoginHandler.HandleAsync(ctx);
+        });
+        app.MapPost("/levelLockOff.nhn", async ctx =>
+        {
+            await LevelLockOffHandler.HandleAsync(ctx);
         });
         app.MapPost("/buyHitodama.nhn", async ctx =>
         {
