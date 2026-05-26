@@ -82,7 +82,7 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
 
     }
 
-    public class PuniRequest
+    public class CommonRequest
     {
         // Client version
         [JsonProperty("appVer")]

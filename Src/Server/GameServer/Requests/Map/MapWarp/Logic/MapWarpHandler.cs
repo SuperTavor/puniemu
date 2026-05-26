@@ -47,6 +47,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapWarp.Logic
             
             if (userStage.FindIndex([stageId.ToString()]) == -1)
             {
+                //Stage status 2 = Need to be unlocked
                 var map = mstMap.Where(x => x.MapId == deserialized.MapId).First();
                 int status = 2;
                 //needs no unlock
