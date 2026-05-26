@@ -96,8 +96,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.DataClasses
         public static GachaPrize? CrankReward(int gachaId, TableParser<YwpUserYoukai> userYokaiTable, TableParser<YwpUserYoukaiSkill> userSkillTable, TableParser.Logic.TableParser dictionaryListTable, TableParser<YwpUserItemEntry> userItemTable)
         {
             EnsureLoaded();
-            //PLACEHOLDER. Will be decided based on rarity
-            var capsule = CapsuleColor.Gray;
+            //Currently items still have a placeholder capsule
+            //Yokai have them by rank
+            var placeHolderCapsule = CapsuleColor.Gray;
             if(Gachas.TryGetValue(gachaId, out GachaPoolItem? gacha))
             {
 
@@ -127,7 +128,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.DataClasses
                         Youkai = null,
                         Icon = null,
                         YMoney = null,
-                        CapsuleColor = capsule,
+                        CapsuleColor = placeHolderCapsule,
                         PrizeType = PrizeType.Item,
                         RarityType = RarityType.RarityB,
                         Item = new ItemWonPopup
@@ -151,7 +152,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.DataClasses
                         var roll = Random.Shared.Next(yokaisToRoll.Count);
                         var resultYokai = yokaisToRoll[roll];
 
-                        return RegisterYokaiAndGetPrize(resultYokai, capsule, rank, userYokaiTable, userSkillTable, dictionaryListTable);
+                        return RegisterYokaiAndGetPrize(resultYokai, GachaService.CAPSULE_CLRS[rank], rank, userYokaiTable, userSkillTable, dictionaryListTable);
                     }
                     else
                     {

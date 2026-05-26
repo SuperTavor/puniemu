@@ -136,10 +136,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
 
             // MAIN HANDLER
 
-            // Capsules should be:
-            // blue - b
-            // red - a
-            // gold - S/SS/Pass
             var prizes = new List<GachaPrize>();
 
 
