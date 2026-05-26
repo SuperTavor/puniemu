@@ -19,5 +19,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.LevelLockOff.DataClasses
 
         [JsonProperty("ywp_user_data")]
         public YwpUserData UserData { get; set; }
+
+        [JsonProperty("ywp_user_icon_budge")]
+        public string IconBudge { get; set; }
     }
 }

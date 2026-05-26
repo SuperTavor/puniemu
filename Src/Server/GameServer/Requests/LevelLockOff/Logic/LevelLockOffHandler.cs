@@ -4,6 +4,7 @@ using System.Buffers;
 using Puniemu.Src.Server.GameServer.Requests.LevelLockOff.DataClasses;
 using Puniemu.Src.TableParser.DataClasses;
 using Puniemu.Src.Server.GameServer.DataClasses;
+using Puniemu.Src.TableParser.Logic;
 namespace Puniemu.Src.Server.GameServer.Requests.LevelLockOff.Logic
 {
     public class LevelLockOffHandler
@@ -16,22 +17,33 @@ namespace Puniemu.Src.Server.GameServer.Requests.LevelLockOff.Logic
             ctx.Request.BodyReader.AdvanceTo(readResult.Buffer.End);
             var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             var deserialized = JsonConvert.DeserializeObject<LevelLockOffRequest>(requestJsonString!)!;
-
+            var mstYokaiRaw = (string)JsonConvert.DeserializeObject<Dictionary<string, object>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai"])["tableData"];
+            var mstYokai = new TableParser<YwpMstYoukai>(mstYokaiRaw);
             var userYokai = new TableParser.Logic.TableParser<YwpUserYoukai>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID!, "ywp_user_youkai"));
             var userYokaiSkill = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID!, "ywp_user_youkai_skill");
             var userYokaiStrongSkill = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID!, "ywp_user_youkai_strong_skill");
             var userYokaiBonusEff = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID!, "ywp_user_youkai_bonus_effect");
             var userData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID!, "ywp_user_data");
+            var iconBudge = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_icon_budge");
+            //Calculate price
+            var rawLevelOpen = DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai_level_open"];
+            var levelOpenDict = JsonConvert.DeserializeObject<Dictionary<string, object>>(rawLevelOpen);
+            var levelOpenData = new TableParser<YwpMstYoukaiLevelOpen>((string)levelOpenDict["tableData"]);
 
-            //Pay price
-            if(userData.YMoney < deserialized.LockOffCost)
+            //Only ymoney unlock is supported now
+            var yokaiRarityType = mstYokai.Items.Where(x => x.YoukaiId == deserialized.YokaiID).First().YoukaiRarity;
+            var yokaiLevel = userYokai.Items.Where(x => x.YoukaiId == deserialized.YokaiID).First().Level;
+            var levelOpenEntry = levelOpenData.Items.Where(x => x.RarityType == yokaiRarityType && x.Level == yokaiLevel).First();
+            var price = levelOpenEntry.YmoneyCost;
+            if(userData.YMoney < price)
             {
                 var errSession = new MsgBoxResponse("You don't have enough Y-Money.", "Too expensive");
                 await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(errSession)));
                 return;
             }
 
-            userData.YMoney -= deserialized.LockOffCost;
+            Console.WriteLine($"[LevelLockOff] Calculated price: {price}");
+            userData.YMoney -= price;
 
             //Unlock yokai
             var yokai = userYokai.Items.Where(x => x.YoukaiId == deserialized.YokaiID).First();
@@ -44,6 +56,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.LevelLockOff.Logic
             res.UserYoukaiSkill = userYokaiSkill;
             res.UserYoukaiBonusEffect = userYokaiBonusEff;
             res.UserYoukaiStrongSkill = userYokaiStrongSkill;
+            res.IconBudge = iconBudge;
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_youkai", res.UserYoukai);
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_data", res.UserData);
             var marshalledResponse = JsonConvert.SerializeObject(res);

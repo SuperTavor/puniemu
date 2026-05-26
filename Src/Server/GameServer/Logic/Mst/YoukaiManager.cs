@@ -39,14 +39,14 @@ namespace Puniemu.Src.Server.GameServer.Logic
             return -1;
         }
 
-        public static int GetYoukaiLevelOpenIndex(TableParser<YwpMstYoukaiLevelOpen> parser, int beforeLevel, int afterLevel, int RarityType)
+        public static int GetYoukaiLevelOpenIndex(TableParser<YwpMstYoukaiLevelOpen> parser, int beforeLevel, int afterLevel, RarityType rarityType)
         {
             int res = -1;
             uint count = 0;
             uint currlevel = 0;
             foreach (YwpMstYoukaiLevelOpen i in parser.Items)
             {
-                if (i.RarityType == RarityType && beforeLevel < i.Level && afterLevel >= i.Level && (i.Level < currlevel || currlevel == 0))
+                if (i.RarityType == rarityType && beforeLevel < i.Level && afterLevel >= i.Level && (i.Level < currlevel || currlevel == 0))
                 {
                     currlevel = (uint)i.Level;
                     res = (int)count;

@@ -9,8 +9,5 @@ namespace Puniemu.Src.Server.GameServer.Requests.LevelLockOff.DataClasses
         [JsonProperty("youkaiId")]
         public long YokaiID;
 
-        //Cost to lock off
-        [JsonProperty("dispCost")]
-        public int LockOffCost;
     }
 }

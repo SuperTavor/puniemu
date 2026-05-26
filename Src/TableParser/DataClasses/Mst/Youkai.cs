@@ -9,7 +9,7 @@ namespace Puniemu.Src.TableParser.DataClasses
         public int YoukaiId { get; set; } //0
         public string? YoukaiName { get; set; } //1
         public int YoukaiType { get; set; } // 2
-        public int YoukaiRarity { get; set; } //3
+        public RarityType YoukaiRarity { get; set; } //3
         public int YoukaiKind { get; set; } //4
         public int LevelType { get; set; } //5
         public int FoodType { get; set; } //6, see FoodTypeString::to_string
