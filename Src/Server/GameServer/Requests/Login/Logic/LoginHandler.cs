@@ -23,8 +23,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.Logic
             var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             var deserialized = JsonConvert.DeserializeObject<LoginRequest>(requestJsonString!)!;
 
-            var dbRes = (await UserDataManager.Logic.UserDataManager.SupabaseClient!.From<Account>().Where(x => x.Gdkey == deserialized.Gdkey).Get())!;
-            var acc = dbRes.Model!;
+            var acc = await UserDataManager.Logic.UserDataManager.GetAccountFromGdkeyAsync(deserialized.Gdkey!);
             //Construct response
             CommonLoginResponse res = new CommonLoginResponse();
             if (DataManager.Logic.DataManager.IsWibWob)
@@ -40,7 +39,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.Logic
             await GeneralUtils.AddTablesToResponse(Consts.LOGIN_TABLES_PUNI,resdict!,true,deserialized!.Gdkey!);
             //Set last login time to now
             acc.LastLoginTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-            await acc.Update<Account>();
             var encryptedRes = NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(resdict));
             ctx.Response.Headers.ContentType = "application/json";
             await ctx.Response.WriteAsync(encryptedRes);
