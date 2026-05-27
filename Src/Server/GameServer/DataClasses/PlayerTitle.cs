@@ -2,7 +2,7 @@
 {
     public enum PlayerTitle
     {
-        Kun = 1,
-        Chan = 2
+        Kun_Little = 1,
+        Chan_President = 2
     }
 }

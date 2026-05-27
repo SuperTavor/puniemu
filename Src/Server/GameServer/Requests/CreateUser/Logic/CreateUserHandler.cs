@@ -121,7 +121,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
             var dbres = await UserDataManager.Logic.UserDataManager.SupabaseClient!.From<Account>().Where(x => x.Gdkey == deserialized.Level5UserID).Get();
             var acc = dbres.Model!;
             ctx.Response.ContentType = "application/json";
-            var generatedUserData = new YwpUserData((PlayerIcon)deserialized.IconID, (PlayerTitle)deserialized.IconID, deserialized.Level5UserID, deserialized.PlayerName);
+            // in wibwob the title is not gender specific in puni yes
+            var title = PlayerTitle.Kun_Little;
+            if (!DataManager.Logic.DataManager.IsWibWob) title = (PlayerTitle)deserialized.IconID;
+            var generatedUserData = new YwpUserData((PlayerIcon)deserialized.IconID, title, deserialized.Level5UserID, deserialized.PlayerName);
             acc.StartDate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             generatedUserData.CharacterID = acc.CharacterId;
             generatedUserData.UserID = System.IO.Hashing.Crc32.HashToUInt32(System.Text.Encoding.UTF8.GetBytes(generatedUserData.CharacterID)).ToString();
