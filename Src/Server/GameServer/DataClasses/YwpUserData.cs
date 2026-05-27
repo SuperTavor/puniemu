@@ -136,27 +136,53 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
 
         public async Task HitodamaRecover(string gdkey)
         {
-            string time = await ManageData.GetLastLoginTime(gdkey);
-            var acc = await UserDataManager.Logic.UserDataManager.GetAccountFromGdkeyAsync(gdkey);
-            acc.LastLoginTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            DateTimeOffset result;
+            DateTimeOffset now = DateTimeOffset.UtcNow;
+            const string TIME_FORMAT = "yyyy-MM-dd HH:mm:ss zzz";
+            const string HITODAMA_RECOVER_TABLE = "last_hitodama_recover";
+            try
+            {
+                string? time = await ManageData.GetYwpUserAsync<string>(gdkey, HITODAMA_RECOVER_TABLE);
+
+                if (time == null || !DateTimeOffset.TryParse(time, null, System.Globalization.DateTimeStyles.AdjustToUniversal, out result))
+                {
+                    result = now;
+                    await ManageData.SetYwpUserAsync(gdkey, HITODAMA_RECOVER_TABLE, result.ToString(TIME_FORMAT));
+                }
+            }
+            catch
+            {
+                result = now;
+                await ManageData.SetYwpUserAsync(gdkey, HITODAMA_RECOVER_TABLE, result.ToString(TIME_FORMAT));
+            }
             const int HITODAMA_RECOVER_SEC = 900;
             const int FREE_HITODAMA_MAX = 5;
-            DateTime dt = DateTime.Parse(time);
-            long seconds = new DateTimeOffset(dt).ToUnixTimeSeconds();
-            long nowSeconds = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            long seconds = result.ToUnixTimeSeconds();
+            long nowSeconds = now.ToUnixTimeSeconds();
             long diff = nowSeconds - seconds;
             int current = this.Hitodama + this.FreeHitodama;
             int recovered = (int)(diff / HITODAMA_RECOVER_SEC);
             int maxCanRecover = FREE_HITODAMA_MAX - current;
-            int applied = Math.Min(recovered, maxCanRecover);
+            int applied = Math.Max(0, Math.Min(recovered, maxCanRecover));
             this.FreeHitodama += applied;
             if (current + applied >= FREE_HITODAMA_MAX)
             {
+                await ManageData.SetYwpUserAsync(gdkey, HITODAMA_RECOVER_TABLE, now.ToString(TIME_FORMAT));
                 this.HitodamaRecoverSec = 0;
-                return;
             }
-            int remainder = (int)(diff % HITODAMA_RECOVER_SEC);
-            this.HitodamaRecoverSec = HITODAMA_RECOVER_SEC - remainder;
+            else
+            {
+                this.HitodamaRecoverSec = HITODAMA_RECOVER_SEC - ((int)diff % HITODAMA_RECOVER_SEC);
+            }
+            if (recovered != 0)
+            {
+                if (this.FreeHitodama + this.Hitodama < FREE_HITODAMA_MAX)
+                {
+                    now = now.AddSeconds(-((int)diff % HITODAMA_RECOVER_SEC));
+                }
+                await ManageData.SetYwpUserAsync(gdkey, HITODAMA_RECOVER_TABLE, now.ToString(TIME_FORMAT));
+            }
+            await ManageData.SetYwpUserAsync(gdkey, "ywp_user_data", this);
         }
         public YwpUserData(PlayerIcon icon, PlayerTitle title, string gdkey, string playerName)
         {
