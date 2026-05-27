@@ -94,6 +94,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
             var YwpUserYoukaiSkillTab = new TableParser.Logic.TableParser((await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai_skill"))!);
             var YwpUserYoukaiSSkillTab = new TableParser.Logic.TableParser((await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai_strong_skill"))!);
 
+            var mstYokai = new TableParser.Logic.TableParser<YwpMstYoukai>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai"]);
 
             var UserDeck = new TableParser.Logic.TableParser(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai_deck"));
             var tutorialList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<TutorialList>(deserialized!.Gdkey!, "ywp_user_tutorial_list");
@@ -171,7 +172,26 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
                     }
                     else
                     {
-                        item.LotYoukaiInfoList.Entries.Add(new LotYoukaiInfo { LotPattern = "00000", LotResult = "0000" }); //todo
+
+                        Dictionary<RarityType, int> placeholderOdds = new()
+                        {
+                            {RarityType.RarityE, 25 },
+                            {RarityType.RarityD, 20 },
+                            {RarityType.RarityC, 15 },
+                            {RarityType.RarityB, 10 },
+                            {RarityType.RarityA, 5 },
+                            {RarityType.RarityS, 3 },
+                            {RarityType.RaritySS, 50 }
+                        };
+                        //Currently completely random - a placeholder.
+                        //Actual lotYoukaiInfo logic not added yet
+                        //25% E 20% D 15% C 10% B 5% A 2.5% S then 50% SS
+                        var yokaiId = int.Parse(enemyParams.Table[enemyParamsIdx][1]);
+                        var yokaiRank = mstYokai.Items.Where(x => x.YoukaiId == yokaiId).First().YoukaiRarity;
+                        var befriend = Random.Shared.Next(100) < placeholderOdds[yokaiRank];
+                        var lotRes = "0000";
+                        if (befriend) lotRes = "1111";
+                        item.LotYoukaiInfoList.Entries.Add(new LotYoukaiInfo { LotPattern = "00000", LotResult = lotRes });
                     }
                     res.EnemyYoukaiList.Add(item);
                 }

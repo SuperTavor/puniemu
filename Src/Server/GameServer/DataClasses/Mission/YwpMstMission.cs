@@ -1,8 +1,9 @@
+namespace Puniemu.Src.Server.GameServer.DataClasses.Mission;
 public class YwpMstMission {
     public int MissionID; //First 3 numbers from the left are Series ID and they unlock one after another
     public int Unk1;
-    public string MissionDescriptionNormal;
-    public string MissionDescriptionStyled;
+    public string MissionName;
+    public string MissionDescription;
     public string Unk2;
     public string Unk3;
     public int Unk4;

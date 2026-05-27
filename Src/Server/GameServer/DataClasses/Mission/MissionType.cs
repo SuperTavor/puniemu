@@ -1,3 +1,4 @@
+namespace Puniemu.Src.Server.GameServer.DataClasses.Mission;
 public enum MissionType {
     TotalScoreInScoreAttack = 70001,
     CollectTotalScore = 11002,

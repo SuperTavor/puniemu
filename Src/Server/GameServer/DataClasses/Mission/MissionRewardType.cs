@@ -1,3 +1,4 @@
+namespace Puniemu.Src.Server.GameServer.DataClasses.Mission;
 public enum MissionRewardType {
     Icon = 12,
     YMoney = 3,
@@ -6,5 +7,6 @@ public enum MissionRewardType {
     Hitodama = 4,
     Title = 13,
     IncreaseMaxFriends = 11,
+    AddItemToShop = 10,
 }
 
