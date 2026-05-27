@@ -1,7 +1,9 @@
 ﻿using Newtonsoft.Json;
+using ManageData = Puniemu.Src.UserDataManager.Logic.UserDataManager;
 using Puniemu.Src.Server.GameServer.Requests.BuyHitodama.DataClasses;
 using System;
 using System.Runtime.Intrinsics.Arm;
+using System.Runtime.Serialization;
 using System.Security.Cryptography;
 
 namespace Puniemu.Src.Server.GameServer.DataClasses
@@ -132,6 +134,30 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
         [JsonProperty("equipWatchId")]
         public int EquipWatchID { get; set; }
 
+        public async Task HitodamaRecover(string gdkey)
+        {
+            string time = await ManageData.GetLastLoginTime(gdkey);
+            var acc = await UserDataManager.Logic.UserDataManager.GetAccountFromGdkeyAsync(gdkey);
+            acc.LastLoginTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            const int HITODAMA_RECOVER_SEC = 900;
+            const int FREE_HITODAMA_MAX = 5;
+            DateTime dt = DateTime.Parse(time);
+            long seconds = new DateTimeOffset(dt).ToUnixTimeSeconds();
+            long nowSeconds = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            long diff = nowSeconds - seconds;
+            int current = this.Hitodama + this.FreeHitodama;
+            int recovered = (int)(diff / HITODAMA_RECOVER_SEC);
+            int maxCanRecover = FREE_HITODAMA_MAX - current;
+            int applied = Math.Min(recovered, maxCanRecover);
+            this.FreeHitodama += applied;
+            if (current + applied >= FREE_HITODAMA_MAX)
+            {
+                this.HitodamaRecoverSec = 0;
+                return;
+            }
+            int remainder = (int)(diff % HITODAMA_RECOVER_SEC);
+            this.HitodamaRecoverSec = HITODAMA_RECOVER_SEC - remainder;
+        }
         public YwpUserData(PlayerIcon icon, PlayerTitle title, string gdkey, string playerName)
         {
             this.YoukaiId = 2235000;

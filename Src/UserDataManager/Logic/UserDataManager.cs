@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Puniemu.Src.Server.GameServer.DataClasses;
 using Puniemu.Src.UserDataManager.DataClasses;
 using Supabase;
 using System.Collections;
@@ -239,7 +240,14 @@ namespace Puniemu.Src.UserDataManager.Logic
             if (tbl == null)
                 return default;
             JToken token = JToken.FromObject(tbl);
-            return token.ToObject<T>();
+            var obj = token.ToObject<T>();
+
+            if (obj is YwpUserData ywp)
+            {
+                await ywp.HitodamaRecover(gdkey);
+            }
+
+            return obj;
         }
 
         public static T? GetYwpUserFromJson<T>(string tableId, Dictionary<string, object?> YwpUserTables)
