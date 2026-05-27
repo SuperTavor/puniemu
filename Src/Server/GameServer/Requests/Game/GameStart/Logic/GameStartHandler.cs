@@ -186,7 +186,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
                         //Currently completely random - a placeholder.
                         //Actual lotYoukaiInfo logic not added yet
                         //25% E 20% D 15% C 10% B 5% A 2.5% S then 50% SS
-                        var yokaiRank = mstYokai.Items.Where(x => x.YoukaiId == i.EnemyId).First().YoukaiRarity;
+                        var yokaiId = int.Parse(enemyParams.Table[enemyParamsIdx][1]);
+                        var yokaiRank = mstYokai.Items.Where(x => x.YoukaiId == yokaiId).First().YoukaiRarity;
                         var befriend = Random.Shared.Next(100) < placeholderOdds[yokaiRank];
                         var lotRes = "0000";
                         if (befriend) lotRes = "1111";
