@@ -30,7 +30,7 @@ class GamedataDownloader:
         except:
             if (self.debug):
                 print(f"[DEBUG] Automatic Version Detector - Failed")
-            input("Game version to spoof (latest version only): ").strip()
+            self.appVer = input("Game version to spoof (latest version only): ").strip()
         
         # Get Udkey and Gdkey (with signature et other information)
         instance = self.get_active(inputUdkey)
