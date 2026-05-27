@@ -65,7 +65,7 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
             "ywp_user_player_effect",
             "ywp_user_player_codename",
             "ywp_user_player_plate",
-
+            "ywp_user_mission"
         };
 
         public static readonly List<string> INIT_GACHA_TABLES = new List<string>
