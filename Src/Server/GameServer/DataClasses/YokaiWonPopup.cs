@@ -31,7 +31,7 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
         public int LevelBefore = 1;
 
         [JsonProperty("getType")]
-        public int GetTypes = 0;
+        public YokaiGetType GetTypes = 0;
 
         [JsonProperty("youkaiId")]
         public long YoukaiId = 0L;

@@ -137,10 +137,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             // MAIN HANDLER
 
             var prizes = new List<GachaPrize>();
-
-
-            const int NEW_GETTYPE = 10;           // valeur observée dans ta sauvegarde pour "nouveau"
-            const int DUPLICATE_GETTYPE = 2;      // valeur choisie pour signaler doublon (modifie si besoin)
             //const int DUPLICATE_REWARD_ITEM_ID = 20506; // exemple d'item donné en cas de doublon
 
 

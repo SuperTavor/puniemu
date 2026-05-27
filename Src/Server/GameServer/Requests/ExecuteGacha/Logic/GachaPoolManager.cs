@@ -1,14 +1,14 @@
 ﻿using Newtonsoft.Json;
 using Puniemu.Src.Server.GameServer.DataClasses;
 using Puniemu.Src.Server.GameServer.Logic;
-using Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic;
+using Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.DataClasses;
 using Puniemu.Src.TableParser.DataClasses;
 using Puniemu.Src.TableParser.Logic;
 using System.Collections.Concurrent;
 using System.Reflection.Metadata.Ecma335;
 using System.Text.RegularExpressions;
 
-namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.DataClasses
+namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
 {
     public static class GachaPoolManager
     {
@@ -20,8 +20,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.DataClasses
         //gachaid, weightSum
         private static ConcurrentDictionary<int, double> _weightSumCache = new();
 
-        private const int NEW_GETTYPE = 10;           
-        private const int DUPLICATE_GETTYPE = 2;
+        private const int MAX_SOULT = 5;
 
         public static void EnsureLoaded()
         {
@@ -38,13 +37,12 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.DataClasses
             _isLoaded = true;
         }
 
-        private static int CheckGetType(long yokaiId, TableParser<YwpUserYoukai> table)
+        private static YokaiGetType CheckGetType(long yokaiId, TableParser<YwpUserYoukai> table)
         {
-            int getType = DUPLICATE_GETTYPE;
-
+            YokaiGetType getType = YokaiGetType.SoultLevelUp;
             if (YoukaiManager.GetYoukaiIndex(table, yokaiId) < 0)
             {
-                getType = NEW_GETTYPE;
+                getType = YokaiGetType.NewYokai;
             }
             return getType;
         }

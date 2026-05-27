@@ -166,7 +166,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.LoginStamp.Logic
                     res.YoukaiPopupResult.LegendYoukaiId = 0; // Legendary youkai flg Todo
                     res.YoukaiPopupResult.LevelBefore = 1; //level Todo
                     res.YoukaiPopupResult.LevelAfter = 1; //level todo
-                    res.YoukaiPopupResult.GetTypes = 10; //IDK Todo
+                    res.YoukaiPopupResult.GetTypes = YokaiGetType.NewYokai; //Check should be added to show soult screen
                     res.YoukaiPopupResult.YoukaiId = current_item_id;
                     res.YoukaiPopupResult.ReleaseType = 0; //IDK todo
                     // skill data is null in the response for now so : IDK | TODO

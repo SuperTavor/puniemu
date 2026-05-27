@@ -420,7 +420,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                             res.YoukaiPopupResult.LegendYoukaiId = 0; // Legendary youkai flg Todo
                             res.YoukaiPopupResult.LevelBefore = 1; //level Todo
                             res.YoukaiPopupResult.LevelAfter = 1; //level todo
-                            res.YoukaiPopupResult.GetTypes = 10; //IDK Todo
+
+                            //Should add check to see if the yokai is already befriended and show the soult level up screen
+                            res.YoukaiPopupResult.GetTypes = YokaiGetType.NewYokai; //IDK Todo
                             res.YoukaiPopupResult.YoukaiId = YoukaiId;
                             res.YoukaiPopupResult.ReleaseType = 0; //IDK todo
                             // skill data is null in the response for now so : IDK | TODO
