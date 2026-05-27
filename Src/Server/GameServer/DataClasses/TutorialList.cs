@@ -20,7 +20,7 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
             //for puni
             else if(obj.Type == JTokenType.String)
             {
-                var tblPrsr = new TableParser<TutorialEntry>(obj.Value<string>(serializer));
+                var tblPrsr = new TableParser<TutorialEntry>(obj.ToObject<string>()!);
                 var list = new TutorialList();
                 list.Entries = tblPrsr.Items;
                 return list;
