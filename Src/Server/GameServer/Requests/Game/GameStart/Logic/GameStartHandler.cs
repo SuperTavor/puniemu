@@ -15,6 +15,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
     {
         static bool haveEnoughHitodama(ref YwpUserData userData)
         {
+            bool moreOrEqualThan5 = ((userData.Hitodama + userData.FreeHitodama) >= 5);
             if (userData.Hitodama <= 0 && userData.FreeHitodama <= 0)
             {
                 return false;
@@ -25,11 +26,12 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
             }
             else
             {
-                if (userData.FreeHitodama == 5)
-                {
-                    userData.HitodamaRecoverSec = 900;
-                }
                 userData.FreeHitodama -= 1;
+            }
+            bool lessThan5 = ((userData.Hitodama + userData.FreeHitodama) < 5);
+            if (moreOrEqualThan5 && lessThan5)
+            {
+                userData.HitodamaRecoverSec = 900;
             }
             return true;
         }

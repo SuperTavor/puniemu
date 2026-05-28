@@ -29,9 +29,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapUnLock.Logic
             ctx.Response.ContentType = "application/json";
             var UserTables = await UserDataManager.Logic.UserDataManager.GetEntireUserData(deserialized!.Level5UserID!);
 
-            var userData = UserDataManager.Logic.UserDataManager.GetYwpUserFromJson<YwpUserData>("ywp_user_data", UserTables)!;
-            var userStage = new TableParser<YwpUserStage>(UserDataManager.Logic.UserDataManager.GetYwpUserFromJson<string>("ywp_user_stage", UserTables)!);
-            var userMap = new TableParser<YwpUserMap>(UserDataManager.Logic.UserDataManager.GetYwpUserFromJson<string>("ywp_user_map", UserTables)!);
+            var userData = await UserDataManager.Logic.UserDataManager.GetYwpUserFromJson<YwpUserData>("ywp_user_data", UserTables, deserialized.Level5UserID)!;
+            var userStage = new TableParser<YwpUserStage>(await UserDataManager.Logic.UserDataManager.GetYwpUserFromJson<string>("ywp_user_stage", UserTables, deserialized.Level5UserID)!);
+            var userMap = new TableParser<YwpUserMap>(await UserDataManager.Logic.UserDataManager.GetYwpUserFromJson<string>("ywp_user_map", UserTables, deserialized.Level5UserID)!);
 
             List<YwpMstMap> mstMap = JsonConvert.DeserializeObject<List<YwpMstMap>>(
                 JsonConvert.DeserializeObject<Dictionary<string, object>>(

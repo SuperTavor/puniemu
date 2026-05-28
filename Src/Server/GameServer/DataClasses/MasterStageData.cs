@@ -83,7 +83,7 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
                     {
                         StageId = item.StageId,
                         StageType = item.StageType,
-                        BattleType = item.BattleType,
+                        BattleType = 0,
                         StarCondIDs = [item.StarCond1, item.StarCond2, item.StarCond3]
                     });
                 }
