@@ -55,6 +55,8 @@ datadownload/
 dlldata.c
 Tools/r2
 Tools/test2
+Tools/half_stage_data.json
+Tools/gamedataDownloader.py
 # Benchmark Results
 BenchmarkDotNet.Artifacts/
 
@@ -407,3 +409,6 @@ Tools/eal
 Tools/ywp_mst_version_resource.json
 Tools/sharedLogic/__pycache__
 /Tools/ywp_mst_stage.txt
+/Tools/data.json
+/Tools/gamedataDownloader.py
+/Tools/gamedataDownloader.py
