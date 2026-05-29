@@ -20,5 +20,6 @@ public class YwpMstMission {
     public int RewardID; //For example if the reward type is icon it will be icon ID, if the reward type is yokai it will be yokaiID etc
     public int YMoneySpiritCount; //For example if a mission has a reward type of YMoney this defines how much ymoney is given, if spirit it defines how much spirit is given
     public int Unk14;
+
 }
 

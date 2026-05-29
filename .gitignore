@@ -412,3 +412,4 @@ Tools/sharedLogic/__pycache__
 /Tools/data.json
 /Tools/gamedataDownloader.py
 /Tools/gamedataDownloader.py
+/Tools/stageDump.py
