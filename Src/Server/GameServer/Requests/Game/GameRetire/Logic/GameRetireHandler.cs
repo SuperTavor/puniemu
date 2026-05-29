@@ -66,10 +66,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameRetire.Logic
 
             var MstEnemyParam = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai_enemy_param"]!)!["tableData"]);
             //var stageConditionInfo = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_stage_condition"]!)!["tableData"], "", "^");
-            var stagesInfo = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_stage"]!)!["tableData"]);
-            var stageInfoIdx = stagesInfo.FindIndex([deserialized.StageId.ToString()]);
+            
+            var stageInfo = MasterStageData.StageItems.Where(x => x.StageId == deserialized.StageId).First();
             var YoukaiLevelMstTable = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai_level"]!)!["tableData"]);
-            List<long> starIdx = new List<long> { long.Parse(stagesInfo.Table[stageInfoIdx][8]), long.Parse(stagesInfo.Table[stageInfoIdx][9]), long.Parse(stagesInfo.Table[stageInfoIdx][10])};
+            List<long> starIdx = new List<long> { stageInfo.StarCondIDs[0], stageInfo.StarCondIDs[1], stageInfo.StarCondIDs[2] };
 
             // stage
             var stageList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_stage");
