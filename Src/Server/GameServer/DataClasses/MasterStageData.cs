@@ -13,6 +13,9 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
         public int BattleType;
         public long[] StarCondIDs = new long[3];
         public int BossFlag;
+        public int UseActionPoint;
+        public int UseActionType;
+        public int UseActionID;
     }
     public static class MasterStageData
     {
@@ -86,7 +89,11 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
                         StageType = item.StageType,
                         BattleType = 0,
                         StarCondIDs = [item.StarCond1, item.StarCond2, item.StarCond3],
-                        BossFlag = item.BossFlag
+                        BossFlag = item.BossFlag,
+                        UseActionID = item.UseActionId,
+                        UseActionPoint = item.UseActionPoint,
+                        UseActionType = item.UseActionType
+
                     });
                 }
                 
@@ -104,7 +111,10 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
                         StageType = item.StageType,
                         BattleType = 0,
                         StarCondIDs = [item.StarCond1, item.StarCond2, item.StarCond3],
-                        BossFlag = item.BossFlag
+                        BossFlag = item.BossFlag,
+                        UseActionID = item.UseActionID,
+                        UseActionPoint = item.UseActionPoint,
+                        UseActionType = item.UseActionType
                     });
                 }
                 

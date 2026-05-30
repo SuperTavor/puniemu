@@ -9,6 +9,7 @@ using System.Buffers;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Puniemu.Src.Server.GameServer.Logic;
+using Puniemu.Src.UserDataManager.Logic;
 namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
 {
     public static class GameStartHandler
@@ -35,6 +36,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
             }
             return true;
         }
+
 
         static async Task<bool> isFirstClear(long stageId, string gdkey)
         {
@@ -77,7 +79,28 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
                 await GeneralUtils.SendBadRequest(ctx);
                 return;
             }
-            
+
+            var stageInfoIdx = MasterStageData.StageItems.FindIndex(x => x.StageId == deserialized.StageId);
+            //Use pass
+            if (MasterStageData.StageItems[stageInfoIdx].UseActionType == 1)
+            {
+                var userItemRaw = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_item");
+                var userItem = new TableParser<YwpUserItem>(userItemRaw);
+                var passItemId = MasterStageData.StageItems[stageInfoIdx].UseActionID;
+                var itemIdx = userItem.Items.FindIndex(x => x.ItemId == passItemId);
+                //Check if have item
+                if (itemIdx != -1 && userItem.Items[itemIdx].Count > 0)
+                {
+                    userItem.Items[itemIdx].Count--;
+                    await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "ywp_user_item", userItem.ToString());
+                }
+                else
+                {
+                    var errRes = new MsgBoxResponse("You don't have the pass.", "Error");
+                    await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(errRes)));
+                    return;
+                }
+            }
             if (!haveEnoughHitodama(ref userData))
             {
                 var errRes = new MsgBoxResponse("You don't have enough spirit.", "Not Enough spirit");
@@ -103,7 +126,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
 
             //get current stage info
             var jsonLevelData = JsonConvert.DeserializeObject<Dictionary<string, StageData>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["stage_data"]);
-            var stageInfoIdx = MasterStageData.StageItems.FindIndex(x => x.StageId == deserialized.StageId);
+            
 
             // Throw error if stage dosent have config info
             if (stageInfoIdx == -1 || (jsonLevelData == null || !(jsonLevelData.ContainsKey(deserialized.StageId.ToString()))))
