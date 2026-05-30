@@ -4,6 +4,7 @@ using Puniemu.Src.NHNCrypt.Logic;
 using Puniemu.Src.Server.GameServer.DataClasses;
 using Puniemu.Src.Server.GameServer.Requests.BuyItem.DataClasses;
 using Puniemu.Src.TableParser.DataClasses;
+using Puniemu.Src.UserDataManager.Logic;
 using System.Buffers;
 using System.Text;
 namespace Puniemu.Src.Server.GameServer.Requests.BuyItem.Logic
@@ -66,7 +67,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.BuyItem.Logic
             }
 
             res.YwpUserItem = userItems.ToString();
-
+            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "ywp_user_item", res.YwpUserItem);
             var encRes = NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(res));
             await ctx.Response.WriteAsync(encRes);
         }

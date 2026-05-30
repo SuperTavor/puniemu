@@ -189,11 +189,12 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
                             {RarityType.RaritySS, 50 }
                         };
                         bool isBoss = MasterStageData.StageItems[stageInfoIdx].BossFlag != 0;
+                        bool isAfterJibanyan = tutorialList.GetStatus(2002, 2) == 1;
                         var yokaiId = int.Parse(enemyParams.Table[enemyParamsIdx][1]);
                         var yokaiRank = mstYokai.Items.Where(x => x.YoukaiId == yokaiId).First().YoukaiRarity;
                         var befriend = Random.Shared.Next(100) < placeholderOdds[yokaiRank];
                         var lotRes = "0000";
-                        if (befriend && !isBoss) lotRes = "1111";
+                        if (befriend && !isBoss && isAfterJibanyan) lotRes = "1111";
                         item.LotYoukaiInfoList.Entries.Add(new LotYoukaiInfo { LotPattern = "00000", LotResult = lotRes });
                     }
                     res.EnemyYoukaiList.Add(item);
