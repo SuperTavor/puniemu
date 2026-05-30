@@ -60,8 +60,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameRetire.Logic
 
             // PLACEHOLDER
             res.UserGameResultData.Score = deserialized.Score;
-            res.UserGameResultData.Exp = deserialized.Score;
-            res.UserGameResultData.Money = deserialized.Score;
+            res.UserGameResultData.Exp = MoneyExpManager.ScoreToExp(deserialized.Score);
+            res.UserGameResultData.Money = MoneyExpManager.ScoreToMoney(deserialized.Score);
             res.UserGameResultData.StageId = deserialized.StageId;
 
             var MstEnemyParam = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai_enemy_param"]!)!["tableData"]);
