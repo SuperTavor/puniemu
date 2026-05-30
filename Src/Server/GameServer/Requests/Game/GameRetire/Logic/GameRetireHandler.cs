@@ -58,7 +58,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameRetire.Logic
             var index = 0;
             var res = new GameRetireResponse();
 
-            // PLACEHOLDER
             res.UserGameResultData.Score = deserialized.Score;
             res.UserGameResultData.Exp = MoneyExpManager.ScoreToExp(deserialized.Score);
             res.UserGameResultData.Money = MoneyExpManager.ScoreToMoney(deserialized.Score);
@@ -144,8 +143,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameRetire.Logic
 
 
                     var LevelIndex = 0;
-                    var const_exp = 200; // test
-                    item.After.Exp = item.Before.Exp + const_exp;
+                    item.After.Exp = item.Before.Exp + res.UserGameResultData.Exp;
                     index = 1;
 
                     while (LevelIndex != -1)
