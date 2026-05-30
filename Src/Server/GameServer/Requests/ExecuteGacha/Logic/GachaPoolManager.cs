@@ -50,7 +50,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
         public static GachaPrize RegisterYokaiAndGetPrize(long yokaiId, CapsuleColor capsule, RarityType rank, TableParser<YwpUserYoukai> userYokaiTable, TableParser<YwpUserYoukaiSkill> userSkillTable, TableParser.Logic.TableParser dictionaryListTable)
         {
             var getType = CheckGetType(yokaiId, userYokaiTable);
-            SkillResult? skill = GachaService.CompureSkillPctg(userSkillTable, yokaiId);
+            SkillResult? skill = YoukaiManager.AddExpToSkill(userSkillTable, yokaiId, 1000);
 
             //Register yokai
             YoukaiManager.AddYoukai(userYokaiTable, yokaiId, userSkillTable);

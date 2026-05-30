@@ -10,6 +10,10 @@ using System.Text;
 
 namespace Puniemu.Src.Server.GameServer.Requests.UseItem.Logic
 {
+    public class MaxLevelException : Exception
+    {
+
+    }
     public class UseItemHandler
     {
         public static async Task HandleAsync(HttpContext ctx)
@@ -22,10 +26,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.UseItem.Logic
             var deserialized = JsonConvert.DeserializeObject<UseItemRequest>(requestJsonString!);
             ctx.Response.ContentType = "application/json";
 
-            //Get item info
-            var mstItemJson = DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_item"];
-            var mstItemParse = JsonConvert.DeserializeObject<Dictionary<string, object>>(mstItemJson);
-            var mstItem = new TableParser<YwpMstItem>((string)mstItemParse["tableData"]);
+            var mstItem = new TableParser<YwpMstItem>(DataManager.Logic.DataManager.GameDataManager.GetTableStringFromJson("ywp_mst_item"));
             YwpMstItem itemInfo;
             try
             {
@@ -33,7 +34,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.UseItem.Logic
             }
             catch
             {
-                var errMsg = new MsgBoxResponse("Item not found on server", "Error");
+                var errMsg = new MsgBoxResponse("Error while fetching data for item.", "Error");
                 await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(errMsg)));
                 return;
             }
@@ -52,11 +53,22 @@ namespace Puniemu.Src.Server.GameServer.Requests.UseItem.Logic
             {
                 if (response.ItemType == ItemType.Exporb)
                 {
-                    itemService.UseExporb();
+                    var expResult = itemService.UseExporb();
+                    response.YoukaiExp = expResult;
                 }
                 else if (response.ItemType == ItemType.SoultBooster)
                 {
-                    itemService.UseSoultBooster();
+                    try
+                    {
+                        var skillResult = itemService.UseSoultBooster();
+                        response.YoukaiSkillExp = skillResult;
+                    }
+                    catch(InvalidOperationException)
+                    {
+                        var errMsg = new MsgBoxResponse("S-Move is at max level.", "Max level");
+                        await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(errMsg)));
+                        return;
+                    }
                 }
                 else if (response.ItemType == ItemType.SkillBooster)
                 {

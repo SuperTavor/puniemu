@@ -1,8 +1,9 @@
 ﻿using Newtonsoft.Json;
+using Puniemu.Src.Server.GameServer.DataClasses;
 
-namespace Puniemu.Src.Server.GameServer.DataClasses
+namespace Puniemu.Src.Server.GameServer.Requests.UseItem.DataClasses
 {
-    public class YoukaiSkillExp
+    public class UseItemSkillResult
     {
         [JsonProperty("isMaxLevel")]
         public bool IsMaxLevel;

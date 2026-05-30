@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using Newtonsoft.Json;
+using System.Collections.Concurrent;
 using System.Reflection;
 using System.Text;
 
@@ -11,7 +12,12 @@ public class GameDataManager
     {
         CacheGamedataFromResources();
     }
-
+    public string GetTableStringFromJson(string tableId)
+    {
+        var raw = GamedataCache[tableId];
+        var json = JsonConvert.DeserializeObject<Dictionary<string, object>>(raw);
+        return (string)json["tableData"];
+    }
     private void CacheGamedataFromResources()
     {
         var assembly = Assembly.GetExecutingAssembly();

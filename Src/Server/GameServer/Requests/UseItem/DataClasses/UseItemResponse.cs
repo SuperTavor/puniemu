@@ -27,6 +27,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.UseItem.DataClasses
         public UserYoukaiResultListRes? YoukaiExp = null;
 
         [JsonProperty("youkaiSkillExp")]
-        public YoukaiSkillExp? YoukaiSkillExp = null;
+        public UseItemSkillResult? YoukaiSkillExp = null;
     }
 }

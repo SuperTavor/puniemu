@@ -1,4 +1,7 @@
-﻿using Puniemu.Src.Server.GameServer.DataClasses;
+﻿using Newtonsoft.Json.Linq;
+using Puniemu.Src.Server.GameServer.DataClasses;
+using Puniemu.Src.Server.GameServer.Logic;
+using Puniemu.Src.Server.GameServer.Requests.UseItem.DataClasses;
 using Puniemu.Src.TableParser.DataClasses;
 using Puniemu.Src.TableParser.Logic;
 
@@ -6,11 +9,11 @@ namespace Puniemu.Src.Server.GameServer.Requests.UseItem.Logic
 {
     public class UseItemService
     {
-        private TableParser<YwpUserItem> _userItem;
+        public TableParser<YwpUserItem> UserItem;
 
-        private TableParser<YwpUserYoukai> _userYoukai;
+        public TableParser<YwpUserYoukai> UserYoukai;
 
-        private TableParser<YwpUserYoukaiSkill> _userYoukaiSkill;
+        public TableParser<YwpUserYoukaiSkill> UserYoukaiSkill;
 
         private YwpMstItem _itemInfo;
 
@@ -21,15 +24,15 @@ namespace Puniemu.Src.Server.GameServer.Requests.UseItem.Logic
         {
             _youkaiId = youkaiId;
             _itemId = itemId;
-            _userItem = userItem;
-            _userYoukai = userYoukai;
-            _userYoukaiSkill = userYoukaiSkill;
+            UserItem = userItem;
+            UserYoukai = userYoukai;
+            UserYoukaiSkill = userYoukaiSkill;
             _itemInfo = ywpMstItem.Items.Where(x => x.ItemID == itemId).First();
         }
 
         private void SpendItem()
         {
-            var itemInfo = _userItem.Items.Where(x => x.ItemId == _itemId).FirstOrDefault();
+            var itemInfo = UserItem.Items.Where(x => x.ItemId == _itemId).FirstOrDefault();
             if(itemInfo.Count == 0)
             {
                 throw new KeyNotFoundException("Not enough of item");
@@ -37,24 +40,49 @@ namespace Puniemu.Src.Server.GameServer.Requests.UseItem.Logic
             itemInfo!.Count--;
         }
 
-        public void UseExporb()
+        public UserYoukaiResultListRes UseExporb()
         {
-            var exp = _itemInfo.ItemParam;
+            var expToAdd = _itemInfo.ItemParam;
 
+            var mstYokai = new TableParser<YwpMstYoukai>(DataManager.Logic.DataManager.GameDataManager.GetTableStringFromJson("ywp_mst_youkai"));
+            var mstYokaiLevel = new TableParser<YwpMstYoukaiLevel>(DataManager.Logic.DataManager.GameDataManager.GetTableStringFromJson("ywp_mst_youkai_level"));
+            var mstYokaiLevelOpen = new TableParser<YwpMstYoukaiLevelOpen>(DataManager.Logic.DataManager.GameDataManager.GetTableStringFromJson("ywp_mst_youkai_level_open"));
 
-
+            var yokaiToGive = UserYoukai.Items.Where(x => x.YoukaiId == _youkaiId).First();
+            var result = MoneyExpManager.GiveYoukaiExp(yokaiToGive, _youkaiId, expToAdd, mstYokai, mstYokaiLevel, mstYokaiLevelOpen);
 
             SpendItem();
+
+            return result;
         }
 
-        public void UseSoultBooster()
+        public UseItemSkillResult UseSoultBooster()
         {
-            var userSkillItem = _userYoukaiSkill.Items.Where(x => x.YoukaiId == _youkaiId).First();
+            var skillItem = UserYoukaiSkill.Items.First(x => x.YoukaiId == _youkaiId);
+            var currentLevel = skillItem.Level;
+            if(currentLevel >= 7)
+            {
+                throw new MaxLevelException();
+            }
+            var soulGain = _itemInfo.ItemParam;
 
+            var skillUpdateRes = YoukaiManager.AddExpToSkill(UserYoukaiSkill, _youkaiId, soulGain);
 
+            skillItem.Points = skillUpdateRes.After.Exp;
+            skillItem.Level = skillUpdateRes.After.Level;
+            skillItem.PercentageDenominator = skillUpdateRes.After.ExpBar.Denominator;
+            skillItem.PercentageNumerator = skillUpdateRes.After.ExpBar.Numerator;
+            skillItem.Percentage = skillUpdateRes.After.ExpBar.Percentage;
 
+            UseItemSkillResult res = new();
+            res.IsMaxLevel = skillUpdateRes.isMaxLevel;
+            res.Before = skillUpdateRes.Before;
+            res.After = skillUpdateRes.After;
+            res.YoukaiID = _youkaiId;
 
             SpendItem();
+
+            return res;
         }
 
         public void UseSkillBooster()
