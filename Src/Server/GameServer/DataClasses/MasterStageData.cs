@@ -12,6 +12,7 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
         //unused in wibwob
         public int BattleType;
         public long[] StarCondIDs = new long[3];
+        public int BossFlag;
     }
     public static class MasterStageData
     {
@@ -84,7 +85,8 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
                         StageId = item.StageId,
                         StageType = item.StageType,
                         BattleType = 0,
-                        StarCondIDs = [item.StarCond1, item.StarCond2, item.StarCond3]
+                        StarCondIDs = [item.StarCond1, item.StarCond2, item.StarCond3],
+                        BossFlag = item.BossFlag
                     });
                 }
                 
@@ -101,7 +103,8 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
                         StageId = item.StageID,
                         StageType = item.StageType,
                         BattleType = 0,
-                        StarCondIDs = [item.StarCond1, item.StarCond2, item.StarCond3]
+                        StarCondIDs = [item.StarCond1, item.StarCond2, item.StarCond3],
+                        BossFlag = item.BossFlag
                     });
                 }
                 

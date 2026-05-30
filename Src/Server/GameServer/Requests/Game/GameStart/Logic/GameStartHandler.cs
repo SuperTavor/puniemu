@@ -174,6 +174,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
                     }
                     else
                     {
+                        //Currently completely random - a placeholder.
+                        //Actual lotYoukaiInfo logic not added yet
+                        //25% E 20% D 15% C 10% B 5% A 2.5% S then 50% SS
 
                         Dictionary<RarityType, int> placeholderOdds = new()
                         {
@@ -185,14 +188,12 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
                             {RarityType.RarityS, 3 },
                             {RarityType.RaritySS, 50 }
                         };
-                        //Currently completely random - a placeholder.
-                        //Actual lotYoukaiInfo logic not added yet
-                        //25% E 20% D 15% C 10% B 5% A 2.5% S then 50% SS
+                        bool isBoss = MasterStageData.StageItems[stageInfoIdx].BossFlag != 0;
                         var yokaiId = int.Parse(enemyParams.Table[enemyParamsIdx][1]);
                         var yokaiRank = mstYokai.Items.Where(x => x.YoukaiId == yokaiId).First().YoukaiRarity;
                         var befriend = Random.Shared.Next(100) < placeholderOdds[yokaiRank];
                         var lotRes = "0000";
-                        if (befriend) lotRes = "1111";
+                        if (befriend && !isBoss) lotRes = "1111";
                         item.LotYoukaiInfoList.Entries.Add(new LotYoukaiInfo { LotPattern = "00000", LotResult = lotRes });
                     }
                     res.EnemyYoukaiList.Add(item);

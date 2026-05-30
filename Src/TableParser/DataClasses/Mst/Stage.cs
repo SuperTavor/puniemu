@@ -98,7 +98,7 @@ namespace Puniemu.Src.TableParser.DataClasses
         public int StageType { get; set; } 
         public long StageNo { get; set; }
         public long FirstStageFlag { get; set; }
-        public long BossFlag { get; set; }
+        public int BossFlag { get; set; }
         public int UseActionPoint { get; set; } //not sure
         public long StarCond1 { get; set; }
         public long StarCond2 { get; set; }
