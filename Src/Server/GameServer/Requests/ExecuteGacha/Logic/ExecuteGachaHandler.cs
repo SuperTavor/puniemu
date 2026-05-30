@@ -35,7 +35,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             var userData = (await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<GameServer.DataClasses.YwpUserData>(deserialized!.Level5UserId!, "ywp_user_data"))!;
             //gacha info
             var GachaMstTable = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_gacha"]!)!["tableData"]);
-            var userItemtable = new TableParser.Logic.TableParser<YwpUserItemEntry>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_item")!);
+            var userItemtable = new TableParser.Logic.TableParser<YwpUserItem>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_item")!);
 
             var dictionaryListTable = new TableParser.Logic.TableParser(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_dictionary")!);
             var userYokaiTable = new TableParser<YwpUserYoukai>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_youkai")!);

@@ -23,5 +23,6 @@
         FuseItem = 5, //Param is 0 always
         Watchpart = 7, //Param is 0 always
         Food = 2, //Param value is unknown
+        SkillBooster = 10, //Param is always 1
     }
 }

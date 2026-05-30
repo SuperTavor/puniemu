@@ -51,14 +51,14 @@ namespace Puniemu.Src.Server.GameServer.Requests.BuyItem.Logic
             res.UserData.YMoney -= ymoneyToSubtract;
 
             //Give item
-            var userItems = new TableParser.Logic.TableParser<YwpUserItemEntry>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_item"));
+            var userItems = new TableParser.Logic.TableParser<YwpUserItem>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_item"));
 
             var itemIdx = userItems.FindIndex([deserialized.GoodsId.ToString()]);
 
             if(itemIdx == -1)
             {
                 //If user doesnt already have item, add it to inventory
-                userItems.Items.Add(new YwpUserItemEntry { ItemId = deserialized.GoodsId, Count = deserialized.GoodsCount });
+                userItems.Items.Add(new YwpUserItem { ItemId = deserialized.GoodsId, Count = deserialized.GoodsCount });
             }
             else
             {

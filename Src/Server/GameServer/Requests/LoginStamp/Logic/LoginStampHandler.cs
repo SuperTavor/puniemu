@@ -141,7 +141,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.LoginStamp.Logic
                 if (current_item_type == 1)
                 {
                     var itemsList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserID!, "ywp_user_item");
-                    var userItemTable = new TableParser<YwpUserItemEntry>(itemsList!);
+                    var userItemTable = new TableParser<YwpUserItem>(itemsList!);
                     userItemTable = ItemManager.AddItem(userItemTable, current_item_id, current_item_count);
                     res.ItemPopupResult = new();
                     res.ItemPopupResult.IsLimitOver = 0;

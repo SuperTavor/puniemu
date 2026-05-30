@@ -9,7 +9,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
 {
     public class ItemManager
     {
-        public static TableParser.Logic.TableParser<YwpUserItemEntry> AddItem(TableParser.Logic.TableParser<YwpUserItemEntry> parser, long itemId, int item_count)
+        public static TableParser.Logic.TableParser<YwpUserItem> AddItem(TableParser.Logic.TableParser<YwpUserItem> parser, long itemId, int item_count)
         {
             try
             {
@@ -18,7 +18,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
             }
             catch
             {
-                parser.Items.Add(new YwpUserItemEntry
+                parser.Items.Add(new YwpUserItem
                 {
                     ItemId = itemId,
                     Count = item_count
@@ -26,7 +26,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
             }
             return parser;
         }
-        public static TableParser.Logic.TableParser<YwpUserItemEntry> RemoveItem(TableParser.Logic.TableParser<YwpUserItemEntry> parser, long itemId, int item_count)
+        public static TableParser.Logic.TableParser<YwpUserItem> RemoveItem(TableParser.Logic.TableParser<YwpUserItem> parser, long itemId, int item_count)
         {
             var itemToRemove = parser.Items.Where(x => x.ItemId == itemId).First();
             if (itemToRemove.Count > item_count) itemToRemove.Count -= item_count;
