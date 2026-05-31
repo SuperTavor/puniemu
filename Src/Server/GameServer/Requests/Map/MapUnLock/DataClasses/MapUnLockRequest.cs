@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using Puniemu.Src.Server.GameServer.Requests.Map.MapUnLock.DataClasses;
 
 namespace Puniemu.Src.Server.GameServer.Requests.MapUnLock.DataClasses
 {
@@ -16,6 +17,11 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapUnLock.DataClasses
         [JsonProperty("mapId")]
         public long MapId { get; set; }
 
+        [JsonProperty("youkaiId")]
+        public long YoukaiID;
+
+        [JsonProperty("unLockType")]
+        public UnlockType UnlockType { get; set; }
         // Interchangeable with gdkey
         [JsonProperty("level5UserID")]
         public string Level5UserID { get; set; }
