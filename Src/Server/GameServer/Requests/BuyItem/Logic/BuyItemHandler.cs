@@ -4,6 +4,7 @@ using Puniemu.Src.NHNCrypt.Logic;
 using Puniemu.Src.Server.GameServer.DataClasses;
 using Puniemu.Src.Server.GameServer.Requests.BuyItem.DataClasses;
 using Puniemu.Src.TableParser.DataClasses;
+using Puniemu.Src.UserDataManager.Logic;
 using System.Buffers;
 using System.Text;
 namespace Puniemu.Src.Server.GameServer.Requests.BuyItem.Logic
@@ -51,14 +52,14 @@ namespace Puniemu.Src.Server.GameServer.Requests.BuyItem.Logic
             res.UserData.YMoney -= ymoneyToSubtract;
 
             //Give item
-            var userItems = new TableParser.Logic.TableParser<YwpUserItemEntry>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_item"));
+            var userItems = new TableParser.Logic.TableParser<YwpUserItem>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_item"));
 
             var itemIdx = userItems.FindIndex([deserialized.GoodsId.ToString()]);
 
             if(itemIdx == -1)
             {
                 //If user doesnt already have item, add it to inventory
-                userItems.Items.Add(new YwpUserItemEntry { ItemId = deserialized.GoodsId, Count = deserialized.GoodsCount });
+                userItems.Items.Add(new YwpUserItem { ItemId = deserialized.GoodsId, Count = deserialized.GoodsCount });
             }
             else
             {
@@ -66,7 +67,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.BuyItem.Logic
             }
 
             res.YwpUserItem = userItems.ToString();
-
+            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "ywp_user_item", res.YwpUserItem);
             var encRes = NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(res));
             await ctx.Response.WriteAsync(encRes);
         }

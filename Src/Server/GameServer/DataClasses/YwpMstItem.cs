@@ -2,15 +2,15 @@
 {
     public class YwpMstItem
     {
-        public int ItemID;
-        public ItemType ItemType;
-        public string ItemName;
-        public int ItemParam;
-        public int Unk0;
-        public string ItemDescription;
-        public string ItemIconPath;
-        public int Unk1; //always empty
-        public int Unk2;
+        public int ItemID { get; set; }
+        public ItemType ItemType { get; set; }
+        public string ItemName { get; set; }
+        public int ItemParam { get; set; }
+        public int Unk0 { get; set; }
+        public string ItemDescription { get; set; }
+        public string ItemIconPath { get; set; }
+        public int Unk1 { get; set; } //always empty
+        public int Unk2 { get; set; }
     }
 
 
@@ -23,5 +23,6 @@
         FuseItem = 5, //Param is 0 always
         Watchpart = 7, //Param is 0 always
         Food = 2, //Param value is unknown
+        SkillBooster = 10, //Param is always 1
     }
 }

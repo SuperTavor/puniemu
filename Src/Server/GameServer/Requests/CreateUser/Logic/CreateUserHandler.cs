@@ -124,7 +124,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
             // in wibwob the title is not gender specific in puni yes
             var title = PlayerTitle.Kun_Little;
             if (!DataManager.Logic.DataManager.IsWibWob) title = (PlayerTitle)deserialized.IconID;
-            var generatedUserData = new YwpUserData((PlayerIcon)deserialized.IconID, title, deserialized.Level5UserID, deserialized.PlayerName);
+            var generatedUserData = new YwpUserData((PlayerIcon)deserialized.IconID, title, deserialized.PlayerName);
             acc.StartDate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             generatedUserData.CharacterID = acc.CharacterId;
             generatedUserData.UserID = System.IO.Hashing.Crc32.HashToUInt32(System.Text.Encoding.UTF8.GetBytes(generatedUserData.CharacterID)).ToString();

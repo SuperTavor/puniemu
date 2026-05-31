@@ -54,6 +54,7 @@ using Puniemu.Src.Server.GameServer.Requests.BuyItem.Logic;
 using Puniemu.Src.Server.GameServer.Requests.Map.Map.Logic;
 using Puniemu.Src.Server.GameServer.Requests.LevelLockOff.Logic;
 using Puniemu.Src.Server.GameServer.Requests.GetMission.Logic;
+using Puniemu.Src.Server.GameServer.Requests.UseItem.Logic;
 namespace Puniemu.Src;
 class Program
 {
@@ -247,6 +248,10 @@ class Program
         app.MapPost("/buyItem.nhn", async ctx =>
         {
             await BuyItemHandler.HandleAsync(ctx);
+        });
+        app.MapPost("/useItem.nhn", async ctx =>
+        {
+            await UseItemHandler.HandleAsync(ctx);
         });
         app.MapPost("/getLimitHitodama.nhn", async ctx =>
         {

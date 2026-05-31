@@ -184,7 +184,7 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
             }
             await ManageData.SetYwpUserAsync(gdkey, "ywp_user_data", this);
         }
-        public YwpUserData(PlayerIcon icon, PlayerTitle title, string gdkey, string playerName)
+        public YwpUserData(PlayerIcon icon, PlayerTitle title, string playerName)
         {
             this.YoukaiId = 2235000;
             this.PlayerName = playerName;

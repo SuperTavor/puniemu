@@ -98,7 +98,7 @@ namespace Puniemu.Src.TableParser.DataClasses
         public int StageType { get; set; } 
         public long StageNo { get; set; }
         public long FirstStageFlag { get; set; }
-        public long BossFlag { get; set; }
+        public int BossFlag { get; set; }
         public int UseActionPoint { get; set; } //not sure
         public long StarCond1 { get; set; }
         public long StarCond2 { get; set; }
@@ -110,8 +110,8 @@ namespace Puniemu.Src.TableParser.DataClasses
         public string? NextStageRelationCode { get; set; }
         public string? HideStageRelationCode { get; set; }
         public long RecommendLevel { get; set; }
-        public long UseActionType { get; set; }
-        public long UseActionId { get; set; }
+        public int UseActionType { get; set; }
+        public int UseActionId { get; set; }
         public long StageObjectType { get; set; }
         public string? BgmFileName { get; set; }
         public long Unk2 { get; set; }

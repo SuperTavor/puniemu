@@ -365,7 +365,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
 
             // items data
             var itemsList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_item");
-            var userItemTable = new TableParser.Logic.TableParser<YwpUserItemEntry>(itemsList!);
+            var userItemTable = new TableParser.Logic.TableParser<YwpUserItem>(itemsList!);
 
 
             //edit stage data

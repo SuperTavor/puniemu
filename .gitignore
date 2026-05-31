@@ -16,6 +16,9 @@
 # Mono auto generated files
 mono_crash.*
 
+
+Tools/stage
+tools/half_stage_data - Copy.json
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
