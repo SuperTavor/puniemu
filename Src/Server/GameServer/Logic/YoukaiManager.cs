@@ -12,11 +12,13 @@ namespace Puniemu.Src.Server.GameServer.Logic
 {
     public class YoukaiManager
     {
+        static readonly int[] SoulLevelCosts = { 0, 1000, 2000, 4000, 6000, 9000, 12000 };
+
         static int SoulLevelFormula(int n)
         {
-            if (n == 0)
+            if (n < 0 || n >= SoulLevelCosts.Length)
                 return 0;
-            return Math.Max(1, (n * (n + 1)) / 3) * 1000;
+            return SoulLevelCosts[n];
         }
         static int SoulLevel(int n)
         {
