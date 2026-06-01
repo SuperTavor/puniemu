@@ -51,17 +51,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.BuyItem.Logic
             //Check if daily limit not reached
             if (item.LimitCnt > 0)
             {
-                string todayStr = DateTime.UtcNow.ToString("yyyyMMdd");
-                var lastResetDate = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "lastShopResetDate");
-
-                if (lastResetDate != todayStr)
-                {
-                    await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "ywp_user_shop_item_remain_cnt", "");
-
-                    await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "lastShopResetDate", todayStr);
-
-                }
-
+                await ShopLimitManager.CheckShopLimitReset(deserialized.Gdkey);
                 var userRemainCntStr = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_shop_item_remain_cnt");
                 TableParser<YwpUserShopItemRemainCnt> userRemainCnt = new(userRemainCntStr);
                 var remainCountItem = userRemainCnt.Items.FirstOrDefault(x => x.ItemID == item.GoodsId);

@@ -24,6 +24,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.Logic
             var deserialized = JsonConvert.DeserializeObject<LoginRequest>(requestJsonString!)!;
 
             var acc = await UserDataManager.Logic.UserDataManager.GetAccountFromGdkeyAsync(deserialized.Gdkey!);
+
+            await ShopLimitManager.CheckShopLimitReset(deserialized.Gdkey);
             //Construct response
             CommonLoginResponse res = new CommonLoginResponse();
             if (DataManager.Logic.DataManager.IsWibWob)
