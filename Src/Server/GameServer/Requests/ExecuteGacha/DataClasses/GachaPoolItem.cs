@@ -8,6 +8,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.DataClasses
         [JsonProperty("gachaId")]
         public int GachaId { get; set; }
 
+        [JsonProperty("convertItem")]
+        public Dictionary<string, ItemWonPopup> ConvertItem { get; set; }
+
         [JsonProperty("weights")]
         public Dictionary<string, double> Weights { get; set; }
 

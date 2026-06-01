@@ -1,10 +1,17 @@
 ﻿using Newtonsoft.Json;
+using Puniemu.Src.Server.GameServer.Logic;
+using Puniemu.Src.TableParser.DataClasses;
+using Puniemu.Src.TableParser.Logic;
+using System.Runtime.CompilerServices;
 
 namespace Puniemu.Src.Server.GameServer.DataClasses
 {
     // probably youkai popup, maybe also used for crank-a-kai
     public class YokaiWonPopup
     {
+        [JsonIgnore]
+        private const int MAX_SOULT = 7;
+
         [JsonProperty("bonusEffectLevelAfter")]
         public int BonusEffectLevelAfter = 0;
 
@@ -56,5 +63,28 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
 
         [JsonProperty("releaseLevelType")]
         public int ReleaseLevelType = 0;
+
+
+        public static YokaiGetType CheckGetType(long yokaiId, TableParser<YwpUserYoukai> userYokai, TableParser<YwpUserYoukaiSkill> userSkill)
+        {
+            YokaiGetType getType = 0;
+            var yokaiIdx = YoukaiManager.GetYoukaiIndex(userYokai, yokaiId);
+            if (yokaiIdx == -1)
+            {
+                getType = YokaiGetType.NewYokai;
+            }
+            else
+            {
+                var soultIdx = YoukaiManager.GetYoukaiSkillIndex(userSkill, yokaiId);
+                if (soultIdx == -1) throw new Exception("No soult idx found for yokai");
+                var soultLvl = userSkill.Items[soultIdx].Level;
+                if (soultLvl == MAX_SOULT)
+                {
+                    getType = YokaiGetType.MaxLevel;
+                }
+                else getType = YokaiGetType.SoultLevelUp;
+            }
+            return getType;
+        }
     }
 }

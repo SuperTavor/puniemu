@@ -40,6 +40,15 @@ public class ExecuteGachaResponseConverter : JsonConverter<ExecuteGachaResponse>
                 }
             }
 
+            if (value.GachaPrizeList[0].ConvertItemInfo != null)
+            {
+                var itemWonInfo = JObject.FromObject(value.GachaPrizeList[0].ConvertItemInfo!);
+                foreach (var prop in itemWonInfo.Properties())
+                {
+                    responseObj[prop.Name] = prop.Value;
+                }
+            }
+
             responseObj.Remove("gachaPrizeList");
         }
     normalWrite:

@@ -437,7 +437,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                             res.YoukaiPopupResult.LevelAfter = 1; //level todo
 
                             //Should add check to see if the yokai is already befriended and show the soult level up screen
-                            res.YoukaiPopupResult.GetTypes = YokaiGetType.NewYokai; //IDK Todo
+                            res.YoukaiPopupResult.GetTypes = YokaiWonPopup.CheckGetType(YoukaiId, userYoukaiTable, userYoukaiSkillTable); //IDK Todo
                             res.YoukaiPopupResult.YoukaiId = YoukaiId;
                             res.YoukaiPopupResult.ReleaseType = 0; //IDK todo
                             // skill data is null in the response for now so : IDK | TODO

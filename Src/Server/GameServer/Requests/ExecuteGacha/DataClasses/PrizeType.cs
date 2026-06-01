@@ -4,5 +4,6 @@
     {
         Item = 1,
         Yokai = 2,
+        ConvertItem = 4,
     }
 }
