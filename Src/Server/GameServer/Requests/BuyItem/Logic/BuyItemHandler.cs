@@ -4,6 +4,7 @@ using Puniemu.Src.NHNCrypt.Logic;
 using Puniemu.Src.Server.GameServer.DataClasses;
 using Puniemu.Src.Server.GameServer.Requests.BuyItem.DataClasses;
 using Puniemu.Src.TableParser.DataClasses;
+using Puniemu.Src.TableParser.Logic;
 using Puniemu.Src.UserDataManager.Logic;
 using System.Buffers;
 using System.Text;
@@ -31,6 +32,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.BuyItem.Logic
                 .ToObject<List<ShopItem>>();
 
             var item = itemList.Where(x => x.GoodsId == deserialized.GoodsId).FirstOrDefault();
+
             if(item == null)
             {
                 await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(
@@ -46,6 +48,44 @@ namespace Puniemu.Src.Server.GameServer.Requests.BuyItem.Logic
                 return;
             }
 
+            //Check if daily limit not reached
+            if (item.LimitCnt > 0)
+            {
+                string todayStr = DateTime.UtcNow.ToString("yyyyMMdd");
+                var lastResetDate = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "lastShopResetDate");
+
+                if (lastResetDate != todayStr)
+                {
+                    await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "ywp_user_shop_item_remain_cnt", "");
+
+                    await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "lastShopResetDate", todayStr);
+
+                }
+
+                var userRemainCntStr = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_shop_item_remain_cnt");
+                TableParser<YwpUserShopItemRemainCnt> userRemainCnt = new(userRemainCntStr);
+                var remainCountItem = userRemainCnt.Items.FirstOrDefault(x => x.ItemID == item.GoodsId);
+                if (remainCountItem == null)
+                { 
+                    remainCountItem = new YwpUserShopItemRemainCnt() { ItemID = deserialized.GoodsId, AlreadyBought = 0};
+                    userRemainCnt.Items.Add(remainCountItem);
+                }
+                //Check if can still buy
+                if(remainCountItem.AlreadyBought + deserialized.GoodsCount <= item.LimitCnt)
+                {
+                    remainCountItem.AlreadyBought += deserialized.GoodsCount;
+                    res.YwpUserShopItemRemainCount = userRemainCnt.ToString();
+                    await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey,"ywp_user_shop_item_remain_cnt", res.YwpUserShopItemRemainCount);
+                }
+                else
+                {
+                    await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(
+                       JsonConvert.SerializeObject(new MsgBoxResponse($"Item is out of stock for today.", "Out of stock"))));
+                    return;
+                }
+            }
+           
+
             //Subtract price
             var ymoneyToSubtract = item.Price * deserialized.GoodsCount;
 
@@ -58,7 +98,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.BuyItem.Logic
 
             if(itemIdx == -1)
             {
-                //If user doesnt already have item, add it to inventory
+                //if doesnt have item add to inventory
                 userItems.Items.Add(new YwpUserItem { ItemId = deserialized.GoodsId, Count = deserialized.GoodsCount });
             }
             else

@@ -23,7 +23,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.BuyItem.DataClasses
         [JsonProperty("ywp_user_item")]
         public string YwpUserItem { get; set; }
 
-        //idk
+        //How much stock remains for item
         [JsonProperty("ywp_user_shop_item_remain_cnt")]
         public string YwpUserShopItemRemainCount { get; set; }
 

@@ -15,6 +15,8 @@ public class CommonLoginResponse : CommonResponse
     [JsonProperty("teamEventButtonHiddenFlg")]
     public int TeamEventButtonHiddenFlag { get; set; }
 
+    [JsonProperty("ywp_user_shop_item_remain_cnt")]
+    public string YwpUserShopItemRemainCnt { get; set; }
     [JsonProperty("noticePageList")]
     public List<object> NoticePageList { get; set; }
 
@@ -61,5 +63,6 @@ public class CommonLoginResponse : CommonResponse
         OpeningTutorialFlag =
             await UserDataManager
                 .GetYwpUserAsync<int>(gdkey, "opening_tutorial_flg");
+        YwpUserShopItemRemainCnt = await UserDataManager.GetYwpUserAsync<string>(gdkey, $"ywp_user_shop_item_remain_cnt_{DateTime.UtcNow.ToString("yyyyMMdd")}")   ;
     }
 }
