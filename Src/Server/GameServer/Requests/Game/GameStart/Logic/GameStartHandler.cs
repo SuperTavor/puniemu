@@ -225,7 +225,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
                         }
                         var mstYokaiItem = mstYokai.Items.Where(x => x.YoukaiId == yokaiId).FirstOrDefault();
                         string lotRes = "0000";
-                        if(!mstYokaiItem.Equals(null))
+                        if(!(mstYokaiItem == null))
                         {
                             var yokaiRank = mstYokaiItem.YoukaiRarity;
                             var befriend = Random.Shared.Next(100) < placeholderOdds[yokaiRank];
