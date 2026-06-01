@@ -18,6 +18,7 @@ mono_crash.*
 
 
 Tools/stage
+Tools/puni
 tools/half_stage_data - Copy.json
 # Build results
 [Dd]ebug/

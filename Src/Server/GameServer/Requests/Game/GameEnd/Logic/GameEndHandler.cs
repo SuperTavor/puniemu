@@ -267,43 +267,58 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
             StageManager.EditStage(ywpUserStage, deserialized.StageId, 1, deserialized.Score, res.UserGameResultData.StarGetFlg1, res.UserGameResultData.StarGetFlg2, res.UserGameResultData.StarGetFlg3, ywpUserStage.Items[stageIndex].NumClear + 1);
 
 
-            // beta might only work for few maps
             bool mapLocked = false;
             long nextStage = MasterStageData.GetNextStage(deserialized.StageId);
+
+            void UnlockMap(long mapId)
+            {
+                int mstIndex = MstMapManager.GetMapIndex(ywpMstMap, mapId);
+                if (mstIndex == -1) return;
+
+                int newMapIndex = MapManager.GetMapIndex(ywpUserMap, ywpMstMap[mstIndex].MapId);
+
+                if (newMapIndex == -1)
+                {
+                    mapLocked = !ywpMstMap[mstIndex].TextUnlock.IsNullOrEmpty();
+                    MapManager.AddMap(ywpUserMap, ywpMstMap[mstIndex].MapId);
+                }
+
+                MapManager.UpdateMap(ywpUserMap, ywpMstMap[mstIndex].MapId, 1);
+
+                nextStage = (ywpMstMap[mstIndex].MapId * 1000) + 1;
+            }
+
             if (nextStage == -1) // new map
             {
-                var OgMapIndex = MstMapManager.GetMapIndex(ywpMstMap, (int)Math.Floor(deserialized.StageId / 1000.0));
-                if (OgMapIndex != -1 && ywpMstMap[OgMapIndex].NextMapId != 0)
+                var ogMapIndex = MstMapManager.GetMapIndex(ywpMstMap, (int)Math.Floor(deserialized.StageId / 1000.0));
+
+                if (ogMapIndex != -1)
                 {
-                    int NewMstMapIndex = MstMapManager.GetMapIndex(ywpMstMap, ywpMstMap[OgMapIndex].NextMapId);
-                    if (NewMstMapIndex != -1)
-                    {
-                        int newMapIndex = MapManager.GetMapIndex(ywpUserMap, ywpMstMap[NewMstMapIndex].MapId);
-                        if (newMapIndex == -1)
-                        {
-                            mapLocked = !ywpMstMap[NewMstMapIndex].TextUnlock.IsNullOrEmpty();
-                            MapManager.AddMap(ywpUserMap, ywpMstMap[NewMstMapIndex].MapId);
-                        }
-                        MapManager.UpdateMap(ywpUserMap, ywpMstMap[NewMstMapIndex].MapId, 1);
-                        nextStage = (ywpMstMap[NewMstMapIndex].MapId * 1000) + 1;
-                    }
+                    var ogMap = ywpMstMap[ogMapIndex];
+
+                    if (ogMap.NextMapId != 0)
+                        UnlockMap(ogMap.NextMapId);
+
+                    if (ogMap.ExtraMapId != 0)
+                        UnlockMap(ogMap.ExtraMapId);
                 }
             }
+
             if (nextStage != -1 && StageManager.GetStageIndex(ywpUserStage, nextStage) == -1)
             {
-                if (mapLocked == false) // we don't create stage placeholder if the new map is locked
+                if (mapLocked == false)
                 {
                     StageManager.AddStage(ywpUserStage, nextStage);
                 }
-                var nextStageItem = new LockedStageResultList()
+
+                res.LockedStageResultList.Add(new LockedStageResultList()
                 {
                     StageId = nextStage,
                     Title = "",
                     ConditionType = 0,
                     Description = "",
                     OriginStageId = 0,
-                };
-                res.LockedStageResultList.Add(nextStageItem);
+                });
             }
         }
         public static async Task HandleAsync(HttpContext ctx)
@@ -405,11 +420,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 {
                     if (YoukaiId != 0) {
                         if (res.UserGameResultData.RewardYoukaiId == 0L) {
-                            dictionaryYoukaiTable = DictionaryManager.EditDictionary(dictionaryYoukaiTable, YoukaiId, false, true);
-                            dictionaryDiff = DictionaryManager.EditDictionary(dictionaryDiff, YoukaiId, false, true);
-                            res.UserGameResultData.RewardYoukaiId = YoukaiId;
-                            YoukaiManager.AddYoukai(userYoukaiTable, YoukaiId, userYoukaiSkillTable);
-                            YoukaiManager.AddYoukai(youkaiDiff, YoukaiId, youkaiSkillDiff);
 
                             res.YoukaiPopupResult = new();
                             res.YoukaiPopupResult.IsWBonusEffectOpen = false; //IDK : TODO
@@ -422,15 +432,25 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                             res.YoukaiPopupResult.LevelAfter = 1; //level todo
 
                             //Should add check to see if the yokai is already befriended and show the soult level up screen
-                            res.YoukaiPopupResult.GetTypes = YokaiGetType.NewYokai; //IDK Todo
+                            res.YoukaiPopupResult.GetTypes = YokaiWonPopup.CheckGetType(YoukaiId, userYoukaiTable, userYoukaiSkillTable);
                             res.YoukaiPopupResult.YoukaiId = YoukaiId;
                             res.YoukaiPopupResult.ReleaseType = 0; //IDK todo
-                            // skill data is null in the response for now so : IDK | TODO
                             res.YoukaiPopupResult.ExchgYmoney = 0; //IDK TODO
                             res.YoukaiPopupResult.LimitLevelAfter = 0; //IDK todo
                             res.YoukaiPopupResult.LimitLevelBefore = 0; //IDK todo
                             res.YoukaiPopupResult.ReleaseLevelType = 0; //IDK TODO
 
+                            if(res.YoukaiPopupResult.GetTypes == YokaiGetType.SoultLevelUp)
+                            {
+                                res.YoukaiPopupResult.Skill = YoukaiManager.AddExpToSkill(userYoukaiSkillTable, YoukaiId, 1000);
+                            }
+
+                            //Register yokai
+                            dictionaryYoukaiTable = DictionaryManager.EditDictionary(dictionaryYoukaiTable, YoukaiId, false, true);
+                            dictionaryDiff = DictionaryManager.EditDictionary(dictionaryDiff, YoukaiId, false, true);
+                            res.UserGameResultData.RewardYoukaiId = YoukaiId;
+                            YoukaiManager.AddYoukai(userYoukaiTable, YoukaiId, userYoukaiSkillTable);
+                            YoukaiManager.AddYoukai(youkaiDiff, YoukaiId, youkaiSkillDiff);
                         }
                     }
                 }

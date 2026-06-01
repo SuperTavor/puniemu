@@ -15,6 +15,9 @@ public class CommonLoginResponse : CommonResponse
     [JsonProperty("teamEventButtonHiddenFlg")]
     public int TeamEventButtonHiddenFlag { get; set; }
 
+    [JsonProperty("ywp_user_shop_item_remain_cnt")]
+    public string YwpUserShopItemRemainCnt { get; set;
+   }
     [JsonProperty("noticePageList")]
     public List<object> NoticePageList { get; set; }
 

@@ -116,7 +116,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
             var enemyParams = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai_enemy_param"]!)!["tableData"]);
             
                 
-            var YwpUserYoukaiSkillTab = new TableParser.Logic.TableParser((await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai_skill"))!);
+            var YwpUserYoukaiSkillTab = new TableParser.Logic.TableParser<YwpUserYoukaiSkill>((await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai_skill"))!);
             var YwpUserYoukaiSSkillTab = new TableParser.Logic.TableParser((await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai_strong_skill"))!);
 
             var mstYokai = new TableParser.Logic.TableParser<YwpMstYoukai>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai"]);
@@ -214,11 +214,25 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
                         bool isBoss = MasterStageData.StageItems[stageInfoIdx].BossFlag != 0;
                         bool isAfterJibanyan = tutorialList.GetStatus(2002, 2) == 1;
                         var yokaiId = int.Parse(enemyParams.Table[enemyParamsIdx][1]);
-                        var yokaiRank = mstYokai.Items.Where(x => x.YoukaiId == yokaiId).First().YoukaiRarity;
-                        var befriend = Random.Shared.Next(100) < placeholderOdds[yokaiRank];
-                        var lotRes = "0000";
-                        if (befriend && !isBoss && isAfterJibanyan) lotRes = "1111";
+                        var skillIdx = YoukaiManager.GetYoukaiSkillIndex(YwpUserYoukaiSkillTab, enemyId);
+
+                        //LB not implemented yet
+
+                        bool isMaxSkill = false;
+                        if(skillIdx != -1)
+                        {
+                            isMaxSkill = YwpUserYoukaiSkillTab.Items[skillIdx].Level >= 7;
+                        }
+                        var mstYokaiItem = mstYokai.Items.Where(x => x.YoukaiId == yokaiId).FirstOrDefault();
+                        string lotRes = "0000";
+                        if(!(mstYokaiItem == null) && mstYokaiItem.YoukaiRarity != RarityType.RarityNone)
+                        {
+                            var yokaiRank = mstYokaiItem.YoukaiRarity;
+                            var befriend = Random.Shared.Next(100) < placeholderOdds[yokaiRank];
+                            if (befriend && !isBoss && isAfterJibanyan && !isMaxSkill) lotRes = "1111";
+                        }
                         item.LotYoukaiInfoList.Entries.Add(new LotYoukaiInfo { LotPattern = "00000", LotResult = lotRes });
+
                     }
                     res.EnemyYoukaiList.Add(item);
                 }
@@ -241,7 +255,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
                 if (YwpUserYoukaiSSkillIndex != -1)
                     item.SSkillLevel = int.Parse(YwpUserYoukaiSSkillTab.Table[YwpUserYoukaiSSkillIndex][1]);
                 if (YwpUserYoukaiSkillIndex != -1)
-                    item.SkillLevel = int.Parse(YwpUserYoukaiSkillTab.Table[YwpUserYoukaiSkillIndex][1]);
+                    item.SkillLevel = YwpUserYoukaiSkillTab.Items[YwpUserYoukaiSkillIndex].Level;
                 res.UserYoukaiList.Add(item);
             }
 

@@ -149,7 +149,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             }
             else
             {
-                prizes.Add(GachaPoolManager.RegisterYokaiAndGetPrize(deserialized.RequestYoukaiId, CapsuleColor.Gray, 0, userYokaiTable, userSkillTable, dictionaryListTable));
+                prizes.Add(GachaPoolManager.RegisterYokaiAndGetPrize(deserialized.RequestYoukaiId, CapsuleColor.Gray, 0, userYokaiTable, userSkillTable, dictionaryListTable, userItemtable, gachaId));
                 pullCount = 1;
             }
 

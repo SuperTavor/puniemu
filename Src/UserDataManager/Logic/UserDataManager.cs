@@ -236,8 +236,7 @@ namespace Puniemu.Src.UserDataManager.Logic
         public static async Task<T?> GetYwpUserAsync<T>(string gdkey, string tableId)
         {
             var account = await GetAccountFromGdkeyAsync(gdkey);
-            var tbl = account.YwpUserTables![tableId];
-            if (tbl == null)
+            if (!account.YwpUserTables.TryGetValue(tableId, out var tbl) || tbl == null)
                 return default;
             JToken token = JToken.FromObject(tbl);
             var obj = token.ToObject<T>();
@@ -246,9 +245,16 @@ namespace Puniemu.Src.UserDataManager.Logic
             {
                 await ywp.HitodamaRecover(gdkey);
             }
+
             return obj;
         }
 
+        public static async Task DeleteYwpUserAsync(string gdkey, string tableId)
+        {
+            var account = await GetAccountFromGdkeyAsync(gdkey);
+            account.YwpUserTables!.Remove(tableId);
+            account.IsDirty = true;
+        }
         public static async Task<T?> GetYwpUserFromJson<T>(string tableId, Dictionary<string, object?> YwpUserTables, string? gdkey)
         {
             var tbl = YwpUserTables[tableId];
