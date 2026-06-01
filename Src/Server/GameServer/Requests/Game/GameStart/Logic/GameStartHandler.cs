@@ -223,10 +223,14 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
                         {
                             isMaxSkill = YwpUserYoukaiSkillTab.Items[skillIdx].Level >= 7;
                         }
-                        var yokaiRank = mstYokai.Items.Where(x => x.YoukaiId == yokaiId).First().YoukaiRarity;
-                        var befriend = Random.Shared.Next(100) < placeholderOdds[yokaiRank];
-                        var lotRes = "0000";
-                        if (befriend && !isBoss && isAfterJibanyan && !isMaxSkill) lotRes = "1111";
+                        var mstYokaiItem = mstYokai.Items.Where(x => x.YoukaiId == yokaiId).FirstOrDefault();
+                        string lotRes = "0000";
+                        if(!mstYokaiItem.Equals(null))
+                        {
+                            var yokaiRank = mstYokaiItem.YoukaiRarity;
+                            var befriend = Random.Shared.Next(100) < placeholderOdds[yokaiRank];
+                            if (befriend && !isBoss && isAfterJibanyan && !isMaxSkill) lotRes = "1111";
+                        }
                         item.LotYoukaiInfoList.Entries.Add(new LotYoukaiInfo { LotPattern = "00000", LotResult = lotRes });
                     }
                     res.EnemyYoukaiList.Add(item);
