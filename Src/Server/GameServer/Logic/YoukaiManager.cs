@@ -80,6 +80,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
                 int denominator = SoulLevelFormula(new_level);
                 int numerator = new_points - SoulPoints(new_level - 1);
                 int percentage = (int)(((double)numerator / (double)denominator) * 100);
+                if (new_level >= 7) percentage = 0;
 
                 res.After.Level = new_level;
                 res.After.ExpBar.Denominator = denominator;
