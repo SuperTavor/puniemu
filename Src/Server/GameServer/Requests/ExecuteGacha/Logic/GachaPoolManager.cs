@@ -41,7 +41,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
 
         public static GachaPrize RegisterYokaiAndGetPrize(long yokaiId, CapsuleColor capsule, RarityType rank, TableParser<YwpUserYoukai> userYokaiTable, TableParser<YwpUserYoukaiSkill> userSkillTable, TableParser.Logic.TableParser dictionaryListTable, TableParser<YwpUserItem> userItem, int gachaId)
         {
-            yokaiId = 2152000;
             var prizeType = PrizeType.Yokai;
             SkillResult? skill = YoukaiManager.AddExpToSkill(userSkillTable, yokaiId, 1000);
             var getType = YokaiWonPopup.CheckGetType(yokaiId, userYokaiTable, userSkillTable);
@@ -73,7 +72,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             }
             else
             {
-                var itemIdForConvert = 20703;
                 convertItemInfo = new()
                 {
                     OGPrizeType = PrizeType.Yokai,
@@ -84,7 +82,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
                 itemForConvert = Gachas[gachaId].ConvertItem[rank.ToString()];
 
                 prizeType = PrizeType.ConvertItem;
-                ItemManager.AddItem(userItem, itemIdForConvert, item_count:1);
+                ItemManager.AddItem(userItem, itemForConvert.ItemId, item_count:1);
             }
               
             //Register yokai if not registered
