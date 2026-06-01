@@ -231,7 +231,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
                             var befriend = Random.Shared.Next(100) < placeholderOdds[yokaiRank];
                             if (befriend && !isBoss && isAfterJibanyan && !isMaxSkill) lotRes = "1111";
                         }
-                        item.LotYoukaiInfoList.Entries.Add(new LotYoukaiInfo { LotPattern = "00000", LotResult = lotRes });
+                        //item.LotYoukaiInfoList.Entries.Add(new LotYoukaiInfo { LotPattern = "00000", LotResult = lotRes });
+                        item.LotYoukaiInfoList.Entries.Add(new LotYoukaiInfo { LotPattern = "00000", LotResult = "1111" });
                     }
                     res.EnemyYoukaiList.Add(item);
                 }

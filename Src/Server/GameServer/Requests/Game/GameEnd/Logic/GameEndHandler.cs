@@ -420,11 +420,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 {
                     if (YoukaiId != 0) {
                         if (res.UserGameResultData.RewardYoukaiId == 0L) {
-                            dictionaryYoukaiTable = DictionaryManager.EditDictionary(dictionaryYoukaiTable, YoukaiId, false, true);
-                            dictionaryDiff = DictionaryManager.EditDictionary(dictionaryDiff, YoukaiId, false, true);
-                            res.UserGameResultData.RewardYoukaiId = YoukaiId;
-                            YoukaiManager.AddYoukai(userYoukaiTable, YoukaiId, userYoukaiSkillTable);
-                            YoukaiManager.AddYoukai(youkaiDiff, YoukaiId, youkaiSkillDiff);
 
                             res.YoukaiPopupResult = new();
                             res.YoukaiPopupResult.IsWBonusEffectOpen = false; //IDK : TODO
@@ -440,12 +435,22 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                             res.YoukaiPopupResult.GetTypes = YokaiWonPopup.CheckGetType(YoukaiId, userYoukaiTable, userYoukaiSkillTable);
                             res.YoukaiPopupResult.YoukaiId = YoukaiId;
                             res.YoukaiPopupResult.ReleaseType = 0; //IDK todo
-                            // skill data is null in the response for now so : IDK | TODO
                             res.YoukaiPopupResult.ExchgYmoney = 0; //IDK TODO
                             res.YoukaiPopupResult.LimitLevelAfter = 0; //IDK todo
                             res.YoukaiPopupResult.LimitLevelBefore = 0; //IDK todo
                             res.YoukaiPopupResult.ReleaseLevelType = 0; //IDK TODO
 
+                            if(res.YoukaiPopupResult.GetTypes == YokaiGetType.SoultLevelUp)
+                            {
+                                res.YoukaiPopupResult.Skill = YoukaiManager.AddExpToSkill(userYoukaiSkillTable, YoukaiId, 1000);
+                            }
+
+                            //Register yokai
+                            dictionaryYoukaiTable = DictionaryManager.EditDictionary(dictionaryYoukaiTable, YoukaiId, false, true);
+                            dictionaryDiff = DictionaryManager.EditDictionary(dictionaryDiff, YoukaiId, false, true);
+                            res.UserGameResultData.RewardYoukaiId = YoukaiId;
+                            YoukaiManager.AddYoukai(userYoukaiTable, YoukaiId, userYoukaiSkillTable);
+                            YoukaiManager.AddYoukai(youkaiDiff, YoukaiId, youkaiSkillDiff);
                         }
                     }
                 }
