@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Reflection.Metadata.Ecma335;
 using System.Runtime.CompilerServices;
 using System.Text;
+using UDM = Puniemu.Src.UserDataManager.Logic.UserDataManager;
 
 namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
 {
@@ -43,87 +44,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 {
                     continue;
                 }
-                UserYoukaiResultListRes item = new();
-                item.HaveFlg = false; // TODO
-                item.CanEvolve = false; //todo
-                item.IsLockLevel = false; //todo (need to paid to be able to level up)
-                item.isMaxLevel = false;
-                item.youkaiId = i.YoukaiId;
-                item.Before.Level = userYoukaiTable.Items[youkaiIDx].Level;
-                item.Before.Exp = (int)userYoukaiTable.Items[youkaiIDx].Exp;
-                item.Before.ExpBar.Denominator = userYoukaiTable.Items[youkaiIDx].ExpDenominator;
-                item.Before.ExpBar.Numerator = userYoukaiTable.Items[youkaiIDx].ExpNumerator;
-                item.Before.ExpBar.Percentage = userYoukaiTable.Items[youkaiIDx].Percentage;
-                item.After.Level = item.Before.Level;
-                item.After.Exp = item.Before.Exp;
-                item.After.ExpBar.Denominator = item.Before.ExpBar.Denominator;
-                item.After.ExpBar.Numerator = item.Before.ExpBar.Numerator;
-                item.After.ExpBar.Percentage = item.Before.ExpBar.Percentage;
 
-                
-                if (userYoukaiTable.Items[youkaiIDx].Level < YoukaiMstTable.Items[YoukaiMstIndex].MaxLevel && userYoukaiTable.Items[youkaiIDx].IsLockedLevel == 0)
-                {
-
-                    var LevelIndex = 0;
-                    var Level = item.Before.Level;
-                    item.After.Exp = item.Before.Exp + res.UserGameResultData.Exp;
-
-                    // get new level for youkai
-                    while (LevelIndex != -1)
-                    {
-                        LevelIndex = MstYoukaiManager.GetYoukaiLevelIndex(YoukaiLevelMstTable, YoukaiMstTable.Items[YoukaiMstIndex].LevelType, Level);
-                        Level++;
-                        if (LevelIndex == -1)
-                            break;
-                        if ((item.After.Exp < YoukaiLevelMstTable.Items[LevelIndex].BaseExp) || (item.After.Exp > YoukaiLevelMstTable.Items[LevelIndex].MaxExp))
-                        {
-                            continue;
-                        }
-                        item.After.Level = YoukaiLevelMstTable.Items[LevelIndex].Level;
-                        item.After.ExpBar.Denominator = (YoukaiLevelMstTable.Items[LevelIndex].MaxExp + 1) - YoukaiLevelMstTable.Items[LevelIndex].BaseExp;
-                        item.After.ExpBar.Numerator = item.After.Exp - YoukaiLevelMstTable.Items[LevelIndex].BaseExp;
-                        item.After.ExpBar.Percentage = (int)(((double)item.After.ExpBar.Numerator / (double)item.After.ExpBar.Denominator) * 100.0f);
-                        break;
-                    }
-
-                    int YoukaiLevelOpenIndex = MstYoukaiManager.GetYoukaiLevelOpenIndex(YoukaiLevelOpenMstTable, item.Before.Level, item.After.Level, YoukaiMstTable.Items[YoukaiMstIndex].YoukaiRarity);
-                    if (YoukaiLevelOpenIndex != -1)
-                    {
-                        item.After.Level = YoukaiLevelOpenMstTable.Items[YoukaiLevelOpenIndex].Level;
-                        userYoukaiTable.Items[youkaiIDx].IsLockedLevel = 1;
-                        int tmpindex = MstYoukaiManager.GetYoukaiLevelIndex(YoukaiLevelMstTable, YoukaiMstTable.Items[YoukaiMstIndex].LevelType, item.After.Level);
-                        if (tmpindex != -1)
-                        {
-                            item.After.ExpBar.Denominator = (YoukaiLevelMstTable.Items[tmpindex].MaxExp + 1) - YoukaiLevelMstTable.Items[tmpindex].BaseExp;
-                            item.After.Exp = YoukaiLevelMstTable.Items[tmpindex].BaseExp;
-                            item.After.ExpBar.Numerator = 0;
-                            item.After.ExpBar.Percentage = 0;
-                        }
-                    }
-                }
-                if (item.Before.Level != item.After.Level)
-                    item.HaveFlg = false;
-                userYoukaiTable.Items[youkaiIDx].Level = item.After.Level;
-                userYoukaiTable.Items[youkaiIDx].Exp = item.After.Exp;
-                userYoukaiTable.Items[youkaiIDx].ExpDenominator = item.After.ExpBar.Denominator;
-                userYoukaiTable.Items[youkaiIDx].ExpNumerator = item.After.ExpBar.Numerator;
-                userYoukaiTable.Items[youkaiIDx].Percentage = item.After.ExpBar.Percentage;
-
-                int hpOffset = (YoukaiMstTable.Items[YoukaiMstIndex].MaxHp - YoukaiMstTable.Items[YoukaiMstIndex].BaseHp) / YoukaiMstTable.Items[YoukaiMstIndex].MaxLevel;
-                int atkOffset = (YoukaiMstTable.Items[YoukaiMstIndex].MaxAtk - YoukaiMstTable.Items[YoukaiMstIndex].BaseAtk) / YoukaiMstTable.Items[YoukaiMstIndex].MaxLevel;
-                userYoukaiTable.Items[youkaiIDx].Hp += (hpOffset * (item.After.Level - item.Before.Level));
-                userYoukaiTable.Items[youkaiIDx].Atk += (atkOffset * (item.After.Level - item.Before.Level));
-                if (userYoukaiTable.Items[youkaiIDx].IsLockedLevel == 1)
-                {
-                    item.IsLockLevel = true;
-                }
-                if (userYoukaiTable.Items[youkaiIDx].Level >= YoukaiMstTable.Items[YoukaiMstIndex].MaxLevel)
-                {
-                    item.isMaxLevel = true;
-                    item.IsLockLevel = false;
-                    userYoukaiTable.Items[youkaiIDx].IsLockedLevel = 0;
-                    userYoukaiTable.Items[youkaiIDx].Level = YoukaiMstTable.Items[YoukaiMstIndex].MaxLevel;
-                }
+                UserYoukaiResultListRes item = new(userYoukaiTable.Items[youkaiIDx], YoukaiMstTable.Items[YoukaiMstIndex]);
+                MoneyExpManager.GiveYoukaiExp(item, userYoukaiTable.Items[youkaiIDx], i.YoukaiId, res.UserGameResultData.Exp, YoukaiMstTable.Items[YoukaiMstIndex]);
                 YwpUserYoukai yokai = userYoukaiTable.Items[youkaiIDx];
                 userYoukaiTableDiff.AddItem(yokai);
                 res.UserYoukaiResultList.Add(item);
@@ -173,25 +96,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 }
                 // we get the condition parameter
                 long param1 = MasterStageData.ConditionItems[tempIndex].ConditionVal1;
-                object sourceParam1 = 0;
-                if (MasterStageData.ConditionItems[tempIndex].ConditionType == ConditionType.MinScore)
-                {
-                    sourceParam1 = deserialized.Score;
-                }
-                else if (MasterStageData.ConditionItems[tempIndex].ConditionType == ConditionType.MaxClearTime)
-                {
-                    sourceParam1 = deserialized.ClearTimeSec;
-                }
-                else if (MasterStageData.ConditionItems[tempIndex].ConditionType == ConditionType.MinLinkSize)
-                {
-                    sourceParam1 = deserialized.LinkSizeMax;
-                }
-                else if (MasterStageData.ConditionItems[tempIndex].ConditionType == ConditionType.UsedYoukai)
-                {
-                    sourceParam1 = deserialized.UserYoukaiResultList!;
-                }
-
-                bool good = ConditionManager.ComputeCondition(MasterStageData.ConditionItems[tempIndex].ConditionType, sourceParam1, param1);
+                bool good = ConditionManager.ComputeStageCondition(MasterStageData.ConditionItems[tempIndex].ConditionType, deserialized, MasterStageData.ConditionItems[tempIndex].ConditionVal1, MasterStageData.ConditionItems[tempIndex].ConditionVal2, MasterStageData.ConditionItems[tempIndex].ConditionVal3);
                 Console.WriteLine(tempConditionId.ToString() + " | " + good.ToString() + " | " + MasterStageData.ConditionItems[tempIndex].ConditionType.ToString());
 
                 // 1-3 are generally the condition for stars, 4+ are generally locked levels condition
@@ -267,6 +172,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
             StageManager.EditStage(ywpUserStage, deserialized.StageId, 1, deserialized.Score, res.UserGameResultData.StarGetFlg1, res.UserGameResultData.StarGetFlg2, res.UserGameResultData.StarGetFlg3, ywpUserStage.Items[stageIndex].NumClear + 1);
 
 
+            // beta might only work for few maps
             bool mapLocked = false;
             long nextStage = MasterStageData.GetNextStage(deserialized.StageId);
 
@@ -287,7 +193,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
 
                 nextStage = (ywpMstMap[mstIndex].MapId * 1000) + 1;
             }
-
             if (nextStage == -1) // new map
             {
                 var ogMapIndex = MstMapManager.GetMapIndex(ywpMstMap, (int)Math.Floor(deserialized.StageId / 1000.0));
@@ -303,14 +208,12 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                         UnlockMap(ogMap.ExtraMapId);
                 }
             }
-
             if (nextStage != -1 && StageManager.GetStageIndex(ywpUserStage, nextStage) == -1)
             {
                 if (mapLocked == false)
                 {
                     StageManager.AddStage(ywpUserStage, nextStage);
                 }
-
                 res.LockedStageResultList.Add(new LockedStageResultList()
                 {
                     StageId = nextStage,
@@ -321,90 +224,35 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 });
             }
         }
-        public static async Task HandleAsync(HttpContext ctx)
+        public static void HandleTutorial(GameEndRequest deserialized, GameEndResponse res, TutorialList? tutorialList, StageData LevelData, int FirstClear)
         {
-            ctx.Response.ContentType = "application/json";
-            ctx.Request.EnableBuffering();
-            var buffer = new MemoryStream();
-            await ctx.Request.Body.CopyToAsync(buffer);
-            buffer.Seek(0, SeekOrigin.Begin);
-            string? requestJsonString;
-            using (var reader = new StreamReader(buffer, Encoding.UTF8))
+            if (LevelData.TutorialEdit != null && LevelData.TutorialEdit.TutorialResp != null)
             {
-                var readResult = await reader.ReadToEndAsync();
-                requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(readResult);
+                foreach (TutorialEntry item in LevelData.TutorialEdit.TutorialResp)
+                {
+                    if (tutorialList != null && (item.FirstClear == 0 || (item.FirstClear == 1 && FirstClear == 1)))
+                    {
+                        tutorialList.EditTutorialFlg(item.TutorialType, (int)item.TutorialId, item.TutorialStatus);
+                    }
+                }
             }
-            var deserialized = JsonConvert.DeserializeObject<GameEndRequest>(requestJsonString!);
-            if (deserialized == null)
+        }
+        public static void HandleMenuFunc(GameEndRequest deserialized, GameEndResponse res, StageData LevelData, TableParser<YwpUserMenufunc> menufuncListTable, int FirstClear)
+        {
+            if (LevelData.Menufunc != null)
             {
-                await GeneralUtils.SendBadRequest(ctx);
-                return;
+                foreach (MenufuncEntry item in LevelData.Menufunc)
+                {
+                    if (FirstClear == 1)
+                    {
+                        MenufuncManager.AddApp(menufuncListTable, item.Id, (int)item.Value);
+                    }
+                }
             }
-            var ReqId = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_requestid");
-            if ((ReqId == null || deserialized.RequestID == null || ReqId == "" || deserialized.RequestID == "") || (ReqId != deserialized.RequestID))
-            {
-                var errSession = new MsgBoxResponse("This session is invalid", "INVALID SESSION");
-                await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(errSession)));
-                return;
-            }
-            var jsonLevelData = JsonConvert.DeserializeObject<Dictionary<string, StageData>>(DataManager.Logic.DataManager.GameDataManager!.GamedataCache["stage_data"]);
-            if (jsonLevelData == null || !(jsonLevelData.ContainsKey(deserialized.StageId.ToString())))
-            {
-                await GeneralUtils.SendBadRequest(ctx);
-                return;
-            }
-            StageData LevelData = jsonLevelData[deserialized.StageId.ToString()];
-            var userData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized!.Gdkey!, "ywp_user_data");
-            if (userData == null)
-            {
-                await GeneralUtils.SendBadRequest(ctx);
-                return;
-            }
-            int newStarsCnt = 0;
-            var youkaiDiff = new TableParser<YwpUserYoukai>("");
-            var youkaiSkillDiff = new TableParser<YwpUserYoukaiSkill>("");
-            var dictionaryDiff = new TableParser.Logic.TableParser("");
-            var res = new GameEndResponse();
-
-            // PLACEHOLDER
-            res.UserGameResultData.Score = deserialized.Score;
-            res.UserGameResultData.Exp = Server.GameServer.Logic.MoneyExpManager.ScoreToExp(deserialized.Score); // credit : Flamer12344
-            res.UserGameResultData.Money = Server.GameServer.Logic.MoneyExpManager.ScoreToMoney(deserialized.Score); // credit : Flamer12344
-
-
-            res.UserGameResultData.StageId = deserialized.StageId;
-
+        }
+        public static void HandleDrop(GameEndRequest deserialized, GameEndResponse res, TableParser<YwpUserDictionary> dictionaryYoukaiTable, TableParser<YwpUserDictionary> dictionaryDiff, TableParser<YwpUserYoukai> userYoukaiTable, TableParser<YwpUserYoukai> youkaiDiff, TableParser<YwpUserYoukaiSkill> userYoukaiSkillTable, TableParser<YwpUserYoukaiSkill> youkaiSkillDiff, TableParser<YwpUserItem> userItemTable, TableParser.Logic.TableParser playerIconTable, YwpUserData userData, StageData LevelData, int FirstClear)
+        {
             var MstEnemyParam = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai_enemy_param"]!)!["tableData"]);
-            //var stageInfoIdx = stagesInfo.FindIndex([deserialized.StageId.ToString()]);
-            //List<long> starIdx = new List<long> { long.Parse(stagesInfo.Table[stageInfoIdx][8]), long.Parse(stagesInfo.Table[stageInfoIdx][9]), long.Parse(stagesInfo.Table[stageInfoIdx][10])};
-
-            // items data
-            var itemsList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_item");
-            var userItemTable = new TableParser.Logic.TableParser<YwpUserItem>(itemsList!);
-
-
-            //edit stage data
-            
-            
-            var ywpUserStage = new TableParser<YwpUserStage>(
-                await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_stage")
-            );
-            var ywpUserMap = new TableParser<YwpUserMap>(
-                await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_map")
-            );
-            int FirstClear = 0;
-            HandleStage(deserialized, res, ref FirstClear, ywpUserStage, ywpUserMap);
-
-
-
-                // enemy list
-                // gameEnd for some ywp_user data, he send only modified row (ywp_user_..._diff)
-            var userYoukai = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai");
-            var userYoukaiSkill = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai_skill");
-            var dictionaryYoukai = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_dictionary");
-            var dictionaryYoukaiTable = new TableParser.Logic.TableParser(dictionaryYoukai!);
-            var userYoukaiTable = new TableParser<YwpUserYoukai>(userYoukai!);
-            TableParser<YwpUserYoukaiSkill> userYoukaiSkillTable = new(userYoukaiSkill!);
 
             foreach (EnemyYoukaiResultList i in deserialized!.EnemyYoukaiResultList!)
             {
@@ -413,14 +261,15 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 if (MstEnemyParamIndex != -1)
                     YoukaiId = long.Parse(MstEnemyParam.Table[MstEnemyParamIndex][1]);
                 // add youkai to dictionary
-                dictionaryYoukaiTable = DictionaryManager.EditDictionary(dictionaryYoukaiTable, YoukaiId, true, false);
-                dictionaryDiff = DictionaryManager.EditDictionary(dictionaryDiff, YoukaiId, true, false);
+                DictionaryManager.EditDictionary(ref dictionaryYoukaiTable, YoukaiId, true, false);
+                DictionaryManager.EditDictionary(ref dictionaryDiff, YoukaiId, true, false);
                 // add yokai if befriend
                 if (i.DropYoukaiFlg == 1)
                 {
-                    if (YoukaiId != 0) {
-                        if (res.UserGameResultData.RewardYoukaiId == 0L) {
-
+                    if (YoukaiId != 0)
+                    {
+                        if (res.UserGameResultData.RewardYoukaiId == 0L)
+                        {
                             res.YoukaiPopupResult = new();
                             res.YoukaiPopupResult.IsWBonusEffectOpen = false; //IDK : TODO
                             res.YoukaiPopupResult.BonusEffectLevelBefore = 0; //IDK Todo
@@ -440,14 +289,12 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                             res.YoukaiPopupResult.LimitLevelBefore = 0; //IDK todo
                             res.YoukaiPopupResult.ReleaseLevelType = 0; //IDK TODO
 
-                            if(res.YoukaiPopupResult.GetTypes == YokaiGetType.SoultLevelUp)
+                            if (res.YoukaiPopupResult.GetTypes == YokaiGetType.SoultLevelUp)
                             {
                                 res.YoukaiPopupResult.Skill = YoukaiManager.AddExpToSkill(userYoukaiSkillTable, YoukaiId, 1000);
                             }
-
-                            //Register yokai
-                            dictionaryYoukaiTable = DictionaryManager.EditDictionary(dictionaryYoukaiTable, YoukaiId, false, true);
-                            dictionaryDiff = DictionaryManager.EditDictionary(dictionaryDiff, YoukaiId, false, true);
+                            DictionaryManager.EditDictionary(ref dictionaryYoukaiTable, YoukaiId, false, true);
+                            DictionaryManager.EditDictionary(ref dictionaryDiff, YoukaiId, false, true);
                             res.UserGameResultData.RewardYoukaiId = YoukaiId;
                             YoukaiManager.AddYoukai(userYoukaiTable, YoukaiId, userYoukaiSkillTable);
                             YoukaiManager.AddYoukai(youkaiDiff, YoukaiId, youkaiSkillDiff);
@@ -464,13 +311,11 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                     val.FirstRewardFlg = 0;
                     val.NewFlg = 0;
                     val.ThemeBonusFlg = 0;
-                    userItemTable = ItemManager.AddItem(userItemTable , i.DropItemId, 1);
+                    ItemManager.AddItem(userItemTable, i.DropItemId, 1);
                     res.UserItemResultList.Add(val);
                 }
             }
             //add first reward item
-            var playerIcon = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_player_icon");
-            var playerIconTable = new TableParser.Logic.TableParser(playerIcon!);
             if (FirstClear == 1)
             {
                 foreach (FirstRewardEntry entry in LevelData.FirstReward!)
@@ -503,58 +348,121 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                     res.UserItemResultList.Add(val);
                 }
             }
+        }
+        public static async Task HandleAsync(HttpContext ctx, GameEndType gameEndType)
+        {
+            ctx.Response.ContentType = "application/json";
+            ctx.Request.EnableBuffering();
+            var buffer = new MemoryStream();
+            await ctx.Request.Body.CopyToAsync(buffer);
+            buffer.Seek(0, SeekOrigin.Begin);
+            string? requestJsonString;
+            using (var reader = new StreamReader(buffer, Encoding.UTF8))
+            {
+                var readResult = await reader.ReadToEndAsync();
+                requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(readResult);
+            }
+            var deserialized = JsonConvert.DeserializeObject<GameEndRequest>(requestJsonString!);
+            if (deserialized == null)
+            {
+                await GeneralUtils.SendBadRequest(ctx);
+                return;
+            }
+            var ReqId = await UDM.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_requestid");
+            if ((ReqId == null || deserialized.RequestID == null || ReqId == "" || deserialized.RequestID == "") || (ReqId != deserialized.RequestID))
+            {
+                var errSession = new MsgBoxResponse("This session is invalid", "INVALID SESSION");
+                await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(errSession)));
+                return;
+            }
+            var jsonLevelData = JsonConvert.DeserializeObject<Dictionary<string, StageData>>(DataManager.Logic.DataManager.GameDataManager!.GamedataCache["stage_data"]);
+            if (jsonLevelData == null || !(jsonLevelData.ContainsKey(deserialized.StageId.ToString())))
+            {
+                await GeneralUtils.SendBadRequest(ctx);
+                return;
+            }
+            StageData LevelData = jsonLevelData[deserialized.StageId.ToString()];
+            var userData = await UDM.GetYwpUserAsync<YwpUserData>(deserialized!.Gdkey!, "ywp_user_data");
+            if (userData == null)
+            {
+                await GeneralUtils.SendBadRequest(ctx);
+                return;
+            }
 
+
+            int newStarsCnt = 0;
+            var youkaiDiff = new TableParser<YwpUserYoukai>("");
+            var youkaiSkillDiff = new TableParser<YwpUserYoukaiSkill>("");
+            var dictionaryDiff = new TableParser<YwpUserDictionary>("");
+            var res = new GameEndResponse();
+
+            res.UserGameResultData.Score = deserialized.Score;
+            res.UserGameResultData.Exp = Server.GameServer.Logic.MoneyExpManager.ScoreToExp(deserialized.Score); // credit : Flamer12344
+            res.UserGameResultData.Money = Server.GameServer.Logic.MoneyExpManager.ScoreToMoney(deserialized.Score); // credit : Flamer12344
+
+
+            res.UserGameResultData.StageId = deserialized.StageId;
+
+            // items data
+            var itemsList = await UDM.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_item");
+            var userItemTable = new TableParser.Logic.TableParser<YwpUserItem>(itemsList!);
+            
+            
+            var ywpUserStage = new TableParser<YwpUserStage>(
+                await UDM.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_stage")
+            );
+            var ywpUserMap = new TableParser<YwpUserMap>(
+                await UDM.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_map")
+            );
+
+            // gameEnd for some ywp_user data, he send only modified row (ywp_user_..._diff)
+            var userYoukai = await UDM.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai");
+            var userYoukaiSkill = await UDM.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai_skill");
+            var dictionaryYoukai = await UDM.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_dictionary");
+            var dictionaryYoukaiTable = new TableParser<YwpUserDictionary>(dictionaryYoukai!);
+            var userYoukaiTable = new TableParser<YwpUserYoukai>(userYoukai!);
+            TableParser<YwpUserYoukaiSkill> userYoukaiSkillTable = new(userYoukaiSkill!);
+            var playerIcon = await UDM.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_player_icon");
+            var playerIconTable = new TableParser.Logic.TableParser(playerIcon!);
+            var menufuncList = await UDM.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_menufunc");
+            var menufuncListTable = new TableParser<YwpUserMenufunc>(menufuncList!);
+            var tutorialList = await UDM.GetYwpUserAsync<TutorialList>(deserialized!.Gdkey!, "ywp_user_tutorial_list");
+
+            var MstEnemyParam = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai_enemy_param"]!)!["tableData"]);
+            foreach (EnemyYoukaiResultList i in deserialized!.EnemyYoukaiResultList!)
+            {
+                var MstEnemyParamIndex = MstEnemyParam.FindIndex([i.EnemyId.ToString()]);
+                long YoukaiId = 0L;
+                if (MstEnemyParamIndex != -1)
+                {
+                    YoukaiId = long.Parse(MstEnemyParam.Table[MstEnemyParamIndex][1]);
+                    DictionaryManager.EditDictionary(ref dictionaryYoukaiTable, YoukaiId, true, false);
+                    DictionaryManager.EditDictionary(ref dictionaryDiff, YoukaiId, true, false);
+                }
+            }
+            if (gameEndType == GameEndType.GameEnd)
+            {
+                int FirstClear = 0;
+                HandleStage(deserialized, res, ref FirstClear, ywpUserStage, ywpUserMap);
+                HandleDrop(deserialized, res, dictionaryYoukaiTable, dictionaryDiff, userYoukaiTable, youkaiDiff, userYoukaiSkillTable,  youkaiSkillDiff, userItemTable, playerIconTable, userData, LevelData, FirstClear);
+                HandleTutorial(deserialized, res, tutorialList, LevelData, FirstClear);
+                HandleMenuFunc(deserialized, res, LevelData, menufuncListTable, FirstClear);
+            }
             // yokai user list
             HandleUserYoukai(deserialized, res, userYoukaiTable, youkaiDiff);
 
-            // edit tutorial
-            var tutorialList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<TutorialList>(deserialized!.Gdkey!, "ywp_user_tutorial_list");
-            
-            if (LevelData.TutorialEdit != null && LevelData.TutorialEdit.TutorialResp != null)
-            {
-                foreach (TutorialEntry item in LevelData.TutorialEdit.TutorialResp)
-                {
-                    if (item.FirstClear == 0 || (item.FirstClear == 1 && FirstClear == 1))
-                    {
-                        tutorialList.EditTutorialFlg(item.TutorialType,(int) item.TutorialId, item.TutorialStatus);
-                    }
-                }
-            }
-            var menufuncList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_menufunc");
-            var menufuncListTable = new TableParser.Logic.TableParser(menufuncList!);
-            if (LevelData.Menufunc != null)
-            {
-                foreach (MenufuncEntry item in LevelData.Menufunc)
-                {
-                    if (FirstClear == 1)
-                    {
-                        var MenuIndex = -1;
-                        var tmpIdx = 0;
-                        foreach (string[] str in menufuncListTable.Table)
-                        {
-                            if (str[0] == item.Id.ToString())
-                                MenuIndex = tmpIdx;
-                            tmpIdx++;
-                        }
-                        if (MenuIndex != -1)
-                        {
-                            menufuncListTable.Table[MenuIndex][1] = item.Value.ToString();
-                        }
-                    }
-                }
-            }
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_requestid", "");
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_stage", ywpUserStage.ToString());
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_youkai", userYoukaiTable.ToString());
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_item", userItemTable.ToString());
-            userData.YMoney += res.UserGameResultData.Money; // add money to user
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_data", userData);
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_menufunc", menufuncListTable.ToString());
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_tutorial_list", tutorialList);
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_dictionary", dictionaryYoukaiTable.ToString());
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_player_icon", playerIconTable.ToString());
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_map", ywpUserMap.ToString());
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_youkai_skill", userYoukaiSkillTable.ToString());
+            await UDM.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_requestid", "");
+            await UDM.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_stage", ywpUserStage.ToString());
+            await UDM.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_youkai", userYoukaiTable.ToString());
+            await UDM.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_item", userItemTable.ToString());
+            userData.YMoney += res.UserGameResultData.Money;
+            await UDM.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_data", userData);
+            await UDM.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_menufunc", menufuncListTable.ToString());
+            await UDM.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_tutorial_list", tutorialList!);
+            await UDM.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_dictionary", dictionaryYoukaiTable.ToString());
+            await UDM.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_player_icon", playerIconTable.ToString());
+            await UDM.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_map", ywpUserMap.ToString());
+            await UDM.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_youkai_skill", userYoukaiSkillTable.ToString());
 
             var resdict = JsonConvert.DeserializeObject<Dictionary<string, object>>(JsonConvert.SerializeObject(res));
             if (resdict == null)

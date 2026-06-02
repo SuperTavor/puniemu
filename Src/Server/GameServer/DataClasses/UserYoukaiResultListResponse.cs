@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Puniemu.Src.TableParser.DataClasses;
 
 namespace Puniemu.Src.Server.GameServer.DataClasses
 {
@@ -9,7 +10,7 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
         public bool HaveFlg = false;
         // Max level flg
         [JsonProperty("isMaxLevel")]
-        public bool isMaxLevel = false;
+        public bool IsMaxLevel = false;
         // level lock (paid) flg
         [JsonProperty("isLockLevel")]
         public bool IsLockLevel = false;
@@ -21,10 +22,20 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
         public ExpInfo After = new();
         // yokai id
         [JsonProperty("youkaiId")]
-        public long youkaiId = 0L;
+        public long YoukaiId = 0L;
         // can evolve flg
         [JsonProperty("canEvolve")]
         public bool CanEvolve = false;
 
+        public UserYoukaiResultListRes()
+        {}
+        public UserYoukaiResultListRes(YwpUserYoukai userYoukai, YwpMstYoukai masterYoukai)
+        {
+            HaveFlg = false;
+            IsMaxLevel = (userYoukai.Level >= masterYoukai.MaxLevel);
+            CanEvolve = (userYoukai.Level >= masterYoukai.EvolutionLevel);
+            YoukaiId = userYoukai.YoukaiId;
+            IsLockLevel = (userYoukai.IsLockedLevel == 1);
+        }
     }
 }

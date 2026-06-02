@@ -7,6 +7,7 @@
         Blue = 2,
         Red = 3,
         Gold = 4,
-        FakeOutGold = 5, 
+        FakeOutGold = 5,
+        Rainbow = 6, // puni puni
     }
 }

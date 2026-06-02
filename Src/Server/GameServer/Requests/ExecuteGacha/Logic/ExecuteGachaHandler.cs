@@ -89,21 +89,21 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
                 }
                 int itemIdAction = int.Parse(itemsListMstTable.Table[itemIdx][1]);
                 int number = 0;
-                if (itemIdAction == 81) // Ymoney
+                if (itemIdAction == 81) // Ypoint
                 {
                     int price = priceNum;
                     foreach(string[] item in itemsListMstTable.Table)
                     {
                         if (int.Parse(item[1]) == itemIdAction)
                         {
-                            
-                            int userItemCount = userItemtable.Items.Where(x => x.ItemId == int.Parse(item[0])).First().Count;
+                            int userItemCount = userItemtable.Items.FirstOrDefault(x => x.ItemId == int.Parse(item[0]))?.Count ?? 0;
                             number += userItemCount;
                             if (price - userItemCount <= 0)
                             {
                                 userItemtable = ItemManager.RemoveItem(userItemtable, int.Parse(item[0]), price);
                                 break;
-                            } else
+                            }
+                            else if (userItemCount > 0)
                             {
                                 price -= userItemCount;
                                 userItemtable = ItemManager.RemoveItem(userItemtable, int.Parse(item[0]), userItemCount);
