@@ -46,7 +46,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
                 }
                 if (star3 == 1 && parser.Items[UserStageIndex].Star3 == 0)
                 {
-                    parser.Items[UserStageIndex].Star2 = 1;
+                    parser.Items[UserStageIndex].Star3 = 1;
                 }
                 if (numClear > parser.Items[UserStageIndex].NumClear)
                 {

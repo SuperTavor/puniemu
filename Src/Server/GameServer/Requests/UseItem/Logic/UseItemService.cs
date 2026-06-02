@@ -45,12 +45,11 @@ namespace Puniemu.Src.Server.GameServer.Requests.UseItem.Logic
             var expToAdd = _itemInfo.ItemParam;
 
             var mstYokai = new TableParser<YwpMstYoukai>(DataManager.Logic.DataManager.GameDataManager.GetTableStringFromJson("ywp_mst_youkai"));
-            var mstYokaiLevel = new TableParser<YwpMstYoukaiLevel>(DataManager.Logic.DataManager.GameDataManager.GetTableStringFromJson("ywp_mst_youkai_level"));
-            var mstYokaiLevelOpen = new TableParser<YwpMstYoukaiLevelOpen>(DataManager.Logic.DataManager.GameDataManager.GetTableStringFromJson("ywp_mst_youkai_level_open"));
 
             var yokaiToGive = UserYoukai.Items.Where(x => x.YoukaiId == _youkaiId).First();
-            var result = MoneyExpManager.GiveYoukaiExp(yokaiToGive, _youkaiId, expToAdd, mstYokai, mstYokaiLevel, mstYokaiLevelOpen);
-
+            YwpMstYoukai mstYokaiEntry = mstYokai.Items.Where(x => x.YoukaiId == _youkaiId).First();
+            var result = new UserYoukaiResultListRes(yokaiToGive, mstYokaiEntry);
+            MoneyExpManager.GiveYoukaiExp(result, yokaiToGive, _youkaiId, expToAdd, mstYokaiEntry);
             SpendItem();
 
             return result;

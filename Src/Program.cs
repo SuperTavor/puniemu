@@ -15,10 +15,10 @@ using Puniemu.Src.Server.GameServer.Requests.BuyHitodama.Logic;
 using Puniemu.Src.Server.GameServer.Requests.InitBilling.Logic;
 using Puniemu.Src.Server.GameServer.Requests.DeckEdit.Logic;
 using Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic;
+using Puniemu.Src.Server.GameServer.Requests.GameEnd;
 using Puniemu.Src.Server.GameServer.Requests.Rename.Logic;
 using Puniemu.Src.Server.GameServer.Requests.GameUseItem.Logic;
 using Puniemu.Src.Server.GameServer.Requests.GameContinue.Logic;
-using Puniemu.Src.Server.GameServer.Requests.GameRetire.Logic;
 using Puniemu.Src.Server.GameServer.Requests.LoginStamp.Logic;
 using Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic;
 using Puniemu.Src.Server.GameServer.Requests.InitCollectMenu.Logic;
@@ -272,7 +272,7 @@ class Program
         });
         app.MapPost("/gameEnd.nhn", async ctx =>
         {
-            await GameEndHandler.HandleAsync(ctx);
+            await GameEndHandler.HandleAsync(ctx, GameEndType.GameEnd);
         });
         app.MapPost("/rename.nhn", async ctx =>
         {
@@ -284,7 +284,7 @@ class Program
         });
         app.MapPost("/gameRetire.nhn", async ctx =>
         {
-            await GameRetireHandler.HandleAsync(ctx);
+            await GameEndHandler.HandleAsync(ctx, GameEndType.GameRetire);
         });
         app.MapPost("/gameContinue.nhn", async ctx =>
         {

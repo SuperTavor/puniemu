@@ -16,7 +16,13 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             {RarityType.RarityB, CapsuleColor.Blue},
             {RarityType.RarityA, CapsuleColor.Red},
             {RarityType.RarityS, CapsuleColor.Gold },
-            {RarityType.RaritySS, CapsuleColor.Gold }
+            {RarityType.RaritySS, CapsuleColor.Gold },
+            {RarityType.RaritySSS, CapsuleColor.Gold },
+            {RarityType.RarityZ, CapsuleColor.Gold },
+            {RarityType.RarityZZ, CapsuleColor.Gold },
+            {RarityType.RarityZZZ, CapsuleColor.Rainbow },
+            {RarityType.RarityUZ, CapsuleColor.Rainbow },
+            {RarityType.RarityUZP, CapsuleColor.Rainbow },
         };
         private static int SoulLevelFormula(int n)
         {

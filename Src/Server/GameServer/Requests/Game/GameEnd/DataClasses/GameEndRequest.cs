@@ -68,10 +68,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.DataClasses
         // damage total recived
         [JsonProperty("recvDamageTotal")]
         public int RecivedDamageTotal { get; set; }
-        //idk
+        // recived attack count, used for condition
         [JsonProperty("resultRecvAtkNum")]
         public int ResultRecivedAttackNum { get; set; }
-        //idk
+        // youkai hp used for condition
         [JsonProperty("resultYoukaiHP")]
         public int ResultYoukaiHP { get; set; }
         // score
