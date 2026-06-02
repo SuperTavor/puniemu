@@ -55,6 +55,8 @@ using Puniemu.Src.Server.GameServer.Requests.Map.Map.Logic;
 using Puniemu.Src.Server.GameServer.Requests.LevelLockOff.Logic;
 using Puniemu.Src.Server.GameServer.Requests.GetMission.Logic;
 using Puniemu.Src.Server.GameServer.Requests.UseItem.Logic;
+using Puniemu.Src.Server.GameServer.Requests.Watch.InitWatch.Logic;
+using Puniemu.Src.Server.GameServer.Requests.Watch.UpdateWatchReadFlg.Logic;
 namespace Puniemu.Src;
 class Program
 {
@@ -184,6 +186,14 @@ class Program
         app.MapPost("/init.nhn", async ctx =>
         {
             await InitHandler.HandleAsync(ctx);
+        });
+        app.MapPost("/initWatch.nhn", async ctx =>
+        {
+            await InitWatchHandler.HandleAsync(ctx);
+        });
+        app.MapPost("/updateWatchReadFlg.nhn", async ctx =>
+        {
+            await UpdateWatchReadFlgHandler.HandleAsync(ctx);
         });
         app.MapPost("/getMaster.nhn", async ctx =>
         {

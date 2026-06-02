@@ -2,7 +2,10 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Puniemu.Src.DataManager.Logic;
 using Puniemu.Src.Server.GameServer.DataClasses;
+using Puniemu.Src.Server.GameServer.Logic;
 using Puniemu.Src.Server.GameServer.Requests.Login.DataClasses;
+using Puniemu.Src.TableParser.DataClasses;
+using Puniemu.Src.TableParser.Logic;
 using Puniemu.Src.UserDataManager.DataClasses;
 using Puniemu.Src.UserDataManager.Logic;
 using Puniemu.Src.Utils.GeneralUtils;
@@ -22,8 +25,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.Logic
             ctx.Request.BodyReader.AdvanceTo(readResult.Buffer.End);
             var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             var deserialized = JsonConvert.DeserializeObject<LoginRequest>(requestJsonString!)!;
-
             var acc = await UserDataManager.Logic.UserDataManager.GetAccountFromGdkeyAsync(deserialized.Gdkey!);
+
 
             await ShopLimitManager.CheckShopLimitReset(deserialized.Gdkey);
             //Construct response
