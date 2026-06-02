@@ -283,8 +283,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
             res.YoukaiHp = 0;
 
             res.StageType = MasterStageData.StageItems[stageInfoIdx].StageType; //maybe, not sure
-            res.BattleType = MasterStageData.StageItems[stageInfoIdx].BattleType; //maybe, not sure
-
+            res.BattleType = deserialized.BattleType; //maybe, not sure
+            Console.WriteLine(deserialized.StageId);
 
             // save userdata and send response
             res.RequestID = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
