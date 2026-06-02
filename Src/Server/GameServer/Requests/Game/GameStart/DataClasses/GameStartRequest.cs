@@ -13,5 +13,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameStart.DataClasses
 
         [JsonProperty("stageId")]
         public int StageId { get; set; }
+
+        [JsonProperty("battleType")]
+        public int BattleType { get; set; }
     }
 }
