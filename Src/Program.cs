@@ -57,6 +57,7 @@ using Puniemu.Src.Server.GameServer.Requests.GetMission.Logic;
 using Puniemu.Src.Server.GameServer.Requests.UseItem.Logic;
 using Puniemu.Src.Server.GameServer.Requests.Watch.InitWatch.Logic;
 using Puniemu.Src.Server.GameServer.Requests.Watch.UpdateWatchReadFlg.Logic;
+using Puniemu.Src.Server.GameServer.Requests.Conflate.Logic;
 namespace Puniemu.Src;
 class Program
 {
@@ -206,6 +207,10 @@ class Program
         app.MapPost("/createUser.nhn", async ctx =>
         {
             await CreateUserHandler.HandleAsync(ctx);
+        });
+        app.MapPost("/conflate.nhn", async ctx =>
+        {
+            await ConflateHandler.HandleAsync(ctx);
         });
         app.MapPost("/getGdkeyAccounts.nhn", async ctx =>
         {

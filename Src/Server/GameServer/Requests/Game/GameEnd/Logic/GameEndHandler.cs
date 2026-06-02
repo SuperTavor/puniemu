@@ -270,31 +270,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                     {
                         if (res.UserGameResultData.RewardYoukaiId == 0L)
                         {
-                            res.YoukaiPopupResult = new();
-                            res.YoukaiPopupResult.IsWBonusEffectOpen = false; //IDK : TODO
-                            res.YoukaiPopupResult.BonusEffectLevelBefore = 0; //IDK Todo
-                            res.YoukaiPopupResult.StrongSkillLevelAfter = 0; //IDK Todo
-                            res.YoukaiPopupResult.BonusEffectLevelAfter = 0; //IDK Todo
-                            res.YoukaiPopupResult.StrongSkillLevelBefore = 0; //IDK Todo
-                            res.YoukaiPopupResult.LegendYoukaiId = 0; // Legendary youkai flg Todo
-                            res.YoukaiPopupResult.LevelBefore = 1; //level Todo
-                            res.YoukaiPopupResult.LevelAfter = 1; //level todo
-
-                            //Should add check to see if the yokai is already befriended and show the soult level up screen
-                            res.YoukaiPopupResult.GetTypes = YokaiWonPopup.CheckGetType(YoukaiId, userYoukaiTable, userYoukaiSkillTable);
-                            res.YoukaiPopupResult.YoukaiId = YoukaiId;
-                            res.YoukaiPopupResult.ReleaseType = 0; //IDK todo
-                            res.YoukaiPopupResult.ExchgYmoney = 0; //IDK TODO
-                            res.YoukaiPopupResult.LimitLevelAfter = 0; //IDK todo
-                            res.YoukaiPopupResult.LimitLevelBefore = 0; //IDK todo
-                            res.YoukaiPopupResult.ReleaseLevelType = 0; //IDK TODO
-
-                            if (res.YoukaiPopupResult.GetTypes == YokaiGetType.SoultLevelUp)
-                            {
-                                res.YoukaiPopupResult.Skill = YoukaiManager.AddExpToSkill(userYoukaiSkillTable, YoukaiId, 1000);
-                            }
-                            DictionaryManager.EditDictionary(ref dictionaryYoukaiTable, YoukaiId, false, true);
-                            DictionaryManager.EditDictionary(ref dictionaryDiff, YoukaiId, false, true);
+                            res.YoukaiPopupResult = new YokaiWonPopup(YoukaiId, userYoukaiTable, userYoukaiSkillTable);
+                            DictionaryManager.EditDictionary(ref dictionaryYoukaiTable, YoukaiId, true, true);
+                            DictionaryManager.EditDictionary(ref dictionaryDiff, YoukaiId, true, true);
                             res.UserGameResultData.RewardYoukaiId = YoukaiId;
                             YoukaiManager.AddYoukai(userYoukaiTable, YoukaiId, userYoukaiSkillTable);
                             YoukaiManager.AddYoukai(youkaiDiff, YoukaiId, youkaiSkillDiff);

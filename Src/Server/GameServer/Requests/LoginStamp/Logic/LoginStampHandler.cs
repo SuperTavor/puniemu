@@ -155,25 +155,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.LoginStamp.Logic
                     var dictionaryYoukai = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserID!, "ywp_user_dictionary");
                     dictionaryYoukaiTable = DictionaryManager.EditDictionary(new TableParser.Logic.TableParser(dictionaryYoukai!), current_item_id, false, true);
                     YoukaiManager.AddYoukai(userYoukaiTable, current_item_id, userYoukaiSkillTable);
-
-
-                    res.YoukaiPopupResult = new();
-                    res.YoukaiPopupResult.IsWBonusEffectOpen = false; //IDK : TODO
-                    res.YoukaiPopupResult.BonusEffectLevelBefore = 0; //IDK Todo
-                    res.YoukaiPopupResult.StrongSkillLevelAfter = 0; //IDK Todo
-                    res.YoukaiPopupResult.BonusEffectLevelAfter = 0; //IDK Todo
-                    res.YoukaiPopupResult.StrongSkillLevelBefore = 0; //IDK Todo
-                    res.YoukaiPopupResult.LegendYoukaiId = 0; // Legendary youkai flg Todo
-                    res.YoukaiPopupResult.LevelBefore = 1; //level Todo
-                    res.YoukaiPopupResult.LevelAfter = 1; //level todo
-                    res.YoukaiPopupResult.GetTypes = YokaiGetType.NewYokai; //Check should be added to show soult screen
-                    res.YoukaiPopupResult.YoukaiId = current_item_id;
-                    res.YoukaiPopupResult.ReleaseType = 0; //IDK todo
-                    // skill data is null in the response for now so : IDK | TODO
-                    res.YoukaiPopupResult.ExchgYmoney = 0; //IDK TODO
-                    res.YoukaiPopupResult.LimitLevelAfter = 0; //IDK todo
-                    res.YoukaiPopupResult.LimitLevelBefore = 0; //IDK todo
-                    res.YoukaiPopupResult.ReleaseLevelType = 0; //IDK TODO
+                    res.YoukaiPopupResult = new(current_item_id, userYoukaiTable, userYoukaiSkillTable);
                     await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_dictionary", dictionaryYoukaiTable.ToString());
                     await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_youkai", userYoukaiTable.ToString());
                     await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_youkai_skill", userYoukaiSkillTable!.ToString());

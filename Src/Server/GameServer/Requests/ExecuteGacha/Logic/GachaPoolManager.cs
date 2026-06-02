@@ -42,33 +42,13 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
         public static GachaPrize RegisterYokaiAndGetPrize(long yokaiId, CapsuleColor capsule, RarityType rank, TableParser<YwpUserYoukai> userYokaiTable, TableParser<YwpUserYoukaiSkill> userSkillTable, TableParser.Logic.TableParser dictionaryListTable, TableParser<YwpUserItem> userItem, int gachaId)
         {
             var prizeType = PrizeType.Yokai;
-            SkillResult? skill = YoukaiManager.AddExpToSkill(userSkillTable, yokaiId, 1000);
             var getType = YokaiWonPopup.CheckGetType(yokaiId, userYokaiTable, userSkillTable);
             YokaiWonPopup? yokai = null;
             ConvertItemInfo? convertItemInfo = null;
             ItemWonPopup? itemForConvert = null;
             if(getType != YokaiGetType.MaxLevel)
             {
-                yokai = new YokaiWonPopup
-                {
-                    BonusEffectLevelAfter = 1,
-                    StrongSkillLevelBefore = 0,
-                    BonusEffectLevelBefore = 1,
-                    LegendYoukaiId = 0,
-                    StrongSkillLevelAfter = 0,
-                    IsWBonusEffectOpen = false,
-                    LevelAfter = 1,
-                    LevelBefore = 1,
-                    YoukaiId = yokaiId,
-                    ReleaseType = 0,
-                    Skill = skill,
-                    ExchgYmoney = 0,
-                    Exp = 0,
-                    LimitLevelBefore = 0,
-                    LimitLevelAfter = 0,
-                    ReleaseLevelType = 0,
-                    GetTypes = getType
-                };
+                yokai = new YokaiWonPopup(yokaiId, userYokaiTable, userSkillTable);
             }
             else
             {
@@ -88,7 +68,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             //Register yokai if not registered
             YoukaiManager.AddYoukai(userYokaiTable, yokaiId, userSkillTable);
 
-            dictionaryListTable = DictionaryManager.EditDictionary(dictionaryListTable, yokaiId, false, true);
+            dictionaryListTable = DictionaryManager.EditDictionary(dictionaryListTable, yokaiId, true, true);
 
             return new GachaPrize
             {

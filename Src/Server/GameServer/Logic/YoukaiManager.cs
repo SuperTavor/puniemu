@@ -91,6 +91,15 @@ namespace Puniemu.Src.Server.GameServer.Logic
             }
         }
 
+        public static void DeleteYoukai(TableParser<YwpUserYoukai> userYokai, TableParser<YwpUserYoukaiSkill> userSkill, long youkaiId)
+        {
+            var yokaiIdx = userYokai.FindIndex([youkaiId.ToString()]);
+            if (yokaiIdx == -1) throw new NotImplementedException("Yokai not found in user");
+            var skillIdx = userSkill.FindIndex([youkaiId.ToString()]);
+            if (skillIdx == -1) throw new NotImplementedException("Skill not found in user");
+            userYokai.Items.Remove(userYokai.Items[yokaiIdx]);
+            userSkill.Items.Remove(userSkill.Items[skillIdx]);
+        }
         public static void AddYoukai(TableParser<YwpUserYoukai> parser, long YoukaiId, TableParser<YwpUserYoukaiSkill> parser2)
         {
             var YoukaiMstTable = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager!.GamedataCache["ywp_mst_youkai"]!)!["tableData"]);

@@ -1,5 +1,5 @@
-namespace Puniemu.Src.Server.GameServer.DataClasses.Mission;
-public enum MissionRewardType {
+namespace Puniemu.Src.Server.GameServer.DataClasses;
+public enum RewardType {
     Icon = 12,
     YMoney = 3,
     Yokai = 2,

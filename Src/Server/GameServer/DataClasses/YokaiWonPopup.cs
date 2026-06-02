@@ -64,7 +64,34 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
         [JsonProperty("releaseLevelType")]
         public int ReleaseLevelType = 0;
 
+        public YokaiWonPopup(
+                     long yokaiId,
+                     TableParser<YwpUserYoukai> userYokai,
+                     TableParser<YwpUserYoukaiSkill> userSkill,
+                     long legendYoukaiId = 0)
+        {
+            IsWBonusEffectOpen = false;
+            BonusEffectLevelBefore = 0;
+            BonusEffectLevelAfter = 0;
+            StrongSkillLevelAfter = 0;
+            StrongSkillLevelBefore = 0;
+            LegendYoukaiId = legendYoukaiId;
+            LevelBefore = 0;
+            LevelAfter = 0;
+            YoukaiId = yokaiId;
+            ReleaseType = 0;
+            ExchgYmoney = 0;
+            LimitLevelAfter = 0;
+            LimitLevelBefore = 0;
+            ReleaseLevelType = 0;
 
+            GetTypes = CheckGetType(yokaiId, userYokai, userSkill);
+
+            if (GetTypes == YokaiGetType.SoultLevelUp)
+            {
+                Skill = YoukaiManager.AddExpToSkill(userSkill, yokaiId, 1000);
+            }
+        }
         public static YokaiGetType CheckGetType(long yokaiId, TableParser<YwpUserYoukai> userYokai, TableParser<YwpUserYoukaiSkill> userSkill)
         {
             YokaiGetType getType = 0;
