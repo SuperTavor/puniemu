@@ -106,11 +106,11 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 }
                 else if (conditionCount == 2)
                 {
-                    res.UserGameResultData.StarGetFlg3 = (good ? 1 : 0);
+                    res.UserGameResultData.StarGetFlg2 = (good ? 1 : 0);
                 }
                 else if (conditionCount == 3)
                 {
-                    res.UserGameResultData.StarGetFlg2 = (good ? 1 : 0);
+                    res.UserGameResultData.StarGetFlg3 = (good ? 1 : 0);
                 }
                 else if (conditionCount >= 4 && (good ? 1 : 0) == 1)
                 {
@@ -169,7 +169,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 conditionCount++;
             }
 
-            StageManager.EditStage(ywpUserStage, deserialized.StageId, 1, deserialized.Score, res.UserGameResultData.StarGetFlg1, res.UserGameResultData.StarGetFlg3, res.UserGameResultData.StarGetFlg2, ywpUserStage.Items[stageIndex].NumClear + 1);
+            StageManager.EditStage(ywpUserStage, deserialized.StageId, 1, deserialized.Score, res.UserGameResultData.StarGetFlg1, res.UserGameResultData.StarGetFlg2, res.UserGameResultData.StarGetFlg3, ywpUserStage.Items[stageIndex].NumClear + 1);
 
 
             // beta might only work for few maps
