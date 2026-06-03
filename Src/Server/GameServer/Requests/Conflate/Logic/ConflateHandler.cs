@@ -10,6 +10,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Conflate.Logic
 {
     public class ConflateHandler
     {
+
         public static async Task HandleAsync(HttpContext ctx)
         {
             ctx.Request.EnableBuffering();
@@ -20,39 +21,48 @@ namespace Puniemu.Src.Server.GameServer.Requests.Conflate.Logic
             var deserialized = JsonConvert.DeserializeObject<ConflateRequest>(requestJsonString!);
             var res = new ConflateResponse();
             var gm = DataManager.Logic.DataManager.GameDataManager;
-            var mstConflateRaw = (string)JsonConvert.DeserializeObject<Dictionary<string,object>>(gm.GamedataCache["ywp_mst_conflate"])["tableData"];
+            var mstConflateRaw = (string)JsonConvert.DeserializeObject<Dictionary<string, object>>(gm.GamedataCache["ywp_mst_conflate"])["tableData"];
             var mstConflate = new TableParser<YwpMstConflate>(mstConflateRaw);
             var userYokai = new TableParser<YwpUserYoukai>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_youkai"));
             var userSkill = new TableParser<YwpUserYoukaiSkill>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_youkai_skill"));
             var userItem = new TableParser<YwpUserItem>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_item"));
             var userDictionary = new TableParser<YwpUserDictionary>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_dictionary"));
-            res.YwpUserData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data"); 
-    
+            res.YwpUserData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data");
+
             //Find how the fusion looks
             var mstConflateItem = mstConflate.Items.FirstOrDefault(x => x.ConflateID == deserialized.ConflateID);
-            if(mstConflateItem == null)
+            if (mstConflateItem == null)
             {
                 await ctx.Response.WriteAsync(JsonConvert.SerializeObject(new MsgBoxResponse("Invalid conflate", "Err")));
                 return;
             }
+            //Do checks
             if (res.YwpUserData.YMoney < mstConflateItem.YMoneyCost)
             {
                 await ctx.Response.WriteAsync(JsonConvert.SerializeObject(new MsgBoxResponse("Not enough Y-Money", "Err")));
                 return;
             }
-            res.YwpUserData.YMoney -= mstConflateItem.YMoneyCost;
             //delete yokai/item that is fused with
             try
             {
+                if (!(CheckIfFusionObjectGood(mstConflateItem.FuseObject1Type, mstConflateItem.FuseObject1ID, userYokai, userItem) && CheckIfFusionObjectGood(mstConflateItem.FuseObject2Type, mstConflateItem.FuseObject2ID, userYokai, userItem)))
+                {
+                    throw new InvalidOperationException("Missing fusion components");
+                }
                 ApplyFusionObject(mstConflateItem.FuseObject1Type, mstConflateItem.FuseObject1ID, userYokai, userSkill, userItem);
                 ApplyFusionObject(mstConflateItem.FuseObject2Type, mstConflateItem.FuseObject2ID, userYokai, userSkill, userItem);
+            }
+            catch(InvalidOperationException ex)
+            {
+                await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(new MsgBoxResponse(ex.Message, "Err"))));
+                return;
             }
             catch(NotImplementedException ex)
             {
                 await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(new MsgBoxResponse(ex.Message, "Err"))));
                 return;
             }
-
+            res.YwpUserData.YMoney -= mstConflateItem.YMoneyCost;
             //Befriend result yokai
             res.Youkai = new YokaiWonPopup(mstConflateItem.ResultID, userYokai, userSkill);
             YoukaiManager.AddYoukai(userYokai, mstConflateItem.ResultID, userSkill);
@@ -75,6 +85,19 @@ namespace Puniemu.Src.Server.GameServer.Requests.Conflate.Logic
             await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(res)));
         }
 
+        private static bool CheckIfFusionObjectGood(
+             RewardType rewardType,
+             long fusionObjId,
+             TableParser<YwpUserYoukai> userYokai,
+             TableParser<YwpUserItem> userItem)
+        {
+            return rewardType switch
+            {
+                RewardType.Yokai => YoukaiManager.GetYoukaiIndex(userYokai, fusionObjId) != -1,
+                RewardType.Item => userItem.FindIndex([fusionObjId.ToString()]) != -1,
+                _ => false
+            };
+        }
         private static void ApplyFusionObject(RewardType rewardType, long fusionObjId, TableParser<YwpUserYoukai> userYokai, TableParser<YwpUserYoukaiSkill> userSkill, TableParser<YwpUserItem> userItem) 
         {
             switch(rewardType)
