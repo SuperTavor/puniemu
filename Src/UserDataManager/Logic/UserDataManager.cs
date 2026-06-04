@@ -153,12 +153,14 @@ namespace Puniemu.Src.UserDataManager.Logic
         // returns the gdkey of the newly created account
         public static async Task<string> NewAccountAsync()
         {
+            var fc = GenerateFriendCode();
             var acc = new Account()
             {
                 Gdkey = Guid.NewGuid().ToString(),
                 YwpUserTables = new(),
                 LastLoginTime = "",
-                CharacterId = GenerateFriendCode()
+                CharacterId = fc,
+                UserId = System.IO.Hashing.Crc32.HashToUInt32(System.Text.Encoding.UTF8.GetBytes(fc)).ToString()
             };
             var response = await SupabaseClient!.From<Account>().Insert(acc);
             var newAcc = response.Models.First();
