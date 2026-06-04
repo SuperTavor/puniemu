@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Puniemu.Src.Server.GameServer.Logic;
+using Puniemu.Src.Server.GameServer.Logic.Mst;
 using Puniemu.Src.TableParser.DataClasses;
 using Puniemu.Src.TableParser.Logic;
 using System.Runtime.CompilerServices;
@@ -67,15 +68,15 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
         public YokaiWonPopup(
                      long yokaiId,
                      TableParser<YwpUserYoukai> userYokai,
-                     TableParser<YwpUserYoukaiSkill> userSkill,
-                     long legendYoukaiId = 0)
+                     TableParser<YwpUserYoukaiSkill> userSkill
+                     )
         {
             IsWBonusEffectOpen = false;
             BonusEffectLevelBefore = 0;
             BonusEffectLevelAfter = 0;
             StrongSkillLevelAfter = 0;
             StrongSkillLevelBefore = 0;
-            LegendYoukaiId = legendYoukaiId;
+            LegendYoukaiId = MstLegendReleaseManager.CheckLegendYoukaiId(yokaiId);
             LevelBefore = 0;
             LevelAfter = 0;
             YoukaiId = yokaiId;

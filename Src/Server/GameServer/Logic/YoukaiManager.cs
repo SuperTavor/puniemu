@@ -93,6 +93,10 @@ namespace Puniemu.Src.Server.GameServer.Logic
 
         public static void DeleteYoukai(TableParser<YwpUserYoukai> userYokai, TableParser<YwpUserYoukaiSkill> userSkill, long youkaiId)
         {
+            var yokaiIdx = userYokai.FindIndex([youkaiId.ToString()]);
+            if (yokaiIdx == -1) throw new NotImplementedException("Yokai not found in user");
+            var skillIdx = userSkill.FindIndex([youkaiId.ToString()]);
+            if (skillIdx == -1) throw new NotImplementedException("Skill not found in user");
             userYokai.Items.Remove(userYokai.Items[yokaiIdx]);
             userSkill.Items.Remove(userSkill.Items[skillIdx]);
         }
