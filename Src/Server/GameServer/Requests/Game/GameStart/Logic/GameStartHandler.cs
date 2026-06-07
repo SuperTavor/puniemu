@@ -204,7 +204,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
                     else
                     {
                         bool isBoss = MasterStageData.StageItems[stageInfoIdx].BossFlag != 0;
-                        bool isAfterJibanyan = tutorialList.GetStatus(2002, 2) == 1;
+                        bool isAfterJibanyan = tutorialList.GetStatus(1, 2) == 1;
                         var yokaiId = int.Parse(enemyParams.Table[enemyParamsIdx][1]);
                         var skillIdx = YoukaiManager.GetYoukaiSkillIndex(YwpUserYoukaiSkillTab, enemyId);
 
