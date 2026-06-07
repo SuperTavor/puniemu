@@ -66,10 +66,10 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
         public int ReleaseLevelType = 0;
 
         public YokaiWonPopup(
-                     long yokaiId,
-                     TableParser<YwpUserYoukai> userYokai,
-                     TableParser<YwpUserYoukaiSkill> userSkill
-                     )
+            long yokaiId,
+            TableParser<YwpUserYoukai> userYokai,
+            TableParser<YwpUserYoukaiSkill> userSkill
+            )
         {
             IsWBonusEffectOpen = false;
             BonusEffectLevelBefore = 0;

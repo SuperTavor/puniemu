@@ -8,7 +8,7 @@ namespace Puniemu.Src.Server.GameServer.Logic;
 using BefriendYokaiInfo = (RarityType Rank, int SoultLevel);
 public static class LotYoukaiManager
 {
-    private static readonly Random _rng = new Random();
+    private static readonly Random _rng = Random.Shared;
 
     /*
         Data collected from Robbett watch amazing video on befriending
