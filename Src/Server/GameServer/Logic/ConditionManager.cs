@@ -56,7 +56,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
             {
                 return true;
             }
-            else if (type == ConditionType.MinSize && false) //idk
+            else if (type == ConditionType.MinSize && deserialized.EraseSizeMax >= param1) //idk
             {
                 return true;
             }
