@@ -64,15 +64,15 @@ namespace Puniemu.Src.Server.GameServer.Logic
             {
                 return true;
             }
-            else if (type == ConditionType.MinBonusBalls && false) //idk
+            else if (type == ConditionType.MinBonusBalls && deserialized.BonusBlockNum >= param1) 
             {
                 return true;
             }
-            else if (type == ConditionType.MinFeverCount && deserialized.FeverTimeNum >= param1) //idk
+            else if (type == ConditionType.MinFeverCount && deserialized.FeverTimeNum >= param1) 
             {
                 return true;
             }
-            else if (type == ConditionType.MaxMilisecondClearTime && deserialized.ClearTimeSec * 1000 >= param1) //idk
+            else if (type == ConditionType.MaxMilisecondClearTime && deserialized.ClearTimeSec * 1000 >= param1) 
             {
                 return true;
             }
@@ -80,7 +80,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
             {
                 return true;
             }
-            else if (type == ConditionType.CompleteStage) //idk
+            else if (type == ConditionType.CompleteStage) 
             {
                 return true;
             }
