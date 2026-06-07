@@ -16,6 +16,25 @@ namespace Puniemu.Src.Server.GameServer.Logic
 {
     public class ConditionManager
     {
+        private static bool IsFinishWithSoult(List<EnemyYoukaiResultList> enemies, long youkaiId = -1)
+        {
+            int biggest = 0;
+            for (int i = 0; i < enemies.Count; i++)
+            {
+                var item = enemies[i];
+                if (item.DeadEndOrder > biggest) biggest = item.DeadEndOrder;
+            }
+            var lastItem = enemies.FirstOrDefault(x => x.DeadEndOrder == biggest);
+            if(youkaiId == -1 && lastItem.DeadEndType != 0)
+            {
+                return true;
+            }
+            else if(lastItem.DeadEndType == youkaiId)
+            {
+                return true;
+            }
+            else return false;
+        }
         public static bool ComputeStageCondition(ConditionType type, GameEndRequest deserialized, long param1, long param2, long param3)
         {
             if (type == ConditionType.MinScore && deserialized.Score >= param1)
@@ -40,13 +59,13 @@ namespace Puniemu.Src.Server.GameServer.Logic
             {
                 return true;
             }
-            else if (type == ConditionType.FinishWithSpecificYoukaiSoult && false) //idk
+            else if (type == ConditionType.FinishWithSpecificYoukaiSoult) 
             {
-                return true;
+                return IsFinishWithSoult(deserialized.EnemyYoukaiResultList, param1);
             }
-            else if (type == ConditionType.FinishWithSoult && false) //idk
+            else if (type == ConditionType.FinishWithSoult) 
             {
-                return true;
+                return IsFinishWithSoult(deserialized.EnemyYoukaiResultList);
             }
             else if (type == ConditionType.ClearStageNTimes && false) //idk
             {
@@ -56,11 +75,11 @@ namespace Puniemu.Src.Server.GameServer.Logic
             {
                 return true;
             }
-            else if (type == ConditionType.MinSize && deserialized.EraseSizeMax >= param1) //idk
+            else if (type == ConditionType.MinSize && deserialized.EraseSizeMax >= param1) 
             {
                 return true;
             }
-            else if (type == ConditionType.MinCombo && deserialized.ComboMax >= param1) //idk
+            else if (type == ConditionType.MinCombo && deserialized.ComboMax >= param1) 
             {
                 return true;
             }
@@ -100,11 +119,17 @@ namespace Puniemu.Src.Server.GameServer.Logic
             {
                 return true;
             }
-            else if (type == ConditionType.MinSMove && false) //idk
+            else if (type == ConditionType.MinSMove && false) 
             {
-                return true;
+                int totalSMove = 0;
+                foreach(var kai in deserialized.UserYoukaiResultList)
+                {
+                    totalSMove += kai.SkillUseNum;
+                }
+
+                return totalSMove >= param1;
             }
-            else if (type == ConditionType.MinPuniErase && deserialized.EraseNumTotal >= param1) //idk
+            else if (type == ConditionType.MinPuniErase && deserialized.EraseNumTotal >= param1) 
             {
                 return true;
             }
@@ -130,11 +155,15 @@ namespace Puniemu.Src.Server.GameServer.Logic
             }
             else if (type == ConditionType.MinSpecificYoukaiLink && false) //idk
             {
-                return true;
+             
             }
-            else if (type == ConditionType.UseSpecificYoukaiSoult && false) //idk
+            else if (type == ConditionType.UseSpecificYoukaiSoult) 
             {
-                return true;
+                foreach(var kai in deserialized.UserYoukaiResultList)
+                {
+                    if (kai.YoukaiId == param1 && kai.SkillUseNum > 0) return true;
+                }
+                return false;
             }
             else if (type == ConditionType.MinSpecificYoukaiSize && false) //idk
             {
