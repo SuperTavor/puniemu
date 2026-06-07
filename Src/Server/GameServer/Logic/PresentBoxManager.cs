@@ -26,7 +26,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
             }
             present.DistItemCnt = itemCnt;
             present.DistItemId = itemId;
-            present.Seq = (long)(new Random().NextDouble() * 1_000_000_000_000L);
+            present.Seq = (long)(Random.Shared.NextDouble() * 1_000_000_000_000L);
 
             present.CanReceiveAll = all_recieve ? 1 : 0;
 

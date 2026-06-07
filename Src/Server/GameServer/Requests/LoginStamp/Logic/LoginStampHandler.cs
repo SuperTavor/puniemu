@@ -42,9 +42,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.LoginStamp.Logic
             var LoginUserStampTable = new TableParser.Logic.TableParser(LoginUserStamp!);
 
             int LoginStamLenght = LoginStamp.Table.Count;
-           
+
             // random when choosing new stamp
-            Random random = new Random();
+            Random random = Random.Shared;
 
             // if walk == 1, it means the login stamp has been updated
             var walk = 0;

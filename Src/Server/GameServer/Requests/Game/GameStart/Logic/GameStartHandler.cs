@@ -101,12 +101,16 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
                     return;
                 }
             }
-            if (!haveEnoughHitodama(ref userData))
+            else
             {
-                var errRes = new MsgBoxResponse("You don't have enough spirit.", "Not Enough spirit");
-                await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(errRes)));
-                return;
+                if (!haveEnoughHitodama(ref userData))
+                {
+                    var errRes = new MsgBoxResponse("You don't have enough spirit.", "Not Enough spirit");
+                    await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(errRes)));
+                    return;
+                }
             }
+            
             
             //Construct response
             var res = new GameStartResponse(userData);
@@ -120,8 +124,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
             var YwpUserYoukaiSSkillTab = new TableParser.Logic.TableParser((await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai_strong_skill"))!);
 
             var mstYokai = new TableParser.Logic.TableParser<YwpMstYoukai>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai"]);
-
-            var UserDeck = new TableParser.Logic.TableParser(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai_deck"));
+            var UserDeck = new TableParser.Logic.TableParser<YwpUserDeck>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai_deck"));
             var tutorialList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<TutorialList>(deserialized!.Gdkey!, "ywp_user_tutorial_list");
 
             //get current stage info
@@ -168,6 +171,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
 
             res.IsFirstClear = (await isFirstClear(deserialized.StageId, deserialized.Gdkey!)) ? 1 : 0;
 
+            // Get deck and user_youkai to get : userYoukaiList info
+            var YwpUserYoukaiTab = new TableParser<YwpUserYoukai>((await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai"))!);
+
             // Create EnemyInfoList (Use an new (but imcomplete right now) format)
             foreach (EnemyStageEntry i in (LevelData.Enemy))
             {
@@ -191,26 +197,12 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
                         LotItemInfoList = "0000", //todo
                         EnableFoodInfoList = new(), //todo
                     };
-                    if (i.DefaultBefriends == 1 && res.IsFirstClear == 1)
+                    if (i.DefaultBefriends == 1 && YwpUserYoukaiTab.FindIndex([enemyId.ToString()]) == -1)
                     {
                         item.LotYoukaiInfoList.Entries.Add(new LotYoukaiInfo { LotPattern = "00000", LotResult = "1111" });
                     }
                     else
                     {
-                        //Currently completely random - a placeholder.
-                        //Actual lotYoukaiInfo logic not added yet
-                        //25% E 20% D 15% C 10% B 5% A 2.5% S then 50% SS
-
-                        Dictionary<RarityType, int> placeholderOdds = new()
-                        {
-                            {RarityType.RarityE, 25 },
-                            {RarityType.RarityD, 20 },
-                            {RarityType.RarityC, 15 },
-                            {RarityType.RarityB, 10 },
-                            {RarityType.RarityA, 5 },
-                            {RarityType.RarityS, 3 },
-                            {RarityType.RaritySS, 50 }
-                        };
                         bool isBoss = MasterStageData.StageItems[stageInfoIdx].BossFlag != 0;
                         bool isAfterJibanyan = tutorialList.GetStatus(2002, 2) == 1;
                         var yokaiId = int.Parse(enemyParams.Table[enemyParamsIdx][1]);
@@ -224,28 +216,24 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
                             isMaxSkill = YwpUserYoukaiSkillTab.Items[skillIdx].Level >= 7;
                         }
                         var mstYokaiItem = mstYokai.Items.Where(x => x.YoukaiId == yokaiId).FirstOrDefault();
-                        string lotRes = "0000";
-                        if(!(mstYokaiItem == null) && mstYokaiItem.YoukaiRarity != RarityType.RarityNone)
+                        if(!(mstYokaiItem == null) && mstYokaiItem.YoukaiRarity != RarityType.RarityNone && !isBoss && isAfterJibanyan && !isMaxSkill)
                         {
                             var yokaiRank = mstYokaiItem.YoukaiRarity;
-                            var befriend = Random.Shared.Next(100) < placeholderOdds[yokaiRank];
-                            if (befriend && !isBoss && isAfterJibanyan && !isMaxSkill) lotRes = "1111";
+                            var befrienders = DeckManager.GetBefrienderSpots(UserDeck, mstYokaiItem, YwpUserYoukaiSkillTab);
+                            item.LotYoukaiInfoList = LotYoukaiManager.GenerateLotYoukai(befrienders, yokaiRank);
+                            Console.WriteLine(JsonConvert.SerializeObject(item.LotYoukaiInfoList));
                         }
-                        item.LotYoukaiInfoList.Entries.Add(new LotYoukaiInfo { LotPattern = "00000", LotResult = lotRes });
-
                     }
                     res.EnemyYoukaiList.Add(item);
                 }
             }
 
-            // Get deck and user_youkai to get : userYoukaiList info
-            var YwpUserYoukaiTab = new TableParser<YwpUserYoukai>((await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai"))!);
-            for (int i = 1; i < 1 + 5; i++)
+            void AddToUserYoukaiList(long youkaiId)
             {
                 //get index of yokai info in general ywpuseryokai table
-                var yokaiInfoIndex = YoukaiManager.GetYoukaiIndex(YwpUserYoukaiTab, int.Parse(UserDeck.Table[0][i]));
-                var YwpUserYoukaiSkillIndex = YwpUserYoukaiSkillTab.FindIndex([UserDeck.Table[0][i]]);
-                var YwpUserYoukaiSSkillIndex = YwpUserYoukaiSSkillTab.FindIndex([UserDeck.Table[0][i]]);
+                var yokaiInfoIndex = YoukaiManager.GetYoukaiIndex(YwpUserYoukaiTab, youkaiId);
+                var YwpUserYoukaiSkillIndex = YwpUserYoukaiSkillTab.FindIndex([youkaiId.ToString()]);
+                var YwpUserYoukaiSSkillIndex = YwpUserYoukaiSSkillTab.FindIndex([youkaiId.ToString()]);
                 var item = new UserYoukaiItem()
                 {
                     YoukaiId = (int)YwpUserYoukaiTab.Items[yokaiInfoIndex].YoukaiId,
@@ -258,6 +246,14 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
                     item.SkillLevel = YwpUserYoukaiSkillTab.Items[YwpUserYoukaiSkillIndex].Level;
                 res.UserYoukaiList.Add(item);
             }
+
+            var currentDeck = UserDeck.Items[0];
+            AddToUserYoukaiList(currentDeck.MiddleYoukaiId);
+            AddToUserYoukaiList(currentDeck.FarLeftYoukaiId);
+
+            AddToUserYoukaiList(currentDeck.LeftYoukaiId);
+            AddToUserYoukaiList(currentDeck.RightYoukaiId);
+            AddToUserYoukaiList(currentDeck.FarRightYoukaiId);
 
 
             // Edit tutorial flg

@@ -1,3 +1,5 @@
+using Puniemu.Src.Server.GameServer.DataClasses;
+using Puniemu.Src.Server.GameServer.Logic;
 using System.Reflection;
 using System.Text;
 

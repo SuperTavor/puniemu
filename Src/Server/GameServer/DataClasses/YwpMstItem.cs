@@ -22,7 +22,7 @@
         Exporb = 1, //Param is how much XP to add 
         FuseItem = 5, //Param is 0 always
         Watchpart = 7, //Param is 0 always
-        Food = 2, //Param value is unknown
+        Food = 2, //Param value is food type
         SkillBooster = 10, //Param is always 1
     }
 }
