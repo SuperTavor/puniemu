@@ -31,6 +31,7 @@
         RandomPopper = 3,
         ScoreBooster = 16,
         AttackBooster = 15,
+        SingleAttackerAndBefriender = 33,
         RangePopper = 1, //Includes "all popper"s
         AttackBoosterAndHeal = 24,
         DefenseBooster = 17,
@@ -42,6 +43,9 @@
         Stunner = 18,
         ItemDropBooster = 14,
         ExpBooster = 12,
+        Tracer = 30,
+        Slasher = 44,
+        NoFillerTracer = 41,
 
     }
 }

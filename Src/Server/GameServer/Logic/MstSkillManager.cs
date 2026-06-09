@@ -24,5 +24,9 @@ namespace Puniemu.Src.Server.GameServer.Logic
             return _mstSkill.Items.FirstOrDefault(x => x.SoultID == youkaiId);
         }
 
+        public static bool IsBefriender(YwpMstYoukaiSkill obj)
+        {
+            return obj.SoultType == SoultType.Befriender || obj.SoultType == SoultType.SingleAttackerAndBefriender;
+        }
     }
 }

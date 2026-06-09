@@ -3,24 +3,23 @@ using Puniemu.Src.TableParser.DataClasses;
 using Puniemu.Src.TableParser.Logic;
 namespace Puniemu.Src.Server.GameServer.Logic
 {
-    using BefriendYokaiInfo = (RarityType Rank, int SoultLevel);
+    using BefriendYokaiInfo = (long YoukaiID, int SoultLevel);
     public static class DeckManager
     {
-
         private static BefriendYokaiInfo GetIsBefriender(long youkaiId, YwpMstYoukai mstYokaiItem, TableParser<YwpUserYoukaiSkill> userSkill)
         {
             var skillObj = MstSkillManager.GetSkillObj(youkaiId);
             if (skillObj == null)
             {
-                return (RarityType.RarityNone, 0);
+                return (youkaiId, 0);
             }
-            if (skillObj.SoultType == SoultType.Befriender)
+            if (MstSkillManager.IsBefriender(skillObj))
             {
                 var skillIdx = userSkill.Items.FindIndex(x => x.YoukaiId == youkaiId);
                 if (skillIdx == -1) throw new Exception("Weird issue bad skill shouldnt happen");
-                return (mstYokaiItem.YoukaiRarity, userSkill.Items[skillIdx].Level);
+                return (youkaiId, userSkill.Items[skillIdx].Level);
             }
-            return (RarityType.RarityNone, 0);
+            return (youkaiId, 0);
         }
 
         //Rank, soultiamte level

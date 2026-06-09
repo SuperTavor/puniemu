@@ -419,3 +419,6 @@ Tools/sharedLogic/__pycache__
 /Tools/stageDump.py
 /Tools/a
 /Tools/data - Copy.json
+/Tools/DumpOdds.py
+/Tools/result.json
+/Tools/DumpOddsresult
