@@ -148,10 +148,16 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
                     prizes.Add(GachaPoolManager.CrankReward(gachaId, userYokaiTable, userSkillTable, dictionaryListTable, userItemtable));
                }
             }
-            else
+            else if(deserialized.RequestYoukaiId != 0 && GachaYoukaiChoiceManager.IsChoiceOk(gachaId, deserialized.RequestYoukaiId))
             {
                 prizes.Add(GachaPoolManager.RegisterYokaiAndGetPrize(deserialized.RequestYoukaiId, CapsuleColor.Gray, 0, userYokaiTable, userSkillTable, dictionaryListTable, userItemtable, gachaId));
                 pullCount = 1;
+            }
+            else
+            {
+                var errSession = new MsgBoxResponse("Error occured", "Error");
+                await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(errSession)));
+                return;
             }
 
             resp.EffectType = 1;
