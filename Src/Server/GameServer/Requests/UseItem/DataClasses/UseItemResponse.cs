@@ -20,6 +20,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.UseItem.DataClasses
         [JsonProperty("ywp_user_youkai")]
         public string YwpUserYoukai;
 
+        [JsonProperty("ywp_user_youkai_bonus_effect")]
+        public string YwpUserBonusEff;
+
         [JsonProperty("ywp_user_item")]
         public string YwpUserItem;
 

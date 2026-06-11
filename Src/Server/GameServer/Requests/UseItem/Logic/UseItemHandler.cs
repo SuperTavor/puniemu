@@ -43,12 +43,12 @@ namespace Puniemu.Src.Server.GameServer.Requests.UseItem.Logic
             response.ItemType = itemInfo.ItemType;
             response.YwpUserIconBudge = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_icon_budge");
             response.YwpUserDictionary = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_dictionary");
-
+            var userBonus = new TableParser<YwpUserYoukaiBonusEffect>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_youkai_bonus_effect"));
             var userYoukaiSkill = new TableParser<YwpUserYoukaiSkill>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_youkai_skill"));
             var userYoukai = new TableParser<YwpUserYoukai>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_youkai"));
             var userItem = new TableParser<YwpUserItem>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_item"));
 
-            var itemService = new UseItemService(deserialized.ItemID, deserialized.YoukaiID, userItem, userYoukai, userYoukaiSkill, mstItem);
+            var itemService = new UseItemService(deserialized.ItemID, deserialized.YoukaiID, userItem, userYoukai, userYoukaiSkill, mstItem, userBonus);
             try
             {
                 if (response.ItemType == ItemType.Exporb)
@@ -70,9 +70,18 @@ namespace Puniemu.Src.Server.GameServer.Requests.UseItem.Logic
                         return;
                     }
                 }
-                else if (response.ItemType == ItemType.SkillBooster)
+                else if (response.ItemType == ItemType.BonusEffectBooster)
                 {
-                    itemService.UseSkillBooster();
+                    try
+                    {
+                        itemService.UseBonusEffectBooster();
+                    }
+                    catch(InvalidOperationException ex)
+                    {
+                        var errMsg = new MsgBoxResponse(ex.Message, "Error");
+                        await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(errMsg)));
+                        return;
+                    }
                 }
             }
             catch (KeyNotFoundException)
@@ -90,11 +99,11 @@ namespace Puniemu.Src.Server.GameServer.Requests.UseItem.Logic
             response.YwpUserYoukai = userYoukai.ToString();
             response.YwpUserYoukaiSkill = userYoukaiSkill.ToString();
             response.YwpUserItem = userItem.ToString();
-
+            response.YwpUserBonusEff = userBonus.ToString();
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_item", response.YwpUserItem);
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_youkai", response.YwpUserYoukai);
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_youkai_skill", response.YwpUserYoukaiSkill);
-
+            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_youkai_bonus_effect", response.YwpUserBonusEff);
             await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(response)));
         }
     }

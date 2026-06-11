@@ -15,12 +15,14 @@ namespace Puniemu.Src.Server.GameServer.Requests.UseItem.Logic
 
         public TableParser<YwpUserYoukaiSkill> UserYoukaiSkill;
 
+        public TableParser<YwpUserYoukaiBonusEffect> UserBonusEffect;
         private YwpMstItem _itemInfo;
 
         private int _itemId;
 
         private long _youkaiId;
-        public UseItemService(int itemId, long youkaiId, TableParser<YwpUserItem> userItem, TableParser<YwpUserYoukai> userYoukai, TableParser<YwpUserYoukaiSkill> userYoukaiSkill, TableParser<YwpMstItem> ywpMstItem)
+        public UseItemService(int itemId, long youkaiId, TableParser<YwpUserItem> userItem, TableParser<YwpUserYoukai> userYoukai, 
+            TableParser<YwpUserYoukaiSkill> userYoukaiSkill, TableParser<YwpMstItem> ywpMstItem, TableParser<YwpUserYoukaiBonusEffect> userBonusEffect)
         {
             _youkaiId = youkaiId;
             _itemId = itemId;
@@ -28,6 +30,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.UseItem.Logic
             UserYoukai = userYoukai;
             UserYoukaiSkill = userYoukaiSkill;
             _itemInfo = ywpMstItem.Items.Where(x => x.ItemID == itemId).First();
+            UserBonusEffect = userBonusEffect;
         }
 
         private void SpendItem()
@@ -42,6 +45,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.UseItem.Logic
 
         public UserYoukaiResultListRes UseExporb()
         {
+            SpendItem();
             var expToAdd = _itemInfo.ItemParam;
 
             var mstYokai = new TableParser<YwpMstYoukai>(DataManager.Logic.DataManager.GameDataManager.GetTableStringFromJson("ywp_mst_youkai"));
@@ -50,7 +54,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.UseItem.Logic
             YwpMstYoukai mstYokaiEntry = mstYokai.Items.Where(x => x.YoukaiId == _youkaiId).First();
             var result = new UserYoukaiResultListRes(yokaiToGive, mstYokaiEntry);
             MoneyExpManager.GiveYoukaiExp(result, yokaiToGive, _youkaiId, expToAdd, mstYokaiEntry);
-            SpendItem();
 
             return result;
         }
@@ -59,10 +62,12 @@ namespace Puniemu.Src.Server.GameServer.Requests.UseItem.Logic
         {
             var skillItem = UserYoukaiSkill.Items.First(x => x.YoukaiId == _youkaiId);
             var currentLevel = skillItem.Level;
-            if(currentLevel >= 7)
+            if (currentLevel >= 7)
             {
                 throw new MaxLevelException();
             }
+            SpendItem();
+        
             var soulGain = _itemInfo.ItemParam;
 
             var skillUpdateRes = YoukaiManager.AddExpToSkill(UserYoukaiSkill, _youkaiId, soulGain);
@@ -78,15 +83,23 @@ namespace Puniemu.Src.Server.GameServer.Requests.UseItem.Logic
             res.Before = skillUpdateRes.Before;
             res.After = skillUpdateRes.After;
             res.YoukaiID = _youkaiId;
-
-            SpendItem();
-
             return res;
         }
 
-        public void UseSkillBooster()
+        public void UseBonusEffectBooster()
         {
-            throw new NotImplementedException();
+            var bonusItem = UserBonusEffect.Items.FirstOrDefault(x => x.YoukaiID  == _youkaiId);
+            if(bonusItem == null)
+            {
+                throw new InvalidOperationException("Yo-kai does not have bonus effect.");
+            }
+            if(bonusItem.BonusEffectLevel == 5)
+            {
+                throw new InvalidOperationException("Yo-kai is at max bonus effect level.");
+            }
+            SpendItem();
+
+            bonusItem.BonusEffectLevel += 1;
         }
 
     }

@@ -41,8 +41,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
 
         public static GachaPrize RegisterYokaiAndGetPrize(long yokaiId, CapsuleColor capsule, RarityType rank, TableParser<YwpUserYoukai> userYokaiTable, TableParser<YwpUserYoukaiSkill> userSkillTable, TableParser.Logic.TableParser dictionaryListTable, TableParser<YwpUserItem> userItem, int gachaId, TableParser<YwpUserYoukaiBonusEffect> userBonus)
         {
-            //dbg
-            yokaiId = 2479000;
             var prizeType = PrizeType.Yokai;
             var getType = YokaiWonPopup.CheckGetType(yokaiId, userYokaiTable, userSkillTable);
             YokaiWonPopup? yokai = null;
