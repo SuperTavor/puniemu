@@ -6,6 +6,7 @@ using Puniemu.Src.Server.GameServer.Logic;
 using Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.DataClasses;
 using Puniemu.Src.TableParser.DataClasses;
 using Puniemu.Src.TableParser.Logic;
+using Puniemu.Src.UserDataManager.Logic;
 using Puniemu.Src.Utils.GeneralUtils;
 using System.Buffers;
 using System.Text;
@@ -36,7 +37,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             //gacha info
             var GachaMstTable = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_gacha"]!)!["tableData"]);
             var userItemtable = new TableParser.Logic.TableParser<YwpUserItem>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_item")!);
-
+            var userBonus = new TableParser<YwpUserYoukaiBonusEffect>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserId, "ywp_user_youkai_bonus_effect"));
             var dictionaryListTable = new TableParser.Logic.TableParser(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_dictionary")!);
             var userYokaiTable = new TableParser<YwpUserYoukai>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_youkai")!);
 
@@ -145,12 +146,12 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             {
                for(int i = 0; i < pullCount; i++)
                {
-                    prizes.Add(GachaPoolManager.CrankReward(gachaId, userYokaiTable, userSkillTable, dictionaryListTable, userItemtable));
+                    prizes.Add(GachaPoolManager.CrankReward(gachaId, userYokaiTable, userSkillTable, dictionaryListTable, userItemtable, userBonus));
                }
             }
             else if(deserialized.RequestYoukaiId != 0 && GachaYoukaiChoiceManager.IsChoiceOk(gachaId, deserialized.RequestYoukaiId))
             {
-                prizes.Add(GachaPoolManager.RegisterYokaiAndGetPrize(deserialized.RequestYoukaiId, CapsuleColor.Gray, 0, userYokaiTable, userSkillTable, dictionaryListTable, userItemtable, gachaId));
+                prizes.Add(GachaPoolManager.RegisterYokaiAndGetPrize(deserialized.RequestYoukaiId, CapsuleColor.Gray, 0, userYokaiTable, userSkillTable, dictionaryListTable, userItemtable, gachaId, userBonus));
                 pullCount = 1;
             }
             else
@@ -171,6 +172,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_data", userData);
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_item", userItemtable.ToString());
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_tutorial_list", tutorialList);
+            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_youkai_bonus_effect", userBonus.ToString());
             var settings = new JsonSerializerSettings();
             var converter = new ExecuteGachaResponseConverter();
             settings.Converters.Add(converter);
@@ -178,6 +180,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             var resdict = JsonConvert.DeserializeObject<Dictionary<string, object>>(serialized)!;
             resdict["ywp_user_youkai"] = userYokaiTable.ToString();
             resdict["ywp_user_data"] = userData;
+            resdict["ywp_user_youkai_bonus_effect"] = userBonus.ToString();
             resdict["ywp_user_dictionary"] = dictionaryListTable.ToString();
             resdict["ywp_user_youkai_skill"] = userSkillTable.ToString();
             List<string> list = new List<string>();

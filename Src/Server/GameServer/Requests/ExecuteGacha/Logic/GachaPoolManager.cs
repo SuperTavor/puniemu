@@ -39,8 +39,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
 
       
 
-        public static GachaPrize RegisterYokaiAndGetPrize(long yokaiId, CapsuleColor capsule, RarityType rank, TableParser<YwpUserYoukai> userYokaiTable, TableParser<YwpUserYoukaiSkill> userSkillTable, TableParser.Logic.TableParser dictionaryListTable, TableParser<YwpUserItem> userItem, int gachaId)
+        public static GachaPrize RegisterYokaiAndGetPrize(long yokaiId, CapsuleColor capsule, RarityType rank, TableParser<YwpUserYoukai> userYokaiTable, TableParser<YwpUserYoukaiSkill> userSkillTable, TableParser.Logic.TableParser dictionaryListTable, TableParser<YwpUserItem> userItem, int gachaId, TableParser<YwpUserYoukaiBonusEffect> userBonus)
         {
+            //dbg
+            yokaiId = 2479000;
             var prizeType = PrizeType.Yokai;
             var getType = YokaiWonPopup.CheckGetType(yokaiId, userYokaiTable, userSkillTable);
             YokaiWonPopup? yokai = null;
@@ -66,7 +68,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             }
               
             //Register yokai if not registered
-            YoukaiManager.AddYoukai(userYokaiTable, yokaiId, userSkillTable);
+            YoukaiManager.AddYoukai(userYokaiTable, yokaiId, userSkillTable, userBonus);
 
             dictionaryListTable = DictionaryManager.EditDictionary(dictionaryListTable, yokaiId, true, true);
 
@@ -84,7 +86,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             };
         }
         //returns null if gacha id doesnt exist, else return yokai id and rarity (Rank)
-        public static GachaPrize? CrankReward(int gachaId, TableParser<YwpUserYoukai> userYokaiTable, TableParser<YwpUserYoukaiSkill> userSkillTable, TableParser.Logic.TableParser dictionaryListTable, TableParser<YwpUserItem> userItemTable)
+        public static GachaPrize? CrankReward(int gachaId, TableParser<YwpUserYoukai> userYokaiTable, TableParser<YwpUserYoukaiSkill> userSkillTable, TableParser.Logic.TableParser dictionaryListTable, TableParser<YwpUserItem> userItemTable, TableParser<YwpUserYoukaiBonusEffect> userBonus)
         {
             EnsureLoaded();
             //Currently items still have a placeholder capsule
@@ -143,7 +145,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
                         var roll = Random.Shared.Next(yokaisToRoll.Count);
                         var resultYokai = yokaisToRoll[roll];
 
-                        return RegisterYokaiAndGetPrize(resultYokai, GachaService.CAPSULE_CLRS[rank], rank, userYokaiTable, userSkillTable, dictionaryListTable, userItemTable, gachaId);
+                        return RegisterYokaiAndGetPrize(resultYokai, GachaService.CAPSULE_CLRS[rank], rank, userYokaiTable, userSkillTable, dictionaryListTable, userItemTable, gachaId, userBonus);
                     }
                     else
                     {

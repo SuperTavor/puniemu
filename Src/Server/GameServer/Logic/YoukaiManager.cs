@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Puniemu.Src.Server.GameServer.DataClasses;
+using Puniemu.Src.Server.GameServer.Logic.Mst;
 using Puniemu.Src.Server.GameServer.Requests.InitGacha.DataClasses;
 using Puniemu.Src.TableParser.DataClasses;
 using Puniemu.Src.TableParser.Logic;
@@ -100,11 +101,11 @@ namespace Puniemu.Src.Server.GameServer.Logic
             userYokai.Items.Remove(userYokai.Items[yokaiIdx]);
             userSkill.Items.Remove(userSkill.Items[skillIdx]);
         }
-        public static void AddYoukai(TableParser<YwpUserYoukai> parser, long YoukaiId, TableParser<YwpUserYoukaiSkill> parser2)
+        public static void AddYoukai(TableParser<YwpUserYoukai> userYokai, long YoukaiId, TableParser<YwpUserYoukaiSkill> userSkill, TableParser<YwpUserYoukaiBonusEffect> userBonus)
         {
             var YoukaiMstTable = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager!.GamedataCache["ywp_mst_youkai"]!)!["tableData"]);
             var YoukaiLevelMstTable = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai_level"]!)!["tableData"]);
-            var UserYoukaiIndex = GetYoukaiIndex(parser, YoukaiId);
+            var UserYoukaiIndex = GetYoukaiIndex(userYokai, YoukaiId);
             var MstYoukaiIndex = YoukaiMstTable.FindIndex([YoukaiId.ToString()]);
             if (UserYoukaiIndex == -1)
             {
@@ -117,12 +118,28 @@ namespace Puniemu.Src.Server.GameServer.Logic
                         break;
                     tmpIdx++;
                 }
-                parser.AddItem(new YwpUserYoukai { YoukaiId = YoukaiId, Level = 1, Exp = 0, Hp =  int.Parse(YoukaiMstTable.Table[MstYoukaiIndex][8]), Atk = int.Parse(YoukaiMstTable.Table[MstYoukaiIndex][10]), ExpDenominator = int.Parse(YoukaiLevelMstTable.Table[tmpIdx][3]), ExpNumerator = 0, Percentage = 0, BefriendDate = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), BreakLimitCount = 0 });
+                userYokai.AddItem(new YwpUserYoukai { YoukaiId = YoukaiId, Level = 1, Exp = 0, Hp =  int.Parse(YoukaiMstTable.Table[MstYoukaiIndex][8]), Atk = int.Parse(YoukaiMstTable.Table[MstYoukaiIndex][10]), ExpDenominator = int.Parse(YoukaiLevelMstTable.Table[tmpIdx][3]), ExpNumerator = 0, Percentage = 0, BefriendDate = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), BreakLimitCount = 0 });
             }
-            YoukaiManager.AddYoukaiSkill(ref parser2, YoukaiId);
+            AddYoukaiSkill(ref userSkill, YoukaiId);
+            AddYoukaiBonusEff(userBonus, YoukaiId);
             return;
         }
-        public static void AddYoukaiSkill(ref TableParser<YwpUserYoukaiSkill> youkaiList, long YoukaiId)
+
+        private static void AddYoukaiBonusEff(TableParser<YwpUserYoukaiBonusEffect> bonusEff, long youkaiId)
+        {
+            if(MstBonusEffectManager.IsHaveBonusEffect(youkaiId) && bonusEff.Items.FirstOrDefault(x => x.YoukaiID == youkaiId) == null)
+            {
+                var newEff = new YwpUserYoukaiBonusEffect()
+                {
+                    YoukaiID = youkaiId,
+                    BonusEffectLevel = 1,
+                    BonusEff2ActivatedFlg = 0, //Second bonus effect not implemented yet
+                    BonusEff3ActivatedFlg = 0
+                };
+                bonusEff.Items.Add(newEff);
+            }
+        }
+        private static void AddYoukaiSkill(ref TableParser<YwpUserYoukaiSkill> youkaiList, long YoukaiId)
         {
             var UserYoukaiIndex = GetYoukaiSkillIndex(youkaiList, YoukaiId);
             if (UserYoukaiIndex == -1)

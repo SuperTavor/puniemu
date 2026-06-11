@@ -27,7 +27,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.LoginStamp.Logic
             List<string> LOGIN_STAMP_TABLES = new();
 
             var res = new LoginStampResponse();
-            
+
+            var userBonus = new TableParser<YwpUserYoukaiBonusEffect>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_youkai_bonus_effect"));
             // used to define variable
             var playerIconTable = new TableParser.Logic.TableParser("");
             var userYoukaiTable = new TableParser<YwpUserYoukai>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserID!, "ywp_user_youkai")!);
@@ -154,14 +155,16 @@ namespace Puniemu.Src.Server.GameServer.Requests.LoginStamp.Logic
                 {
                     var dictionaryYoukai = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserID!, "ywp_user_dictionary");
                     dictionaryYoukaiTable = DictionaryManager.EditDictionary(new TableParser.Logic.TableParser(dictionaryYoukai!), current_item_id, false, true);
-                    YoukaiManager.AddYoukai(userYoukaiTable, current_item_id, userYoukaiSkillTable);
+                    YoukaiManager.AddYoukai(userYoukaiTable, current_item_id, userYoukaiSkillTable, userBonus);
                     res.YoukaiPopupResult = new(current_item_id, userYoukaiTable, userYoukaiSkillTable);
                     await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_dictionary", dictionaryYoukaiTable.ToString());
                     await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_youkai", userYoukaiTable.ToString());
                     await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_youkai_skill", userYoukaiSkillTable!.ToString());
+                    await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_youkai_bonus_effect", userBonus!.ToString());
                     LOGIN_STAMP_TABLES.Add("ywp_user_youkai");
                     LOGIN_STAMP_TABLES.Add("ywp_user_dictionary");
                     LOGIN_STAMP_TABLES.Add("ywp_user_youkai_skill");
+                    LOGIN_STAMP_TABLES.Add("ywp_user_youkai_bonus_effect");
                 }
                 if (current_item_type == 3)
                 {

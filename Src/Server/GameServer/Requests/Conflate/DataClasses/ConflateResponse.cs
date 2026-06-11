@@ -20,6 +20,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.Conflate.DataClasses
         [JsonProperty("ywp_user_youkai_skill")]
         public string YwpUserYoukaiSkill { get; set; }
 
+        [JsonProperty("ywp_user_youkai_bonus_effect")]
+        public string YwpUserBonusEffect { get; set; }
+
         [JsonProperty("ywp_user_icon_budge")]
         public string YwpUserIconBudge { get; set; }
 

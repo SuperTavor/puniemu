@@ -250,7 +250,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 }
             }
         }
-        public static void HandleDrop(GameEndRequest deserialized, GameEndResponse res, TableParser<YwpUserDictionary> dictionaryYoukaiTable, TableParser<YwpUserDictionary> dictionaryDiff, TableParser<YwpUserYoukai> userYoukaiTable, TableParser<YwpUserYoukai> youkaiDiff, TableParser<YwpUserYoukaiSkill> userYoukaiSkillTable, TableParser<YwpUserYoukaiSkill> youkaiSkillDiff, TableParser<YwpUserItem> userItemTable, TableParser.Logic.TableParser playerIconTable, YwpUserData userData, StageData LevelData, int FirstClear)
+        public static void HandleDrop(GameEndRequest deserialized, GameEndResponse res, TableParser<YwpUserDictionary> dictionaryYoukaiTable, TableParser<YwpUserDictionary> dictionaryDiff, 
+            TableParser<YwpUserYoukai> userYoukaiTable, TableParser<YwpUserYoukai> youkaiDiff, TableParser<YwpUserYoukaiSkill> userYoukaiSkillTable, 
+            TableParser<YwpUserYoukaiSkill> youkaiSkillDiff, TableParser<YwpUserItem> userItemTable, TableParser.Logic.TableParser playerIconTable, 
+            YwpUserData userData, StageData LevelData, int FirstClear, TableParser<YwpUserYoukaiBonusEffect> userBonus)
         {
             var MstEnemyParam = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai_enemy_param"]!)!["tableData"]);
 
@@ -274,8 +277,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                             DictionaryManager.EditDictionary(ref dictionaryYoukaiTable, YoukaiId, true, true);
                             DictionaryManager.EditDictionary(ref dictionaryDiff, YoukaiId, true, true);
                             res.UserGameResultData.RewardYoukaiId = YoukaiId;
-                            YoukaiManager.AddYoukai(userYoukaiTable, YoukaiId, userYoukaiSkillTable);
-                            YoukaiManager.AddYoukai(youkaiDiff, YoukaiId, youkaiSkillDiff);
+                            YoukaiManager.AddYoukai(userYoukaiTable, YoukaiId, userYoukaiSkillTable, userBonus);
+                            YoukaiManager.AddYoukai(youkaiDiff, YoukaiId, youkaiSkillDiff, userBonus);
                         }
                     }
                 }
@@ -400,6 +403,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
             var userYoukai = await UDM.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai");
             var userYoukaiSkill = await UDM.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai_skill");
             var dictionaryYoukai = await UDM.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_dictionary");
+            var userBonus = new TableParser<YwpUserYoukaiBonusEffect>(await UDM.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_youkai_bonus_effect"));
             var dictionaryYoukaiTable = new TableParser<YwpUserDictionary>(dictionaryYoukai!);
             var userYoukaiTable = new TableParser<YwpUserYoukai>(userYoukai!);
             TableParser<YwpUserYoukaiSkill> userYoukaiSkillTable = new(userYoukaiSkill!);
@@ -425,7 +429,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
             {
                 int FirstClear = 0;
                 HandleStage(deserialized, res, ref FirstClear, ywpUserStage, ywpUserMap);
-                HandleDrop(deserialized, res, dictionaryYoukaiTable, dictionaryDiff, userYoukaiTable, youkaiDiff, userYoukaiSkillTable,  youkaiSkillDiff, userItemTable, playerIconTable, userData, LevelData, FirstClear);
+                HandleDrop(deserialized, res, dictionaryYoukaiTable, dictionaryDiff, userYoukaiTable, youkaiDiff, userYoukaiSkillTable,  youkaiSkillDiff, userItemTable, playerIconTable, userData, LevelData, FirstClear, userBonus);
                 HandleTutorial(deserialized, res, tutorialList, LevelData, FirstClear);
                 HandleMenuFunc(deserialized, res, LevelData, menufuncListTable, FirstClear);
             }
@@ -444,7 +448,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
             await UDM.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_player_icon", playerIconTable.ToString());
             await UDM.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_map", ywpUserMap.ToString());
             await UDM.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_youkai_skill", userYoukaiSkillTable.ToString());
-
+            await UDM.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_youkai_bonus_effect", userBonus.ToString());
             var resdict = JsonConvert.DeserializeObject<Dictionary<string, object>>(JsonConvert.SerializeObject(res));
             if (resdict == null)
             {
@@ -463,7 +467,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 youkaiDiffStr = youkaiDiffStr.Substring(1);
             }
 
-
+            resdict["ywp_user_youkai_bonus_effect"] = userBonus.ToString();
             resdict["ywp_user_youkai_skill"] = userYoukaiSkillTable.ToString();
             resdict["ywp_user_youkai_bonus_effect_diff"] = ""; // TODO
             resdict["ywp_user_youkai_strong_skill_diff"] = ""; // TODO

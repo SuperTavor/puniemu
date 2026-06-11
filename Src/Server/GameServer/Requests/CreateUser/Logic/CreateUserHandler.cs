@@ -17,18 +17,18 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
     public class CreateUserHandler
     {
 
-        public static Tuple<string, string> CreateUserYoukaiSave()
+        public static Tuple<string, string, string> CreateUserYoukaiSave()
         {
             TableParser<YwpUserYoukai> value = new("");
             TableParser<YwpUserYoukaiSkill> value2 = new("");
+            TableParser<YwpUserYoukaiBonusEffect> userBonus = new("");
+            YoukaiManager.AddYoukai(value, 2157000, value2, userBonus);
+            YoukaiManager.AddYoukai(value, 2213000, value2, userBonus);
+            YoukaiManager.AddYoukai(value, 2231000, value2, userBonus);
+            YoukaiManager.AddYoukai(value, 2235000, value2, userBonus);
+            YoukaiManager.AddYoukai(value, 2281000, value2, userBonus);
 
-            YoukaiManager.AddYoukai(value, 2157000, value2);
-            YoukaiManager.AddYoukai(value, 2213000, value2);
-            YoukaiManager.AddYoukai(value, 2231000, value2);
-            YoukaiManager.AddYoukai(value, 2235000, value2);
-            YoukaiManager.AddYoukai(value, 2281000, value2);
-
-            return new Tuple<string, string> (value.ToString(), value2.ToString());
+            return new Tuple<string, string, string> (value.ToString(), value2.ToString(), userBonus.ToString());
         }
         public static void CreateSave(Dictionary<string, object?> tables, YwpUserData generatedUserData)
         {
@@ -68,7 +68,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
             tables.Add("ywp_user_gacha_stamp", null);
             tables.Add("ywp_user_youkai_strong_skill", null);
             tables.Add("ywp_user_youkai_legend_release_history", null);
-            tables.Add("ywp_user_youkai_bonus_effect", null);
             tables.Add("ywp_user_treasure_series", null);
             tables.Add("ywp_user_treasure", null);
             tables.Add("ywp_user_shop_item_unlock", null);
@@ -105,9 +104,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
             tables.Add("ywp_user_player_effect", "1");
             tables.Add("ywp_user_player_codename", "1");
 
-            Tuple<string, string> youkai = CreateUserYoukaiSave();
+            Tuple<string, string, string> youkai = CreateUserYoukaiSave();
             tables.Add("ywp_user_youkai", youkai.Item1);
             tables.Add("ywp_user_youkai_skill", youkai.Item2);
+            tables.Add("ywp_user_youkai_bonus_effect", youkai.Item3);
 
         }
         public static async Task HandleAsync(HttpContext ctx)

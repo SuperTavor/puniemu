@@ -5,6 +5,7 @@ using Puniemu.Src.Server.GameServer.Requests.Conflate.DataClasses;
 using Puniemu.Src.Server.GameServer.Requests.GetRanking.DataClasses;
 using Puniemu.Src.TableParser.DataClasses;
 using Puniemu.Src.TableParser.Logic;
+using Puniemu.Src.UserDataManager.Logic;
 using System.Buffers;
 namespace Puniemu.Src.Server.GameServer.Requests.Conflate.Logic
 {
@@ -27,6 +28,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Conflate.Logic
             var userSkill = new TableParser<YwpUserYoukaiSkill>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_youkai_skill"));
             var userItem = new TableParser<YwpUserItem>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_item"));
             var userDictionary = new TableParser<YwpUserDictionary>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_dictionary"));
+            var userBonus = new TableParser<YwpUserYoukaiBonusEffect>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_youkai_bonus_effect"));
             res.YwpUserData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data");
 
             //Find how the fusion looks
@@ -65,7 +67,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Conflate.Logic
             res.YwpUserData.YMoney -= mstConflateItem.YMoneyCost;
             //Befriend result yokai
             res.Youkai = new YokaiWonPopup(mstConflateItem.ResultID, userYokai, userSkill);
-            YoukaiManager.AddYoukai(userYokai, mstConflateItem.ResultID, userSkill);
+            YoukaiManager.AddYoukai(userYokai, mstConflateItem.ResultID, userSkill, userBonus);
             DictionaryManager.EditDictionary(ref userDictionary, mstConflateItem.ResultID, true, true);
             //Save response and data
             res.YwpUserYoukai = userYokai.ToString();
@@ -75,8 +77,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.Conflate.Logic
             res.YwpUserDictionary = userDictionary.ToString();
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_dictionary", res.YwpUserDictionary);
             res.YwpUserItem = userItem.ToString();
+            res.YwpUserBonusEffect = userBonus.ToString();
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_item", res.YwpUserItem);
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_data", res.YwpUserData);
+            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_youkai_bonus_effect", res.YwpUserBonusEffect);
             //add filler tables
             res.YwpUserIconBudge = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_icon_budge");
             res.YwpUserYoukaiDeck = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_youkai_deck");
