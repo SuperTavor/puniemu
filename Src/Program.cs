@@ -58,6 +58,7 @@ using Puniemu.Src.Server.GameServer.Requests.UseItem.Logic;
 using Puniemu.Src.Server.GameServer.Requests.Watch.InitWatch.Logic;
 using Puniemu.Src.Server.GameServer.Requests.Watch.UpdateWatchReadFlg.Logic;
 using Puniemu.Src.Server.GameServer.Requests.Conflate.Logic;
+using Puniemu.Src.Server.GameServer.Requests.UseAddition.Logic;
 namespace Puniemu.Src;
 class Program
 {
@@ -329,6 +330,10 @@ class Program
         app.MapPost("/initCollectMenu.nhn", async ctx =>
         {
             await InitCollectMenuHandler.HandleAsync(ctx);
+        });
+        app.MapPost("/useAddition.nhn", async ctx =>
+        {
+            await UseAdditionHandler.HandleAsync(ctx);
         });
         app.MapPost("/initGoku.nhn", async ctx =>
         {

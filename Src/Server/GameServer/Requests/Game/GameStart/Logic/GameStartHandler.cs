@@ -174,6 +174,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
             // Get deck and user_youkai to get : userYoukaiList info
             var YwpUserYoukaiTab = new TableParser<YwpUserYoukai>((await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai"))!);
 
+            var isSuperShrine = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<bool>(deserialized.Gdkey, "ywp_user_addition");
             // Create EnemyInfoList (Use an new (but imcomplete right now) format)
             foreach (EnemyStageEntry i in (LevelData.Enemy))
             {
@@ -220,7 +221,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
                         {
                             var yokaiRank = mstYokaiItem.YoukaiRarity;
                             var befrienders = DeckManager.GetBefrienderSpots(UserDeck, mstYokaiItem, YwpUserYoukaiSkillTab);
-                            item.LotYoukaiInfoList = LotYoukaiManager.GenerateLotYoukai(befrienders, yokaiRank);
+                            item.LotYoukaiInfoList = LotYoukaiManager.GenerateLotYoukai(befrienders, yokaiRank, isSuperShrine);
                             //Console.WriteLine(JsonConvert.SerializeObject(item.LotYoukaiInfoList));
                         }
                     }

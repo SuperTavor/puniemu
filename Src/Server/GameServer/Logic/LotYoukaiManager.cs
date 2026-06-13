@@ -60,6 +60,7 @@ public static class LotYoukaiManager
         4.25f,  // bit 4 — 4-heart,   base x 4.25
     };
 
+    private static readonly float SUPER_SHRINE_MULTIPLIER = FoodMultipliers[3];
     private static float GetSoultimateBoost(string pattern, BefriendYokaiInfo[] befrienders, float[] ptsArr)
     {
         double totalMultiplier = 1.0;
@@ -81,19 +82,23 @@ public static class LotYoukaiManager
         return (float)totalMultiplier;
     }
 
-    private static float GetBefriendWeight(RarityType enemyRank, int bitPosition, float soultimateBoost)
+    private static float GetBefriendWeight(RarityType enemyRank, int bitPosition, float soultimateBoost, bool isSuperShrine)
     {
         float baseRate = BaseRateByRank[enemyRank];
         float foodMultiplier = FoodMultipliers[bitPosition];
-        return Math.Clamp(baseRate * foodMultiplier * soultimateBoost, 0f, 1f);
+        var shrineMultiplier = 0.0f;
+        var preClamp = baseRate * soultimateBoost;
+        if (isSuperShrine) shrineMultiplier = SUPER_SHRINE_MULTIPLIER;
+        preClamp *= Math.Max(shrineMultiplier, foodMultiplier);
+        return Math.Clamp(preClamp, 0f, 1f);
     }
 
-    private static string GenerateLotResult(RarityType enemyRank, float soultimateBoost)
+    private static string GenerateLotResult(RarityType enemyRank, float soultimateBoost, bool isSuperShrine)
     {
         var bits = new char[5];
         for (int bitPos = 0; bitPos < 5; bitPos++)
         {
-            float weight = GetBefriendWeight(enemyRank, bitPos, soultimateBoost);
+            float weight = GetBefriendWeight(enemyRank, bitPos, soultimateBoost, isSuperShrine);
             bits[bitPos] = _rng.NextDouble() < weight ? '1' : '0';
         }
         return new string(bits);
@@ -149,7 +154,7 @@ public static class LotYoukaiManager
         }
         return ptsArr;
     }
-    public static LotYoukaiInfoList GenerateLotYoukai(BefriendYokaiInfo[] befrienders, RarityType enemyRank)
+    public static LotYoukaiInfoList GenerateLotYoukai(BefriendYokaiInfo[] befrienders, RarityType enemyRank, bool isSuperShrine)
     {
         var ptsArr = GetBefrienderPts(befrienders);
         var patterns = GenerateLotPatterns(befrienders);
@@ -161,7 +166,7 @@ public static class LotYoukaiManager
             lotList.Entries.Add(new LotYoukaiInfo
             {
                 LotPattern = pattern,
-                LotResult = GenerateLotResult(enemyRank, soultimateBoost)
+                LotResult = GenerateLotResult(enemyRank, soultimateBoost, isSuperShrine)
             });
         }
 

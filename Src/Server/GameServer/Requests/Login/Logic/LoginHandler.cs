@@ -4,6 +4,7 @@ using Puniemu.Src.DataManager.Logic;
 using Puniemu.Src.Server.GameServer.DataClasses;
 using Puniemu.Src.Server.GameServer.Logic;
 using Puniemu.Src.Server.GameServer.Requests.Login.DataClasses;
+using Puniemu.Src.Server.GameServer.Requests.UseAddition.Logic;
 using Puniemu.Src.TableParser.DataClasses;
 using Puniemu.Src.TableParser.Logic;
 using Puniemu.Src.UserDataManager.DataClasses;
@@ -27,7 +28,11 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.Logic
             var deserialized = JsonConvert.DeserializeObject<LoginRequest>(requestJsonString!)!;
             var acc = await UserDataManager.Logic.UserDataManager.GetAccountFromGdkeyAsync(deserialized.Gdkey!);
 
-
+            var additionService = new UseAdditionService(deserialized.Gdkey);
+            if(await additionService.CanDoShrineToday())
+            {
+                await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "ywp_user_addition", false);
+            }
             await ShopLimitManager.CheckShopLimitReset(deserialized.Gdkey);
             //Construct response
             CommonLoginResponse res = new CommonLoginResponse();
