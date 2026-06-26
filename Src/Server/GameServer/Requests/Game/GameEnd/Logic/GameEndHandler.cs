@@ -350,7 +350,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 return;
             }
             //its like this in the original game idk whys\
-            deserialized.Score += 10000;
+            if(gameEndType == GameEndType.GameEnd)
+                deserialized.Score += 10000;
 
             var ReqId = await UDM.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_requestid");
             if ((ReqId == null || deserialized.RequestID == null || ReqId == "" || deserialized.RequestID == "") || (ReqId != deserialized.RequestID))

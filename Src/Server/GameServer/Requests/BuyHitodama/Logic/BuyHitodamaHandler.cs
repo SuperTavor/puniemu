@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Puniemu.Src.Server.GameServer.DataClasses;
+using Puniemu.Src.Server.GameServer.Logic;
 using Puniemu.Src.Server.GameServer.Requests.BuyHitodama.DataClasses;
 using System.Buffers;
 using System.Text;
@@ -18,11 +19,13 @@ namespace Puniemu.Src.Server.GameServer.Requests.BuyHitodama.Logic
             var deserialized = JsonConvert.DeserializeObject<BuyHitodamaRequest>(requestJsonString!)!;
             //Find ID
             ctx.Response.Headers.ContentType = "application/json";
-            if (HitodamaGoods.Goods.TryGetValue(deserialized.GoodsId,out var good))
+            var shopData = ShopHitodamaManager.Data;
+            var good = shopData.FirstOrDefault(x => x.GoodsID == deserialized.GoodsId);
+            if (good != null)
             {
                 var userData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized!.Gdkey!, "ywp_user_data");
                 var before = new HitodamaInformation(userData!.Hitodama, userData.FreeHitodama);
-                if(userData.YMoney < good.Cost)
+                if(userData.YMoney < good.Price)
                 {
                     var response = JsonConvert.SerializeObject(new MsgBoxResponse("You don't have enough Y Money", "Too expensive"));
                     await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(response));

@@ -225,10 +225,10 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
             return SECONDS_IN_DAY - secondsPassed;
         }
 
-        public void BuyHitodamaGood(Good good)
+        public void BuyHitodamaGood(YwpMstShopHitodama good)
         {
-            this.YMoney -= good.Cost;
-            this.Hitodama += (good.RewardedHitodama + good.BonusSalesHitodama);
+            this.YMoney -= good.Price;
+            this.Hitodama += (good.SellCount + good.BonusCount);
         }
     }
 

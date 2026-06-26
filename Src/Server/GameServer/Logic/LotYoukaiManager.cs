@@ -30,7 +30,7 @@ public static class LotYoukaiManager
         3-heart food: ~100% increase in befriend rate
         4-heart food: ~325% increase in befriend rate
 
-        Befriender boost formula is currently (Note: formula probably not accurate to the original game but it should be the same ceiling since its using the points from the MST): 
+        Befriender boost formula is currently (Note: formula probably not accurate to the original game but it should be the same power scaling since its using the points from the MST): 
         
         ∏(i=0 to N-1) [1 + ((P - 0.006i) × 0.08) / 100]
         

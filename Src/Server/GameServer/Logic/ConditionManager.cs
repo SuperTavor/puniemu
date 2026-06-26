@@ -18,12 +18,14 @@ namespace Puniemu.Src.Server.GameServer.Logic
     {
         private static bool IsFinishWithSoult(List<EnemyYoukaiResultList> enemies, long youkaiId = -1)
         {
+            //Find enemy that died last
             int biggest = 0;
             for (int i = 0; i < enemies.Count; i++)
             {
                 var item = enemies[i];
                 if (item.DeadEndOrder > biggest) biggest = item.DeadEndOrder;
             }
+            //Check if ended with soult and if it was specific to teh youkai
             var lastItem = enemies.FirstOrDefault(x => x.DeadEndOrder == biggest);
             if(youkaiId == -1 && lastItem.DeadEndType != 0)
             {
@@ -61,11 +63,12 @@ namespace Puniemu.Src.Server.GameServer.Logic
             }
             else if (type == ConditionType.FinishWithSpecificYoukaiSoult) 
             {
-                return IsFinishWithSoult(deserialized.EnemyYoukaiResultList, param1);
+                return IsFinishWithSoult(deserialized.EnemyYoukaiResultList, youkaiId: param1);
             }
             else if (type == ConditionType.FinishWithSoult) 
             {
-                return IsFinishWithSoult(deserialized.EnemyYoukaiResultList);
+                // Youkai ID specified as -1 to say that the soult check is generic and not specific
+                return IsFinishWithSoult(deserialized.EnemyYoukaiResultList, youkaiId: -1);
             }
             else if (type == ConditionType.ClearStageNTimes && false) //idk
             {
