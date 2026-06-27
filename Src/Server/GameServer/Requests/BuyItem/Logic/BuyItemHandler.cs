@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using Puniemu.Src.NHNCrypt.Logic;
 using Puniemu.Src.Server.GameServer.DataClasses;
+using Puniemu.Src.Server.GameServer.Logic;
 using Puniemu.Src.Server.GameServer.Requests.BuyItem.DataClasses;
 using Puniemu.Src.TableParser.DataClasses;
 using Puniemu.Src.TableParser.Logic;
@@ -96,6 +97,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.BuyItem.Logic
                 userItems.Items[itemIdx].Count += deserialized.GoodsCount;
             }
 
+            await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.TotalPurchaseShop, 1);
+            await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.BuySpecificItemAtShop, deserialized.GoodsId);
             res.YwpUserItem = userItems.ToString();
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "ywp_user_item", res.YwpUserItem);
             var encRes = NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(res));

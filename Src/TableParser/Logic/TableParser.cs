@@ -231,7 +231,17 @@ namespace Puniemu.Src.TableParser.Logic
         private string[] ConvertObjectToRow(T item)
         {
             var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-            return properties.Select(p => p.GetValue(item)?.ToString() ?? "").ToArray();
+
+            return properties.Select(p =>
+            {
+                var val = p.GetValue(item);
+                if (val == null) return "";
+
+                if (p.PropertyType.IsEnum)
+                    return ((int)val).ToString(); // or Convert.ToInt32(val)
+
+                return Convert.ToString(val) ?? "";
+            }).ToArray();
         }
 
         private void LoadRowIntoIdentifierTable(string[] row, int i)
