@@ -111,6 +111,14 @@ namespace Puniemu.Src.Server.GameServer.Logic
                             mission.MissionCompleteStatus = MissionCompleteStatus.CompletePendingReward;
                         }
                     }
+                    else if (missionType == MissionType.CollectTotalScore)
+                    {
+                        mission.MissionParamProgress = mission.MissionParamProgress += progressToUpdate;
+                        if (mission.MissionParamProgress >= mission.MissionParamTarget)
+                        {
+                            mission.MissionCompleteStatus = MissionCompleteStatus.CompletePendingReward;
+                        }
+                    }
                     else if(missionType == MissionType.TotalScoreInScoreAttack)
                     {
                         mission.MissionParamProgress = mission.MissionParamProgress += progressToUpdate;

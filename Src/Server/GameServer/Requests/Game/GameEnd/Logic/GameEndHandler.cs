@@ -352,7 +352,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
             //its like this in the original game idk whys\
             if(gameEndType == GameEndType.GameEnd)
                 deserialized.Score += 10000;
-
+            await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.CollectTotalScore, deserialized.Score);
             var ReqId = await UDM.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_requestid");
             if ((ReqId == null || deserialized.RequestID == null || ReqId == "" || deserialized.RequestID == "") || (ReqId != deserialized.RequestID))
             {
