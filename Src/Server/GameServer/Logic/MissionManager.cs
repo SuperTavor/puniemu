@@ -22,7 +22,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
         }
 
         private static readonly List<SeriesCfgItem> _seriesCfg = JsonConvert.DeserializeObject<List<SeriesCfgItem>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["mission_cfg"])!;
-        private static TableParser<YwpMstMission> GetMstMission()
+        public static TableParser<YwpMstMission> GetMstMission()
         {
             if(_mstMission == null)
             {
@@ -33,6 +33,48 @@ namespace Puniemu.Src.Server.GameServer.Logic
             return _mstMission;
         }
 
+        public static async void TryUnlockNextMission(int missionId, TableParser<YwpUserMission> userMission)
+        {
+            var currentMissionIdx = userMission.Items.FindIndex(x => x.MissionID == missionId);
+            var currentMission = userMission.Items[currentMissionIdx];
+            var idxResult = GetMissionCfgIdx(missionId);
+            SeriesCfgItem seriesCfgItem = idxResult.Item1;
+            int missionCfgIdx = idxResult.Item2;
+            //Try unlock next mission in series
+            int nextMissionCfgIdx = missionCfgIdx + 1;
+            if (seriesCfgItem.Missions.Count > nextMissionCfgIdx)
+            {
+                var nextMissionCfgItem = seriesCfgItem.Missions[nextMissionCfgIdx];
+                var newMission = new YwpUserMission()
+                {
+                    MissionID = nextMissionCfgItem.MissionID,
+                    SeqNo = int.Parse("1" + nextMissionCfgItem.MissionID.ToString()),
+                    MissionCompleteStatus = MissionCompleteStatus.NotComplete,
+                    IsAppear = 1,
+                    MissionParamTarget = nextMissionCfgItem.Params[0],
+                    MissionParamProgress = currentMission.MissionParamProgress,
+                    NewStatus = MissionNewStatus.None,
+                };
+                userMission.Items.Remove(currentMission);
+                userMission.Items.Insert(currentMissionIdx,newMission);
+            }
+        }
+        private static (SeriesCfgItem, int) GetMissionCfgIdx(int missionId)
+        {
+            int missionCfgIdx = -1;
+            SeriesCfgItem seriesCfgItem = null;
+            foreach (var tSeries in _seriesCfg)
+            {
+                var tCfgEntry = tSeries.Missions.FindIndex(x => x.MissionID == missionId);
+                if (tCfgEntry != -1)
+                {
+                    missionCfgIdx = tCfgEntry;
+                    seriesCfgItem = tSeries;
+                    break;
+                }
+            }
+            return (seriesCfgItem, missionCfgIdx);
+        }
         public static async Task UpdateProgress(string gdkey, MissionType missionType, int progressToUpdate)
         {
             var userMission = await GetUserMission(gdkey);
@@ -46,24 +88,11 @@ namespace Puniemu.Src.Server.GameServer.Logic
                 if(mstEntry.MissionType == missionType)
                 {
                     //Get cfg entry
-                    int missionCfgIdx = -1;
-                    SeriesCfgItem seriesCfgItem = null;
-                    foreach (var tSeries in _seriesCfg)
-                    {
-                        var tCfgEntry = tSeries.Missions.FindIndex(x => x.MissionID == mstEntry.MissionID);
-                        if (tCfgEntry != -1)
-                        {
-                            missionCfgIdx = tCfgEntry;
-                            seriesCfgItem = tSeries;
-                            break;
-                        }
-                    }
-                    if (missionCfgIdx == -1 || seriesCfgItem == null)
-                    {
-                        throw new InvalidDataException("Can't find missionID in missionCfg: " + mission.MissionID);
-                    }
+                    var idxResult = GetMissionCfgIdx(mission.MissionID);
+                    SeriesCfgItem seriesCfgItem = idxResult.Item1;
+                    int missionCfgIdx = idxResult.Item2;
                     var missionCfgItem = seriesCfgItem.Missions[missionCfgIdx];
-                    Console.WriteLine($"[*] Updating mission for user ${gdkey}: \"{missionCfgItem.MissionName}\".");
+                    Console.WriteLine($"[*] Checking mission for user ${gdkey}: \"{missionCfgItem.MissionName}\".");
                     if(missionType == MissionType.TotalPurchaseShop)
                     {
                         int newProgress = mission.MissionParamProgress += progressToUpdate;
@@ -71,22 +100,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
                         {
                             mission.MissionParamProgress = mission.MissionParamTarget;
                             mission.MissionCompleteStatus = MissionCompleteStatus.CompletePendingReward;
-                            ////Try unlock next mission in series
-                            //int nextMissionCfgIdx = missionCfgIdx + 1;
-                            //if(seriesCfgItem.Missions.Count > nextMissionCfgIdx)
-                            //{
-                            //    var nextMissionCfgItem = seriesCfgItem.Missions[nextMissionCfgIdx];
-                            //    var newMission = new YwpUserMission()
-                            //    {
-                            //        MissionID = nextMissionCfgItem.MissionID,
-                            //        MissionIDWithSeries = nextMissionCfgItem.MissionID,
-                            //        MissionCompleteStatus = MissionCompleteStatus.NotComplete,
-                            //        IsAppear = 1,
-                            //        MissionParamTarget = nextMissionCfgItem.Params[0],
-                            //        MissionParamProgress = mission.MissionParamProgress,
-                            //        NewStatus = MissionNewStatus.ShowNewPopup,
-                            //    };
-                            //}
+                      
                         }
                         else
                         {

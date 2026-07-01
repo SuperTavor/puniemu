@@ -14,5 +14,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetMission.DataClasses
         [JsonProperty("ywp_user_mission")]
 
         public string UserMission { get; set; }
+
+        [JsonProperty("ywp_mst_daily_event_mission")]
+        public string MstDailyMission { get; set; }
     }
 }

@@ -18,6 +18,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetMission.Logic
             var deserialized = JsonConvert.DeserializeObject<CommonRequest>(requestJsonString!)!;
             var mstMission = (string)
                 JsonConvert.DeserializeObject<Dictionary<string, object>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_mission"])["tableData"];
+            var mstDaily = (string)
+                JsonConvert.DeserializeObject<Dictionary<string, object>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_daily_event_mission"])["tableData"];
             var userMission = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_mission");
             var userData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data");
 
@@ -25,7 +27,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetMission.Logic
             res.UserData = userData;
             res.UserMission = userMission;
             res.MstMission = mstMission;
-
+            res.MstDailyMission = mstDaily;
             var marshalledResponse = JsonConvert.SerializeObject(res);
             var encryptedResponse = NHNCrypt.Logic.NHNCrypt.EncryptResponse(marshalledResponse);
             await ctx.Response.WriteAsync(encryptedResponse);

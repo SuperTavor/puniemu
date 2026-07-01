@@ -59,6 +59,7 @@ using Puniemu.Src.Server.GameServer.Requests.Watch.InitWatch.Logic;
 using Puniemu.Src.Server.GameServer.Requests.Watch.UpdateWatchReadFlg.Logic;
 using Puniemu.Src.Server.GameServer.Requests.Conflate.Logic;
 using Puniemu.Src.Server.GameServer.Requests.UseAddition.Logic;
+using Puniemu.Src.Server.GameServer.Requests.MissionReward.Logic;
 namespace Puniemu.Src;
 class Program
 {
@@ -228,6 +229,10 @@ class Program
         app.MapPost("/updateProfile.nhn", async ctx =>
         {
             await UpdateProfileHandler.HandleAsync(ctx);
+        });
+        app.MapPost("/missionReward.nhn", async ctx =>
+        {
+            await MissionRewardHandler.HandleAsync(ctx);
         });
         app.MapPost("/deleteUser.nhn", async ctx =>
         {
