@@ -97,8 +97,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.BuyItem.Logic
                 userItems.Items[itemIdx].Count += deserialized.GoodsCount;
             }
 
-            await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.TotalPurchaseShop, 1);
-            await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.BuySpecificItemAtShop, deserialized.GoodsId);
+            var userMission = await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.TotalPurchaseShop, 1, null, true);
+            await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.BuySpecificItemAtShop, deserialized.GoodsId, userMission, true);
+            await MissionManager.SaveUserMission(deserialized.Gdkey, userMission);
             res.YwpUserItem = userItems.ToString();
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "ywp_user_item", res.YwpUserItem);
             var encRes = NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(res));

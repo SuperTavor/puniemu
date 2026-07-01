@@ -190,7 +190,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             {
                 resdict["ywp_user_tutorial_list"] = tutorialList;
             }
-           
+            await MissionManager.UpdateProgress(deserialized.Level5UserId, GameServer.DataClasses.Mission.MissionType.TotalCrank, 1);
             await GeneralUtils.AddTablesToResponse(Consts.EXECUTE_GACHA_TABLES, resdict!, true, deserialized!.Level5UserId!);
             var outResponse = NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(resdict));
             await ctx.Response.WriteAsync(outResponse);

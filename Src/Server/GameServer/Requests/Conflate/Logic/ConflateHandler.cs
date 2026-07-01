@@ -85,7 +85,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Conflate.Logic
             res.YwpUserIconBudge = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_icon_budge");
             res.YwpUserYoukaiDeck = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_youkai_deck");
             res.YwpUserMenuFunc = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_menufunc");
-
+            await MissionManager.UpdateProgress(deserialized.Level5UserID, GameServer.DataClasses.Mission.MissionType.FuseTotalYokai, 1);
             await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(res)));
         }
 

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Puniemu.Src.Server.GameServer.DataClasses;
+using Puniemu.Src.Server.GameServer.Logic;
 using Puniemu.Src.Server.GameServer.Requests.UseItem.DataClasses;
 using Puniemu.Src.Server.GameServer.Requests.UserInfoRefresh.DataClasses;
 using Puniemu.Src.TableParser.DataClasses;
@@ -104,6 +105,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.UseItem.Logic
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_youkai", response.YwpUserYoukai);
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_youkai_skill", response.YwpUserYoukaiSkill);
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_youkai_bonus_effect", response.YwpUserBonusEff);
+
+            await MissionManager.UpdateProgress(deserialized.Level5UserID, GameServer.DataClasses.Mission.MissionType.UseTotalItems, 1);
             await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(response)));
         }
     }

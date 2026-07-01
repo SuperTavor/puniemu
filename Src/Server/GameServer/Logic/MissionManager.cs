@@ -16,7 +16,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
             return new TableParser<YwpUserMission>(raw);
         }
 
-        private static async Task SaveUserMission(string gdkey, TableParser<YwpUserMission> userMission)
+        public static async Task SaveUserMission(string gdkey, TableParser<YwpUserMission> userMission)
         {
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(gdkey, "ywp_user_mission", userMission.ToString());
         }
@@ -79,9 +79,23 @@ namespace Puniemu.Src.Server.GameServer.Logic
             }
             return (seriesCfgItem, missionCfgIdx);
         }
-        public static async Task UpdateProgress(string gdkey, MissionType missionType, int progressToUpdate)
+
+        private static void BasicProgressCheck(YwpUserMission mission, int progressToUpdate)
         {
-            var userMission = await GetUserMission(gdkey);
+            mission.MissionParamProgress += progressToUpdate;
+            if (mission.MissionParamProgress >= mission.MissionParamTarget)
+            {
+                mission.MissionCompleteStatus = MissionCompleteStatus.CompletePendingReward;
+
+            }
+        }
+        public static async Task<TableParser<YwpUserMission>> UpdateProgress(string gdkey, MissionType missionType, int progressToUpdate, 
+            TableParser<YwpUserMission> paramUserMission = null, bool manualSave = false)
+        {
+            TableParser<YwpUserMission> userMission;
+            if (paramUserMission == null)
+                userMission = await GetUserMission(gdkey);
+            else userMission = paramUserMission;
             var mstMission = GetMstMission();
             //Get latest mission for type
             foreach(var mission in userMission.Items)
@@ -94,16 +108,11 @@ namespace Puniemu.Src.Server.GameServer.Logic
                 if(mstEntry.MissionType == missionType && mission.IsAppear == 1 && mission.MissionCompleteStatus != MissionCompleteStatus.CompleteRewardAcquired)
                 {
                     Console.WriteLine($"[*] Checking mission for user ${gdkey}: \"{missionCfgItem.MissionName}\".");
-                    if(missionType == MissionType.TotalPurchaseShop)
+                    if (missionType == MissionType.TotalPurchaseShop)
                     {
-                        mission.MissionParamProgress += progressToUpdate;
-                        if(mission.MissionParamProgress >= mission.MissionParamTarget)
-                        { 
-                            mission.MissionCompleteStatus = MissionCompleteStatus.CompletePendingReward;
-                      
-                        }
+                        BasicProgressCheck(mission, progressToUpdate);
                     }
-                    else if(missionType == MissionType.BuySpecificItemAtShop)
+                    else if (missionType == MissionType.BuySpecificItemAtShop)
                     {
                         if (missionCfgItem.Params[0] == progressToUpdate)
                         {
@@ -113,24 +122,53 @@ namespace Puniemu.Src.Server.GameServer.Logic
                     }
                     else if (missionType == MissionType.CollectTotalScore)
                     {
-                        mission.MissionParamProgress = mission.MissionParamProgress += progressToUpdate;
-                        if (mission.MissionParamProgress >= mission.MissionParamTarget)
-                        {
-                            mission.MissionCompleteStatus = MissionCompleteStatus.CompletePendingReward;
-                        }
+                        BasicProgressCheck(mission, progressToUpdate);
+                    }
+                    else if (missionType == MissionType.TotalCrank)
+                    {
+                        BasicProgressCheck(mission, progressToUpdate);
+                    }
+                    else if (missionType == MissionType.CollectTotalStars)
+                    {
+                        BasicProgressCheck(mission, progressToUpdate);
+                    }
+                    else if (missionType == MissionType.CreateTotalBonusBalls)
+                    {
+                        BasicProgressCheck(mission, progressToUpdate);
+                    }
+                    else if (missionType == MissionType.DoTotalSoults)
+                    {
+                        BasicProgressCheck(mission, progressToUpdate);
+                    }
+                    else if (missionType == MissionType.EnterFeverTimeTotalTimes)
+                    {
+                        BasicProgressCheck(mission, progressToUpdate);
+                    }
+                    else if (missionType == MissionType.UseTotalItems)
+                    {
+                        BasicProgressCheck(mission, progressToUpdate);
+                    }
+                    else if(missionType == MissionType.TotalLoginDays)
+                    {
+                        BasicProgressCheck(mission, progressToUpdate);
                     }
                     else if(missionType == MissionType.TotalScoreInScoreAttack)
                     {
-                        mission.MissionParamProgress = mission.MissionParamProgress += progressToUpdate;
-                        if(mission.MissionParamProgress >= mission.MissionParamTarget)
-                        {
-                            mission.MissionCompleteStatus = MissionCompleteStatus.CompletePendingReward;
-                        }
+                        BasicProgressCheck(mission, progressToUpdate);
                     }
-
-                    await SaveUserMission(gdkey, userMission);
+                    else if(missionType == MissionType.PopTotalPuni)
+                    {
+                        BasicProgressCheck(mission, progressToUpdate);
+                    }
+                    else if (missionType == MissionType.FuseTotalYokai)
+                    {
+                        BasicProgressCheck(mission, progressToUpdate);
+                    }
+                    if (!manualSave)
+                        await SaveUserMission(gdkey, userMission);
                 }
             }
+            return userMission;
             
         }
     }
