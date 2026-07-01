@@ -55,7 +55,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
                     MissionParamProgress = currentMission.MissionParamProgress,
                     NewStatus = MissionNewStatus.None,
                 };
-                userMission.Items.Remove(currentMission);
+                currentMission.IsAppear = 0;
                 userMission.Items.Insert(currentMissionIdx,newMission);
             }
         }
