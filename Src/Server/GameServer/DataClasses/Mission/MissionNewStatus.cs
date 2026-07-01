@@ -2,8 +2,8 @@
 {
     public enum MissionNewStatus
     {
-        ShowNewPopup = 0,
+        ShowNewPopup = 1,
         ShowNewTag = 2,
-        None = 1,
+        None = 0,
     }
 }

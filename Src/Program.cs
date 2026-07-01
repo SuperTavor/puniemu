@@ -264,7 +264,7 @@ class Program
         });
         app.MapPost("/getMission.nhn", async ctx =>
         {
-            await GetMissionHandler.HandleAsync(ctx);
+            await GetMissionHandler.HandleAsync(ctx, false);
         });
         app.MapPost("/buyItem.nhn", async ctx =>
         {
@@ -387,6 +387,10 @@ class Program
         app.MapPost("/getRanking.nhn", async ctx =>
         {
             await GetRankingHandler.HandleAsync(ctx);
+        });
+        app.MapPost("/getMissionAlreadyReward.nhn", async ctx =>
+        {
+            await GetMissionHandler.HandleAsync(ctx, true);
         });
         app.MapPost("/mapWarp.nhn", async ctx =>
         {

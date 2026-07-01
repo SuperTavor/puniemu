@@ -53,10 +53,14 @@ namespace Puniemu.Src.Server.GameServer.Logic
                     IsAppear = 1,
                     MissionParamTarget = nextMissionCfgItem.Params[0],
                     MissionParamProgress = currentMission.MissionParamProgress,
-                    NewStatus = MissionNewStatus.None,
+                    NewStatus = MissionNewStatus.ShowNewPopup,
                 };
-                currentMission.IsAppear = 0;
+                
                 userMission.Items.Insert(currentMissionIdx,newMission);
+                //Append it at end and make it disappear
+                currentMission.IsAppear = 0;
+                userMission.Items.Remove(currentMission);
+                userMission.Items.Add(currentMission);
             }
         }
         private static (SeriesCfgItem, int) GetMissionCfgIdx(int missionId)
@@ -82,37 +86,36 @@ namespace Puniemu.Src.Server.GameServer.Logic
             //Get latest mission for type
             foreach(var mission in userMission.Items)
             {
-                if (mission.MissionCompleteStatus != MissionCompleteStatus.NotComplete) continue;
                 var mstEntry = mstMission.Items.Where(x => x.MissionID == mission.MissionID).FirstOrDefault();
+                var cfgIdx = GetMissionCfgIdx(mission.MissionID);
+                if (cfgIdx.Item1 == null) continue;
+                var missionCfgItem = cfgIdx.Item1.Missions[cfgIdx.Item2];
                 if (mstEntry == null) continue;
-                if(mstEntry.MissionType == missionType)
+                if(mstEntry.MissionType == missionType && mission.IsAppear == 1 && mission.MissionCompleteStatus != MissionCompleteStatus.CompleteRewardAcquired)
                 {
-                    //Get cfg entry
-                    var idxResult = GetMissionCfgIdx(mission.MissionID);
-                    SeriesCfgItem seriesCfgItem = idxResult.Item1;
-                    int missionCfgIdx = idxResult.Item2;
-                    var missionCfgItem = seriesCfgItem.Missions[missionCfgIdx];
                     Console.WriteLine($"[*] Checking mission for user ${gdkey}: \"{missionCfgItem.MissionName}\".");
                     if(missionType == MissionType.TotalPurchaseShop)
                     {
-                        int newProgress = mission.MissionParamProgress += progressToUpdate;
-                        if(newProgress >= mission.MissionParamTarget)
-                        {
-                            mission.MissionParamProgress = mission.MissionParamTarget;
+                        mission.MissionParamProgress += progressToUpdate;
+                        if(mission.MissionParamProgress >= mission.MissionParamTarget)
+                        { 
                             mission.MissionCompleteStatus = MissionCompleteStatus.CompletePendingReward;
                       
                         }
-                        else
+                    }
+                    else if(missionType == MissionType.BuySpecificItemAtShop)
+                    {
+                        if (missionCfgItem.Params[0] == progressToUpdate)
                         {
-                            mission.MissionParamProgress += progressToUpdate;
+                            mission.MissionParamProgress = 1;
+                            mission.MissionCompleteStatus = MissionCompleteStatus.CompletePendingReward;
                         }
                     }
-                    if(missionType == MissionType.TotalScoreInScoreAttack)
+                    else if(missionType == MissionType.TotalScoreInScoreAttack)
                     {
-                        int newProgress = mission.MissionParamProgress += progressToUpdate;
-                        if(newProgress >= mission.MissionParamTarget)
+                        mission.MissionParamProgress = mission.MissionParamProgress += progressToUpdate;
+                        if(mission.MissionParamProgress >= mission.MissionParamTarget)
                         {
-                            mission.MissionParamProgress = mission.MissionParamTarget;
                             mission.MissionCompleteStatus = MissionCompleteStatus.CompletePendingReward;
                         }
                     }

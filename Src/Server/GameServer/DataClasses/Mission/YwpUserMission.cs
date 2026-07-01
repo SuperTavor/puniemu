@@ -11,6 +11,6 @@
         public MissionCompleteStatus MissionCompleteStatus { get; set; }
         public MissionNewStatus NewStatus { get; set; }
 
-        public int Unk { get; set; } = 1;
+        public int Unk { get; set; } = 0;
     }
 }
