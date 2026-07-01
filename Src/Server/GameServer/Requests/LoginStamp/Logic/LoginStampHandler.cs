@@ -84,6 +84,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.LoginStamp.Logic
             // update day
             if (daysSinceEpoch2 > (long.Parse(LoginUserStampTable.Table[0][0]) + 86400))
             {
+                await MissionManager.UpdateProgress(deserialized.Level5UserID, GameServer.DataClasses.Mission.MissionType.TotalLoginDays, 1);
                 walk = 1;
                 LoginUserStampTable.Table[0][0] = daysSinceEpoch2.ToString();
                 day += 1;
@@ -197,7 +198,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.LoginStamp.Logic
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "login_stamp", LoginUserStampTable.ToString());
             res.UserData = userData;
             var resdict = JsonConvert.DeserializeObject<Dictionary<string, object>>(JsonConvert.SerializeObject(res));
-            await MissionManager.UpdateProgress(deserialized.Level5UserID, GameServer.DataClasses.Mission.MissionType.TotalLoginDays, 1);
             // actually it's not const but we use this to dont send youkai, item, dictionary... tables if not modified
             await GeneralUtils.AddTablesToResponse(LOGIN_STAMP_TABLES, resdict!, true, deserialized!.Level5UserID!);
             var encryptedRes = NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(resdict));
