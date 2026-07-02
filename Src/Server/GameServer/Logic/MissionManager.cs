@@ -14,7 +14,10 @@ namespace Puniemu.Src.Server.GameServer.Logic
 
         //Which missions DONT carry over progress in the series
         private static readonly ImmutableHashSet<MissionType> NotCarryOver = [
-            MissionType.BuySpecificItemAtShop    
+            MissionType.BuySpecificItemAtShop,
+            MissionType.UseSpecificItemInBattle,
+            MissionType.BefriendSpecificYokai,
+
         ];
 
         //Which mission types need just a basic progress check
@@ -23,6 +26,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
             MissionType.CollectTotalStars,
             MissionType.TotalCrank,
             MissionType.TotalLoginDays,
+            MissionType.AddTotalYokaiToMedallium,
             MissionType.FuseTotalYokai,
             MissionType.TotalPurchaseShop,
             MissionType.TotalScoreInScoreAttack,
@@ -37,6 +41,31 @@ namespace Puniemu.Src.Server.GameServer.Logic
             return new TableParser<YwpUserMission>(raw);
         }
 
+        public static void SortUserMission(TableParser<YwpUserMission> userMission, int finishedMissionsIsAppear, bool killNewPopup)
+        {
+            List<YwpUserMission> newOrder = [];
+            //First kill all the new mission popups
+            foreach(var mission in userMission.Items)
+            {
+                if(mission.MissionCompleteStatus == MissionCompleteStatus.CompleteRewardAcquired) mission.IsAppear = finishedMissionsIsAppear;
+                if((mission.NewStatus == MissionNewStatus.ShowNewPopup || mission.NewStatus == MissionNewStatus.ShowNewTag) && killNewPopup)
+                {
+                    mission.NewStatus = MissionNewStatus.None;
+                }
+            }
+            //Add it by this order:
+            //Missions with pending reward -> mission in progress -> missions done (with isAppear as false)
+            newOrder.AddRange(userMission.Items.Where(x => x.MissionCompleteStatus == MissionCompleteStatus.CompletePendingReward));
+            newOrder.AddRange(userMission.Items.Where(x => x.MissionCompleteStatus == MissionCompleteStatus.NotComplete));
+
+            newOrder.AddRange(
+                userMission.Items
+                    .Where(x => x.MissionCompleteStatus == MissionCompleteStatus.CompleteRewardAcquired)
+                    .OrderBy(x => x.MissionID)   
+            );
+
+            userMission.Items = newOrder;
+        }
         public static async Task SaveUserMission(string gdkey, TableParser<YwpUserMission> userMission)
         {
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(gdkey, "ywp_user_mission", userMission.ToString());
@@ -111,6 +140,15 @@ namespace Puniemu.Src.Server.GameServer.Logic
                 mission.MissionCompleteStatus = MissionCompleteStatus.CompletePendingReward;
             }
         }
+
+        private static void BasicParamCheck(YwpUserMission mission, int progressToUpdate, int param)
+        {
+            if (param == progressToUpdate)
+            {
+                mission.MissionParamProgress = 1;
+                mission.MissionCompleteStatus = MissionCompleteStatus.CompletePendingReward;
+            }
+        }
         public static async Task<TableParser<YwpUserMission>> UpdateProgress(string gdkey, MissionType missionType, int progressToUpdate, 
             TableParser<YwpUserMission> paramUserMission = null, bool manualSave = false)
         {
@@ -136,11 +174,15 @@ namespace Puniemu.Src.Server.GameServer.Logic
                     }
                     else if (missionType == MissionType.BuySpecificItemAtShop)
                     {
-                        if (missionCfgItem.Params[0] == progressToUpdate)
-                        {
-                            mission.MissionParamProgress = 1;
-                            mission.MissionCompleteStatus = MissionCompleteStatus.CompletePendingReward;
-                        }
+                        BasicParamCheck(mission, progressToUpdate, missionCfgItem.Params[0]);
+                    }
+                    else if (missionType == MissionType.BefriendSpecificYokai)
+                    {
+                        BasicParamCheck(mission, progressToUpdate, missionCfgItem.Params[0]);
+                    }
+                    else if (missionType == MissionType.UseSpecificItemInBattle)
+                    {
+                        BasicParamCheck(mission, progressToUpdate, missionCfgItem.Params[0]);
                     }
                     if (!manualSave)
                         await SaveUserMission(gdkey, userMission);

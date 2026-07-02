@@ -248,7 +248,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 }
             }
         }
-        public static void HandleDrop(GameEndRequest deserialized, GameEndResponse res, TableParser<YwpUserDictionary> dictionaryYoukaiTable, TableParser<YwpUserDictionary> dictionaryDiff, 
+        public static async Task HandleDrop(GameEndRequest deserialized, GameEndResponse res, TableParser<YwpUserDictionary> dictionaryYoukaiTable, TableParser<YwpUserDictionary> dictionaryDiff, 
             TableParser<YwpUserYoukai> userYoukaiTable, TableParser<YwpUserYoukai> youkaiDiff, TableParser<YwpUserYoukaiSkill> userYoukaiSkillTable, 
             TableParser<YwpUserYoukaiSkill> youkaiSkillDiff, TableParser<YwpUserItem> userItemTable, TableParser.Logic.TableParser playerIconTable, 
             YwpUserData userData, StageData LevelData, int FirstClear, TableParser<YwpUserYoukaiBonusEffect> userBonus)
@@ -275,8 +275,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                             DictionaryManager.EditDictionary(ref dictionaryYoukaiTable, YoukaiId, true, true);
                             DictionaryManager.EditDictionary(ref dictionaryDiff, YoukaiId, true, true);
                             res.UserGameResultData.RewardYoukaiId = YoukaiId;
-                            YoukaiManager.AddYoukai(userYoukaiTable, YoukaiId, userYoukaiSkillTable, userBonus);
-                            YoukaiManager.AddYoukai(youkaiDiff, YoukaiId, youkaiSkillDiff, userBonus);
+                            await YoukaiManager.AddYoukai(userYoukaiTable, YoukaiId, userYoukaiSkillTable, userBonus, deserialized.Gdkey);
+                            await YoukaiManager.AddYoukai(youkaiDiff, YoukaiId, youkaiSkillDiff, userBonus, deserialized.Gdkey);
                         }
                     }
                 }
@@ -427,7 +427,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
             {
                 int FirstClear = 0;
                 HandleStage(deserialized, res, ref FirstClear, ywpUserStage, ywpUserMap);
-                HandleDrop(deserialized, res, dictionaryYoukaiTable, dictionaryDiff, userYoukaiTable, youkaiDiff, userYoukaiSkillTable,  youkaiSkillDiff, userItemTable, playerIconTable, userData, LevelData, FirstClear, userBonus);
+                await HandleDrop(deserialized, res, dictionaryYoukaiTable, dictionaryDiff, userYoukaiTable, youkaiDiff, userYoukaiSkillTable,  youkaiSkillDiff, userItemTable, playerIconTable, userData, LevelData, FirstClear, userBonus);
                 HandleTutorial(deserialized, res, tutorialList, LevelData, FirstClear);
                 HandleMenuFunc(deserialized, res, LevelData, menufuncListTable, FirstClear);
             }

@@ -7,11 +7,12 @@ using Puniemu.Src.Server.GameServer.Requests.GetMission.DataClasses;
 using Puniemu.Src.Server.GameServer.DataClasses.Mission;
 using Puniemu.Src.TableParser.Logic;
 using Puniemu.Src.UserDataManager.Logic;
+using Puniemu.Src.Server.GameServer.Logic;
 namespace Puniemu.Src.Server.GameServer.Requests.GetMission.Logic
 {
     public class GetMissionHandler
     {
-        public static async Task HandleAsync(HttpContext ctx, bool isAlreadyReward)
+        public static async Task HandleAsync(HttpContext ctx, int alreadyRewardIsAppear)
         {
             ctx.Request.EnableBuffering();
             var readResult = await ctx.Request.BodyReader.ReadAsync();
@@ -25,31 +26,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetMission.Logic
                 JsonConvert.DeserializeObject<Dictionary<string, object>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_daily_event_mission"])["tableData"];
             var userMission = new TableParser<YwpUserMission>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_mission"));
             var userData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data");
-            //Get all the already rewarded missions and make them disappear
-            //when GetMissionAlreadyReward is called it will be isAppear 1
-            for (int i = 0; i < userMission.Items.Count; i++ )
-            {
-                var mission = userMission.Items[i];
-                if(mission.MissionCompleteStatus == MissionCompleteStatus.CompletePendingReward)
-                {
-                    userMission.Items.Remove(mission);
-                    userMission.Items.Insert(0, mission);
-                }
-
-            }
-            //Remove previous new popups
-            foreach(var mission in userMission.Items)
-            {
-                if(mission.NewStatus == MissionNewStatus.ShowNewPopup)
-                {
-                    mission.NewStatus = MissionNewStatus.None;
-                }
-            }
-            foreach(var mission in userMission.Items.Where(x => x.MissionCompleteStatus == MissionCompleteStatus.CompleteRewardAcquired))
-            {
-                mission.IsAppear = Convert.ToInt32(isAlreadyReward);
-                mission.Unk = 0;
-            }
+            MissionManager.SortUserMission(userMission, alreadyRewardIsAppear, true);
             var res = new GetMissionResponse();
             res.UserData = userData;
             res.UserMission = userMission.ToString();

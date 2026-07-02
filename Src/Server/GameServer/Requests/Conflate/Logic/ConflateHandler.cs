@@ -67,7 +67,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Conflate.Logic
             res.YwpUserData.YMoney -= mstConflateItem.YMoneyCost;
             //Befriend result yokai
             res.Youkai = new YokaiWonPopup(mstConflateItem.ResultID, userYokai, userSkill);
-            YoukaiManager.AddYoukai(userYokai, mstConflateItem.ResultID, userSkill, userBonus);
+            await YoukaiManager.AddYoukai(userYokai, mstConflateItem.ResultID, userSkill, userBonus, deserialized.Level5UserID);
             DictionaryManager.EditDictionary(ref userDictionary, mstConflateItem.ResultID, true, true);
             //Save response and data
             res.YwpUserYoukai = userYokai.ToString();

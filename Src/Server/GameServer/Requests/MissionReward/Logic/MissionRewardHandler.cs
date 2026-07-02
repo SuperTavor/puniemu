@@ -26,6 +26,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.MissionReward.Logic
             var userSkill = new TableParser<YwpUserYoukaiSkill>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_youkai_skill"));
             var userBonus = new TableParser<YwpUserYoukaiBonusEffect>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_youkai_bonus_effect"));
             var userShop = new TableParser<YwpUserShopItemUnlock>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_shop_item_unlock"));
+            MissionManager.SortUserMission(userMission, 0, true);
             //Check if have mission
             var uMissionItem = userMission.Items.FirstOrDefault(x => x.MissionID == deserialized.MissionID);
             if (uMissionItem == null)
@@ -77,7 +78,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.MissionReward.Logic
             else if(mstMissionItem.RewardType == RewardType.Yokai)
             {
                 res.Youkai = new YokaiWonPopup(mstMissionItem.RewardID, userYokai, userSkill);
-                YoukaiManager.AddYoukai(userYokai, mstMissionItem.RewardID, userSkill, userBonus);
+                await YoukaiManager.AddYoukai(userYokai, mstMissionItem.RewardID, userSkill, userBonus, deserialized.Level5UserID, userMission, true);
             }
             else if(mstMissionItem.RewardType == RewardType.AddItemToShop)
             {
@@ -96,6 +97,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.MissionReward.Logic
             res.UserSkill = userSkill.ToString();
             res.UserBonus = userBonus.ToString();
             MissionManager.TryUnlockNextMission(deserialized.MissionID, userMission);
+            MissionManager.SortUserMission(userMission, 0, false);
             res.UserMission = userMission.ToString();
             res.UserItem = userItem.ToString();
             res.UserShop = userShop.ToString();

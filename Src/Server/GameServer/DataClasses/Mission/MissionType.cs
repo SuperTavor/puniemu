@@ -9,7 +9,7 @@ public enum MissionType {
     PopTotalPuni = 11001, //done
     CreateTotalBonusBalls = 11004, //done
     EnterFeverTimeTotalTimes = 11005, //done
-    AddTotalYokaiToMedallium = 61401, 
+    AddTotalYokaiToMedallium = 61401, //done
     TotalLoginDays = 61301,//done
     CompleteStageInSeconds = 10103,
     CollectStarsInMap = 21002,
@@ -21,7 +21,7 @@ public enum MissionType {
     DefeatBossWithTribe = 10105,
     ClearStageWithRank = 10104,
     BuySpecificItemAtShop = 60201, //done
-    BefriendSpecificYokai = 40101,
-    UseSpecificItemInBattle = 30001,
+    BefriendSpecificYokai = 40101, //done
+    UseSpecificItemInBattle = 30001, //done
 
 }

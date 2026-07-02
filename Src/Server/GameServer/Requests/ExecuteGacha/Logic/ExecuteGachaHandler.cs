@@ -146,12 +146,13 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             {
                for(int i = 0; i < pullCount; i++)
                {
-                    prizes.Add(GachaPoolManager.CrankReward(gachaId, userYokaiTable, userSkillTable, dictionaryListTable, userItemtable, userBonus));
+                    prizes.Add(await GachaPoolManager.CrankReward(gachaId, userYokaiTable, userSkillTable, dictionaryListTable, userItemtable, userBonus,deserialized.Level5UserId));
                }
             }
             else if(deserialized.RequestYoukaiId != 0 && GachaYoukaiChoiceManager.IsChoiceOk(gachaId, deserialized.RequestYoukaiId))
             {
-                prizes.Add(GachaPoolManager.RegisterYokaiAndGetPrize(deserialized.RequestYoukaiId, CapsuleColor.Gray, 0, userYokaiTable, userSkillTable, dictionaryListTable, userItemtable, gachaId, userBonus));
+                prizes.Add(await GachaPoolManager.RegisterYokaiAndGetPrize(deserialized.RequestYoukaiId, CapsuleColor.Gray, 0, 
+                    userYokaiTable, userSkillTable, dictionaryListTable, userItemtable, gachaId, userBonus, deserialized.Level5UserId));
                 pullCount = 1;
             }
             else

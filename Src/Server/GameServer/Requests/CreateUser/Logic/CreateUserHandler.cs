@@ -17,20 +17,20 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
     public class CreateUserHandler
     {
 
-        public static Tuple<string, string, string> CreateUserYoukaiSave()
+        public static async Task<Tuple<string, string, string>> CreateUserYoukaiSave(string gdkey)
         {
             TableParser<YwpUserYoukai> value = new("");
             TableParser<YwpUserYoukaiSkill> value2 = new("");
             TableParser<YwpUserYoukaiBonusEffect> userBonus = new("");
-            YoukaiManager.AddYoukai(value, 2157000, value2, userBonus);
-            YoukaiManager.AddYoukai(value, 2213000, value2, userBonus);
-            YoukaiManager.AddYoukai(value, 2231000, value2, userBonus);
-            YoukaiManager.AddYoukai(value, 2235000, value2, userBonus);
-            YoukaiManager.AddYoukai(value, 2281000, value2, userBonus);
+            await YoukaiManager.AddYoukai(value, 2157000, value2, userBonus, gdkey);
+            await YoukaiManager.AddYoukai(value, 2213000, value2, userBonus, gdkey);
+            await YoukaiManager.AddYoukai(value, 2231000, value2, userBonus, gdkey);
+            await YoukaiManager.AddYoukai(value, 2235000, value2, userBonus, gdkey);
+            await YoukaiManager.AddYoukai(value, 2281000, value2, userBonus, gdkey);
 
             return new Tuple<string, string, string> (value.ToString(), value2.ToString(), userBonus.ToString());
         }
-        public static void CreateSave(Dictionary<string, object?> tables, YwpUserData generatedUserData)
+        public static async Task CreateSave(Dictionary<string, object?> tables, YwpUserData generatedUserData, string gdkey)
         {
             tables.Add("ywp_user_data", generatedUserData);
 
@@ -104,7 +104,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
             tables.Add("ywp_user_player_effect", "1");
             tables.Add("ywp_user_player_codename", "1");
 
-            Tuple<string, string, string> youkai = CreateUserYoukaiSave();
+            Tuple<string, string, string> youkai = await CreateUserYoukaiSave(gdkey);
             tables.Add("ywp_user_youkai", youkai.Item1);
             tables.Add("ywp_user_youkai_skill", youkai.Item2);
             tables.Add("ywp_user_youkai_bonus_effect", youkai.Item3);
@@ -133,7 +133,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
             await acc.Update<Account>();
             try
             {
-                await RegisterDefaultTables(deserialized, generatedUserData);
+                await RegisterDefaultTables(deserialized, generatedUserData, acc.Gdkey);
             }
             catch (Exception ex)
             {
@@ -149,10 +149,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
             
         }
 
-        private static async Task RegisterDefaultTables(CreateUserRequest deserialized,YwpUserData generatedUserData)
+        private static async Task RegisterDefaultTables(CreateUserRequest deserialized,YwpUserData generatedUserData, string gdkey)
         {
             Dictionary<string,object?> tables = new Dictionary<string,object?>();
-            CreateSave(tables, generatedUserData);
+            await CreateSave(tables, generatedUserData, gdkey);
 
             tables["opening_tutorial_flg"] = false;
             foreach (var userTable in Consts.LOGIN_TABLES_PUNI.Where(x => x.Contains("ywp_user") && x != "ywp_user_data"))

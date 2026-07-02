@@ -17,7 +17,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameUseItem.DataClasses
         public string? RequestID { get; set; }
         //item id
         [JsonProperty("itemId")]
-        public long? ItemId { get; set; }
+        public int ItemId { get; set; }
         // Interchangeable with gdkey
         [JsonProperty("level5UserID")]
         public string Level5UserID { get; set; }

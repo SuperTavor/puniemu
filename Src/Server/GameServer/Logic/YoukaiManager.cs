@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Puniemu.Src.Server.GameServer.DataClasses;
+using Puniemu.Src.Server.GameServer.DataClasses.Mission;
 using Puniemu.Src.Server.GameServer.Logic.Mst;
 using Puniemu.Src.Server.GameServer.Requests.InitGacha.DataClasses;
 using Puniemu.Src.TableParser.DataClasses;
@@ -101,7 +102,8 @@ namespace Puniemu.Src.Server.GameServer.Logic
             userYokai.Items.Remove(userYokai.Items[yokaiIdx]);
             userSkill.Items.Remove(userSkill.Items[skillIdx]);
         }
-        public static void AddYoukai(TableParser<YwpUserYoukai> userYokai, long YoukaiId, TableParser<YwpUserYoukaiSkill> userSkill, TableParser<YwpUserYoukaiBonusEffect> userBonus)
+        public static async Task AddYoukai(TableParser<YwpUserYoukai> userYokai, long YoukaiId, TableParser<YwpUserYoukaiSkill> userSkill, TableParser<YwpUserYoukaiBonusEffect> userBonus, 
+            string gdkey, TableParser<YwpUserMission> userMission = null, bool manualMissionSave = false)
         {
             var YoukaiMstTable = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager!.GamedataCache["ywp_mst_youkai"]!)!["tableData"]);
             var YoukaiLevelMstTable = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai_level"]!)!["tableData"]);
@@ -109,6 +111,8 @@ namespace Puniemu.Src.Server.GameServer.Logic
             var MstYoukaiIndex = YoukaiMstTable.FindIndex([YoukaiId.ToString()]);
             if (UserYoukaiIndex == -1)
             {
+                var um = await MissionManager.UpdateProgress(gdkey, DataClasses.Mission.MissionType.AddTotalYokaiToMedallium, 1, userMission, manualMissionSave);
+                await MissionManager.UpdateProgress(gdkey, MissionType.BefriendSpecificYokai, (int)YoukaiId, um, manualMissionSave);
                 // add new youkai
                 var tmpIdx = 0;
                 var levelType = int.Parse(YoukaiMstTable.Table[MstYoukaiIndex][5]);
@@ -119,6 +123,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
                     tmpIdx++;
                 }
                 userYokai.AddItem(new YwpUserYoukai { YoukaiId = YoukaiId, Level = 1, Exp = 0, Hp =  int.Parse(YoukaiMstTable.Table[MstYoukaiIndex][8]), Atk = int.Parse(YoukaiMstTable.Table[MstYoukaiIndex][10]), ExpDenominator = int.Parse(YoukaiLevelMstTable.Table[tmpIdx][3]), ExpNumerator = 0, Percentage = 0, BefriendDate = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), BreakLimitCount = 0 });
+
             }
             AddYoukaiSkill(ref userSkill, YoukaiId);
             AddYoukaiBonusEff(userBonus, YoukaiId);

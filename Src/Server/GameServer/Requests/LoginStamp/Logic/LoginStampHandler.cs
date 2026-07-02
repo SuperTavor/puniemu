@@ -156,7 +156,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.LoginStamp.Logic
                 {
                     var dictionaryYoukai = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserID!, "ywp_user_dictionary");
                     dictionaryYoukaiTable = DictionaryManager.EditDictionary(new TableParser.Logic.TableParser(dictionaryYoukai!), current_item_id, false, true);
-                    YoukaiManager.AddYoukai(userYoukaiTable, current_item_id, userYoukaiSkillTable, userBonus);
+                    await YoukaiManager.AddYoukai(userYoukaiTable, current_item_id, userYoukaiSkillTable, userBonus, deserialized.Level5UserID);
                     res.YoukaiPopupResult = new(current_item_id, userYoukaiTable, userYoukaiSkillTable);
                     await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_dictionary", dictionaryYoukaiTable.ToString());
                     await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_youkai", userYoukaiTable.ToString());
