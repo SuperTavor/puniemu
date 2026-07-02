@@ -25,6 +25,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.MissionReward.Logic
             var userYokai = new TableParser<YwpUserYoukai>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_youkai"));
             var userSkill = new TableParser<YwpUserYoukaiSkill>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_youkai_skill"));
             var userBonus = new TableParser<YwpUserYoukaiBonusEffect>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_youkai_bonus_effect"));
+            var userShop = new TableParser<YwpUserShopItemUnlock>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_shop_item_unlock"));
             //Check if have mission
             var uMissionItem = userMission.Items.FirstOrDefault(x => x.MissionID == deserialized.MissionID);
             if (uMissionItem == null)
@@ -78,6 +79,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.MissionReward.Logic
                 res.Youkai = new YokaiWonPopup(mstMissionItem.RewardID, userYokai, userSkill);
                 YoukaiManager.AddYoukai(userYokai, mstMissionItem.RewardID, userSkill, userBonus);
             }
+            else if(mstMissionItem.RewardType == RewardType.AddItemToShop)
+            {
+                userShop.Items.Add(new() { ItemID = mstMissionItem.RewardID });
+            }
             else
             {
                 var err = new MsgBoxResponse("Unsupported reward type.", "Err");
@@ -93,12 +98,14 @@ namespace Puniemu.Src.Server.GameServer.Requests.MissionReward.Logic
             MissionManager.TryUnlockNextMission(deserialized.MissionID, userMission);
             res.UserMission = userMission.ToString();
             res.UserItem = userItem.ToString();
+            res.UserShop = userShop.ToString();
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_data", userData);
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_youkai", res.UserYoukai);
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_youkai_skill", res.UserSkill);
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_youkai_bonus_effect", res.UserBonus);
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_mission", res.UserMission);
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_item", res.UserItem);
+            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_shop_item_unlock", res.UserShop);
             await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(res)));
 
         }

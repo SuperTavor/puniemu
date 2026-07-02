@@ -3,6 +3,7 @@ using Puniemu.Src.Server.GameServer.DataClasses.Mission;
 using Puniemu.Src.Server.GameServer.DataClasses.Mission.CustomMissionCfg;
 using Puniemu.Src.TableParser.Logic;
 using Puniemu.Src.UserDataManager.Logic;
+using System.Collections.Immutable;
 
 namespace Puniemu.Src.Server.GameServer.Logic
 {
@@ -10,6 +11,26 @@ namespace Puniemu.Src.Server.GameServer.Logic
     {
 
         private static TableParser<YwpMstMission> _mstMission = null;
+
+        //Which missions DONT carry over progress in the series
+        private static readonly ImmutableHashSet<MissionType> NotCarryOver = [
+            MissionType.BuySpecificItemAtShop    
+        ];
+
+        //Which mission types need just a basic progress check
+        private static readonly ImmutableHashSet<MissionType> BasicProgress = [
+            MissionType.CollectTotalScore,
+            MissionType.CollectTotalStars,
+            MissionType.TotalCrank,
+            MissionType.TotalLoginDays,
+            MissionType.FuseTotalYokai,
+            MissionType.TotalPurchaseShop,
+            MissionType.TotalScoreInScoreAttack,
+            MissionType.CreateTotalBonusBalls,
+            MissionType.DoTotalSoults,
+            MissionType.PopTotalPuni,
+            MissionType.EnterFeverTimeTotalTimes,
+        ];
         private static async Task<TableParser<YwpUserMission>> GetUserMission(string gdkey)
         {
             var raw = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(gdkey, "ywp_user_mission");
@@ -45,6 +66,8 @@ namespace Puniemu.Src.Server.GameServer.Logic
             if (seriesCfgItem.Missions.Count > nextMissionCfgIdx)
             {
                 var nextMissionCfgItem = seriesCfgItem.Missions[nextMissionCfgIdx];
+                var newProgress = currentMission.MissionParamProgress;
+                if (NotCarryOver.Contains(nextMissionCfgItem.MissionType)) newProgress = 0;
                 var newMission = new YwpUserMission()
                 {
                     MissionID = nextMissionCfgItem.MissionID,
@@ -52,7 +75,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
                     MissionCompleteStatus = MissionCompleteStatus.NotComplete,
                     IsAppear = 1,
                     MissionParamTarget = nextMissionCfgItem.Params[0],
-                    MissionParamProgress = currentMission.MissionParamProgress,
+                    MissionParamProgress = newProgress,
                     NewStatus = MissionNewStatus.ShowNewPopup,
                 };
                 
@@ -86,7 +109,6 @@ namespace Puniemu.Src.Server.GameServer.Logic
             if (mission.MissionParamProgress >= mission.MissionParamTarget)
             {
                 mission.MissionCompleteStatus = MissionCompleteStatus.CompletePendingReward;
-
             }
         }
         public static async Task<TableParser<YwpUserMission>> UpdateProgress(string gdkey, MissionType missionType, int progressToUpdate, 
@@ -108,7 +130,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
                 if(mstEntry.MissionType == missionType && mission.IsAppear == 1 && mission.MissionCompleteStatus != MissionCompleteStatus.CompleteRewardAcquired)
                 {
                     Console.WriteLine($"[*] Checking mission for user ${gdkey}: \"{missionCfgItem.MissionName}\".");
-                    if (missionType == MissionType.TotalPurchaseShop)
+                    if(BasicProgress.Contains(missionType))
                     {
                         BasicProgressCheck(mission, progressToUpdate);
                     }
@@ -119,50 +141,6 @@ namespace Puniemu.Src.Server.GameServer.Logic
                             mission.MissionParamProgress = 1;
                             mission.MissionCompleteStatus = MissionCompleteStatus.CompletePendingReward;
                         }
-                    }
-                    else if (missionType == MissionType.CollectTotalScore)
-                    {
-                        BasicProgressCheck(mission, progressToUpdate);
-                    }
-                    else if (missionType == MissionType.TotalCrank)
-                    {
-                        BasicProgressCheck(mission, progressToUpdate);
-                    }
-                    else if (missionType == MissionType.CollectTotalStars)
-                    {
-                        BasicProgressCheck(mission, progressToUpdate);
-                    }
-                    else if (missionType == MissionType.CreateTotalBonusBalls)
-                    {
-                        BasicProgressCheck(mission, progressToUpdate);
-                    }
-                    else if (missionType == MissionType.DoTotalSoults)
-                    {
-                        BasicProgressCheck(mission, progressToUpdate);
-                    }
-                    else if (missionType == MissionType.EnterFeverTimeTotalTimes)
-                    {
-                        BasicProgressCheck(mission, progressToUpdate);
-                    }
-                    else if (missionType == MissionType.UseTotalItems)
-                    {
-                        BasicProgressCheck(mission, progressToUpdate);
-                    }
-                    else if(missionType == MissionType.TotalLoginDays)
-                    {
-                        BasicProgressCheck(mission, progressToUpdate);
-                    }
-                    else if(missionType == MissionType.TotalScoreInScoreAttack)
-                    {
-                        BasicProgressCheck(mission, progressToUpdate);
-                    }
-                    else if(missionType == MissionType.PopTotalPuni)
-                    {
-                        BasicProgressCheck(mission, progressToUpdate);
-                    }
-                    else if (missionType == MissionType.FuseTotalYokai)
-                    {
-                        BasicProgressCheck(mission, progressToUpdate);
                     }
                     if (!manualSave)
                         await SaveUserMission(gdkey, userMission);

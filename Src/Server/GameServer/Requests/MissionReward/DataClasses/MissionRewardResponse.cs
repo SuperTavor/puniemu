@@ -33,6 +33,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.MissionReward.DataClasses
         [JsonProperty("ywp_user_youkai_skill")]
         public string UserSkill { get; set; }
 
+        [JsonProperty("ywp_user_shop_item_unlock")]
+        public string UserShop { get; set; }
         [JsonProperty("ywp_user_youkai_bonus_effect")]
         public string UserBonus { get; set; }
 

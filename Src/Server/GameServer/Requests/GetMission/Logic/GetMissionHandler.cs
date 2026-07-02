@@ -37,6 +37,14 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetMission.Logic
                 }
 
             }
+            //Remove previous new popups
+            foreach(var mission in userMission.Items)
+            {
+                if(mission.NewStatus == MissionNewStatus.ShowNewPopup)
+                {
+                    mission.NewStatus = MissionNewStatus.None;
+                }
+            }
             foreach(var mission in userMission.Items.Where(x => x.MissionCompleteStatus == MissionCompleteStatus.CompleteRewardAcquired))
             {
                 mission.IsAppear = Convert.ToInt32(isAlreadyReward);

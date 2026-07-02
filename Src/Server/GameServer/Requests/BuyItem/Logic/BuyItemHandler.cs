@@ -21,7 +21,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.BuyItem.Logic
             ctx.Request.BodyReader.AdvanceTo(readResult.Buffer.End);
             var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             var deserialized = JsonConvert.DeserializeObject<BuyItemRequest>(requestJsonString!)!;
-
+            var userShop = new TableParser<YwpUserShopItemUnlock>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_shop_item_unlock"));
             //init res
             var res = await BuyItemResponse.BuildAsync(deserialized.Gdkey);
 
@@ -34,6 +34,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.BuyItem.Logic
 
             var item = itemList.Where(x => x.GoodsId == deserialized.GoodsId).FirstOrDefault();
 
+            
             if(item == null)
             {
                 await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(
@@ -41,6 +42,16 @@ namespace Puniemu.Src.Server.GameServer.Requests.BuyItem.Logic
                 return;
             }
 
+            if(item.LockConditionFlg == 1)
+            {
+                var userShopitem = userShop.Items.Where(x => x.ItemID == item.ItemId);
+                if(userShopitem == null)
+                {
+                    await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(
+                        JsonConvert.SerializeObject(new MsgBoxResponse($"Item not unlocked", "Item not found"))));
+                    return;
+                }
+            }
             //Check if user has enough money
             if (deserialized.GoodsCount * item.Price > res.UserData.YMoney)
             {
