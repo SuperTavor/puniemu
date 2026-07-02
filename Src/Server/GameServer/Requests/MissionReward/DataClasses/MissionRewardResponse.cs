@@ -30,6 +30,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.MissionReward.DataClasses
         [JsonProperty("ywp_user_player_icon")]
         public string UserIcon { get; set; }
 
+        [JsonProperty("ywp_user_player_title")]
+        public string UserTitle { get; set; }
+
         [JsonProperty("ywp_user_youkai")]
         public string UserYoukai { get; set; }
 

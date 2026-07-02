@@ -205,6 +205,7 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
             this.CharacterID = "";
             this.LimitTimeSaleRemainSec = 0;
             this.TotMedalPoint = 0;
+            this.Hitodama = 30;
             this.EventPointUpItemRemainSec = 0;
             this.TodaysRemainSec = GetRemainingSecondsInDay();
             this.WeeklyFreeFlag = 0;
@@ -228,7 +229,7 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
         public void BuyHitodamaGood(YwpMstShopHitodama good)
         {
             this.YMoney -= good.Price;
-            this.Hitodama += (good.SellCount + good.BonusCount);
+            this.Hitodama += (good.SellCount + good.bonuy);
         }
     }
 
