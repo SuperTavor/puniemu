@@ -58,6 +58,10 @@ namespace Puniemu.Src.Server.GameServer.Logic
         {
             var currentMissionIdx = userMission.Items.FindIndex(x => x.MissionID == missionId);
             var currentMission = userMission.Items[currentMissionIdx];
+            //Append it at end and make it disappear
+            currentMission.IsAppear = 0;
+            userMission.Items.Remove(currentMission);
+            userMission.Items.Add(currentMission);
             var idxResult = GetMissionCfgIdx(missionId);
             SeriesCfgItem seriesCfgItem = idxResult.Item1;
             int missionCfgIdx = idxResult.Item2;
@@ -80,10 +84,6 @@ namespace Puniemu.Src.Server.GameServer.Logic
                 };
                 
                 userMission.Items.Insert(currentMissionIdx,newMission);
-                //Append it at end and make it disappear
-                currentMission.IsAppear = 0;
-                userMission.Items.Remove(currentMission);
-                userMission.Items.Add(currentMission);
             }
         }
         private static (SeriesCfgItem, int) GetMissionCfgIdx(int missionId)
