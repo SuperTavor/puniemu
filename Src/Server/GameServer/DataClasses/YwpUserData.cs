@@ -229,7 +229,7 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
         public void BuyHitodamaGood(YwpMstShopHitodama good)
         {
             this.YMoney -= good.Price;
-            this.Hitodama += (good.SellCount + good.bonuy);
+            this.Hitodama += (good.SellCount + good.BonusCount);
         }
     }
 
