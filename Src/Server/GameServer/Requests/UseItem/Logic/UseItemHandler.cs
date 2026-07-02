@@ -54,7 +54,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.UseItem.Logic
             {
                 if (response.ItemType == ItemType.Exporb)
                 {
-                    var expResult = itemService.UseExporb();
+                    var expResult = await itemService.UseExporb(deserialized.Level5UserID);
                     response.YoukaiExp = expResult;
                 }
                 else if (response.ItemType == ItemType.SoultBooster)

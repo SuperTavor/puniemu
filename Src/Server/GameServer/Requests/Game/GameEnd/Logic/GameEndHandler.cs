@@ -18,7 +18,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
 {
     public static class GameEndHandler
     {
-        public static void HandleUserYoukai(GameEndRequest deserialized, GameEndResponse res, TableParser<YwpUserYoukai> userYoukaiTable, TableParser<YwpUserYoukai> userYoukaiTableDiff)
+        public static async Task HandleUserYoukai(GameEndRequest deserialized, GameEndResponse res, TableParser<YwpUserYoukai> userYoukaiTable, TableParser<YwpUserYoukai> userYoukaiTableDiff, string gdkey)
         {
             var YoukaiMstTable = new TableParser<YwpMstYoukai>(
                 JsonConvert.DeserializeObject<Dictionary<string, string>>(
@@ -46,7 +46,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 }
 
                 UserYoukaiResultListRes item = new(userYoukaiTable.Items[youkaiIDx], YoukaiMstTable.Items[YoukaiMstIndex]);
-                MoneyExpManager.GiveYoukaiExp(item, userYoukaiTable.Items[youkaiIDx], i.YoukaiId, res.UserGameResultData.Exp, YoukaiMstTable.Items[YoukaiMstIndex]);
+                await MoneyExpManager.GiveYoukaiExp(item, userYoukaiTable.Items[youkaiIDx], i.YoukaiId, res.UserGameResultData.Exp, YoukaiMstTable.Items[YoukaiMstIndex], gdkey);
                 YwpUserYoukai yokai = userYoukaiTable.Items[youkaiIDx];
                 userYoukaiTableDiff.AddItem(yokai);
                 res.UserYoukaiResultList.Add(item);
@@ -432,7 +432,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 HandleMenuFunc(deserialized, res, LevelData, menufuncListTable, FirstClear);
             }
             // yokai user list
-            HandleUserYoukai(deserialized, res, userYoukaiTable, youkaiDiff);
+            await HandleUserYoukai(deserialized, res, userYoukaiTable, youkaiDiff, deserialized.Gdkey);
 
             await UDM.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_requestid", "");
             await UDM.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_stage", ywpUserStage.ToString());

@@ -43,7 +43,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.UseItem.Logic
             itemInfo!.Count--;
         }
 
-        public UserYoukaiResultListRes UseExporb()
+        public async Task<UserYoukaiResultListRes> UseExporb(string gdkey)
         {
             SpendItem();
             var expToAdd = _itemInfo.ItemParam;
@@ -53,7 +53,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.UseItem.Logic
             var yokaiToGive = UserYoukai.Items.Where(x => x.YoukaiId == _youkaiId).First();
             YwpMstYoukai mstYokaiEntry = mstYokai.Items.Where(x => x.YoukaiId == _youkaiId).First();
             var result = new UserYoukaiResultListRes(yokaiToGive, mstYokaiEntry);
-            MoneyExpManager.GiveYoukaiExp(result, yokaiToGive, _youkaiId, expToAdd, mstYokaiEntry);
+            await MoneyExpManager.GiveYoukaiExp(result, yokaiToGive, _youkaiId, expToAdd, mstYokaiEntry, gdkey);
 
             return result;
         }

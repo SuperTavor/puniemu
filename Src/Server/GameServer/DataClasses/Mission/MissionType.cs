@@ -14,7 +14,7 @@ public enum MissionType {
     CompleteStageInSeconds = 10103,
     CollectStarsInMap = 21002,
     MinimumComboInStage = 10102,
-    GetSpecificYokaiToLevel = 40001,
+    GetSpecificYokaiToLevel = 40001, //done
     TotalPurchaseShop = 61201, //done
     UseTotalItems = 31001, //done
     TotalCrank = 61101, //done

@@ -17,7 +17,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
             MissionType.BuySpecificItemAtShop,
             MissionType.UseSpecificItemInBattle,
             MissionType.BefriendSpecificYokai,
-
+            MissionType.GetSpecificYokaiToLevel,
         ];
 
         //Which mission types need just a basic progress check
@@ -34,6 +34,13 @@ namespace Puniemu.Src.Server.GameServer.Logic
             MissionType.DoTotalSoults,
             MissionType.PopTotalPuni,
             MissionType.EnterFeverTimeTotalTimes,
+        ];
+
+        //Which mission types just need a basic check with a param
+        private static readonly ImmutableHashSet<MissionType> BasicParam = [
+            MissionType.BefriendSpecificYokai,
+            MissionType.BuySpecificItemAtShop,
+            MissionType.UseSpecificItemInBattle
         ];
         private static async Task<TableParser<YwpUserMission>> GetUserMission(string gdkey)
         {
@@ -150,7 +157,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
             }
         }
         public static async Task<TableParser<YwpUserMission>> UpdateProgress(string gdkey, MissionType missionType, int progressToUpdate, 
-            TableParser<YwpUserMission> paramUserMission = null, bool manualSave = false)
+            TableParser<YwpUserMission> paramUserMission = null, bool manualSave = false, int progressToUpdate2 = -1)
         {
             TableParser<YwpUserMission> userMission;
             if (paramUserMission == null)
@@ -172,17 +179,22 @@ namespace Puniemu.Src.Server.GameServer.Logic
                     {
                         BasicProgressCheck(mission, progressToUpdate);
                     }
-                    else if (missionType == MissionType.BuySpecificItemAtShop)
+                    else if(BasicParam.Contains(missionType))
                     {
                         BasicParamCheck(mission, progressToUpdate, missionCfgItem.Params[0]);
                     }
-                    else if (missionType == MissionType.BefriendSpecificYokai)
+                    else if(missionType == MissionType.GetSpecificYokaiToLevel)
                     {
-                        BasicParamCheck(mission, progressToUpdate, missionCfgItem.Params[0]);
-                    }
-                    else if (missionType == MissionType.UseSpecificItemInBattle)
-                    {
-                        BasicParamCheck(mission, progressToUpdate, missionCfgItem.Params[0]);
+                        //progressToUpdate is yokai ID
+                        //progressToUpdate2 is yokai now level
+                        if(progressToUpdate == missionCfgItem.Params[0])
+                        {
+                            mission.MissionParamProgress = progressToUpdate2;
+                            if(mission.MissionParamProgress >= mission.MissionParamTarget)
+                            {
+                                mission.MissionCompleteStatus = MissionCompleteStatus.CompletePendingReward;
+                            }
+                        }
                     }
                     if (!manualSave)
                         await SaveUserMission(gdkey, userMission);
