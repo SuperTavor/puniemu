@@ -80,11 +80,11 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
             }
 
             int conditionCount = 1;
-
+            // used to differentiate locked levels from one same map
+            int secretStageSkipp = 0;
             while (true)
             {
-                // used to differentiate locked levels from one same map
-                int secretStageSkipp = 0;
+
                 // compute the conditionId from stageId and conditionCount
                 int tempConditionId = (deserialized.StageId * 10) + conditionCount;
                 // get the array index of the computed conditionId in the table
@@ -191,7 +191,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
 
                 nextStage = (ywpMstMap[mstIndex].MapId * 1000) + 1;
             }
-            if (nextStage == -1) // new map
+            if (nextStage == -1 && MasterStageData.StageItems.FirstOrDefault(x => x.StageId == deserialized.StageId).StageType != 2) // new map
             {
                 var ogMapIndex = MstMapManager.GetMapIndex(ywpMstMap, (int)Math.Floor(deserialized.StageId / 1000.0));
 
