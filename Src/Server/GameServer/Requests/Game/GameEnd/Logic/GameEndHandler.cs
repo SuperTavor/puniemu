@@ -501,18 +501,19 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
             resdict["ywp_user_youkai_strong_skill_diff"] = ""; // TODO
             resdict["ywp_user_youkai"] = userYoukaiTable.ToString();
             resdict["ywp_user_dictionary"] = dictionaryYoukaiTable.ToString();
+            var totalSoult = 0;
+            foreach (var kai in deserialized.UserYoukaiResultList)
+            {
+                totalSoult += kai.SkillUseNum;
+            }
             var userMission = await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.CollectTotalScore, deserialized.Score, null, true);
-            await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.CollectTotalStars, res.UserGameResultData.StarGetFlg1 + res.UserGameResultData.StarGetFlg2 + res.UserGameResultData.StarGetFlg3, userMission, true);            // beta might only work for few maps
+            await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.CollectTotalStars, res.UserGameResultData.StarGetFlg1 + res.UserGameResultData.StarGetFlg2 + res.UserGameResultData.StarGetFlg3, userMission, true);
+            await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.DoTotalSoults, totalSoult, userMission, true);
             await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.CreateTotalBonusBalls, deserialized.BonusBlockNum, userMission, true);
             await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.EnterFeverTimeTotalTimes, deserialized.FeverTimeNum, userMission, true);
             await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.PopTotalPuni, deserialized.EraseNumTotal, userMission, true);
             await MissionManager.SaveUserMission(deserialized.Gdkey, userMission);
-            var totalSoult = 0;
-            foreach(var kai in deserialized.UserYoukaiResultList)
-            {
-                totalSoult += kai.SkillUseNum;
-            }
-            await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.DoTotalSoults, totalSoult);
+
             await GeneralUtils.AddTablesToResponse(Consts.GAME_END_TABLES, resdict!, true, deserialized!.Gdkey!);
             var encryptedRes = NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(resdict));
             ctx.Response.Headers.ContentType = "application/json";

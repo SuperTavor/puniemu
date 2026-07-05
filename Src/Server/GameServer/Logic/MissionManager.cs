@@ -118,7 +118,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
                     MissionParamProgress = newProgress,
                     NewStatus = MissionNewStatus.ShowNewPopup,
                 };
-                
+                if (newProgress >= newMission.MissionParamTarget) newMission.MissionCompleteStatus = MissionCompleteStatus.CompletePendingReward;
                 userMission.Items.Insert(currentMissionIdx,newMission);
             }
         }
@@ -196,10 +196,11 @@ namespace Puniemu.Src.Server.GameServer.Logic
                             }
                         }
                     }
-                    if (!manualSave)
-                        await SaveUserMission(gdkey, userMission);
+
                 }
             }
+            if (!manualSave)
+                await SaveUserMission(gdkey, userMission);
             return userMission;
             
         }
