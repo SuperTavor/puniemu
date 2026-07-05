@@ -35,6 +35,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameUseItem.Logic
             item.Count--;
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_item", playerItemTable.ToString());
             await MissionManager.UpdateProgress(deserialized.Level5UserID, GameServer.DataClasses.Mission.MissionType.UseSpecificItemInBattle, deserialized.ItemId);
+            await MissionManager.UpdateProgress(deserialized.Level5UserID, GameServer.DataClasses.Mission.MissionType.UseTotalItems, 1);
             var renameResponse = new GameUseItemResponse(userData!, playerItemTable.ToString(), deserialized.ItemId);
             var marshalledResponse = JsonConvert.SerializeObject(renameResponse);
             var encryptedResponse = NHNCrypt.Logic.NHNCrypt.EncryptResponse(marshalledResponse);
