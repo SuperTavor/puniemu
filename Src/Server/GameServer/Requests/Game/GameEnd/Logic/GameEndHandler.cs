@@ -52,7 +52,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 res.UserYoukaiResultList.Add(item);
             }
         }
-        public static void HandleStage(GameEndRequest deserialized, GameEndResponse res, ref int FirstClear, TableParser<YwpUserStage> ywpUserStage, TableParser<YwpUserMap> ywpUserMap)
+        public static void HandleStage(GameEndRequest deserialized, GameEndResponse res, ref int FirstClear, TableParser<YwpUserStage> ywpUserStage, TableParser<YwpUserMap> ywpUserMap
+            ,StageData levelData)
         {
             List<YwpMstMap> ywpMstMap = JsonConvert.DeserializeObject<List<YwpMstMap>>(
                 JsonConvert.DeserializeObject<Dictionary<string, object>>(
@@ -173,6 +174,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
 
             bool mapLocked = false;
             long nextStage = MasterStageData.GetNextStage(deserialized.StageId);
+            int[] altUnlock = levelData.AltUnlock;
 
             void UnlockMap(long mapId)
             {
@@ -191,36 +193,64 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
 
                 nextStage = (ywpMstMap[mstIndex].MapId * 1000) + 1;
             }
-            if (nextStage == -1 && MasterStageData.StageItems.FirstOrDefault(x => x.StageId == deserialized.StageId).StageType != 2) // new map
+            if (altUnlock == null || altUnlock.SequenceEqual(new int[] { -1 }))
             {
-                var ogMapIndex = MstMapManager.GetMapIndex(ywpMstMap, (int)Math.Floor(deserialized.StageId / 1000.0));
-
-                if (ogMapIndex != -1)
+                if (nextStage == -1 && MasterStageData.StageItems.FirstOrDefault(x => x.StageId == deserialized.StageId).StageType != 2) // new map
                 {
-                    var ogMap = ywpMstMap[ogMapIndex];
+                    var ogMapIndex = MstMapManager.GetMapIndex(ywpMstMap, (int)Math.Floor(deserialized.StageId / 1000.0));
 
-                    if (ogMap.NextMapId != 0)
-                        UnlockMap(ogMap.NextMapId);
+                    if (ogMapIndex != -1)
+                    {
+                        var ogMap = ywpMstMap[ogMapIndex];
+                        if (ogMap.NextMapId != 0 && ogMap.NextMapId != 1015) //Yopple inc is buggy so we limiting it for now
+                            UnlockMap(ogMap.NextMapId);
 
-                    if (ogMap.ExtraMapId != 0)
-                        UnlockMap(ogMap.ExtraMapId);
+                        else if (ogMap.ExtraMapId != 0)
+                            UnlockMap(ogMap.ExtraMapId);
+                    }
+                }
+                if (nextStage != -1 && StageManager.GetStageIndex(ywpUserStage, nextStage) == -1)
+                {
+                    if (mapLocked == false)
+                    {
+                        StageManager.AddStage(ywpUserStage, nextStage);
+                    }
+                    res.LockedStageResultList.Add(new LockedStageResultList()
+                    {
+                        StageId = nextStage,
+                        Title = "",
+                        ConditionType = 0,
+                        Description = "",
+                        OriginStageId = 0,
+                    });
                 }
             }
-            if (nextStage != -1 && StageManager.GetStageIndex(ywpUserStage, nextStage) == -1)
+            else if(altUnlock.SequenceEqual(new int[1] { 0 }))
             {
-                if (mapLocked == false)
-                {
-                    StageManager.AddStage(ywpUserStage, nextStage);
-                }
-                res.LockedStageResultList.Add(new LockedStageResultList()
-                {
-                    StageId = nextStage,
-                    Title = "",
-                    ConditionType = 0,
-                    Description = "",
-                    OriginStageId = 0,
-                });
+                return;
             }
+            else
+            {
+                foreach(var stage in altUnlock)
+                {
+                    if(StageManager.GetStageIndex(ywpUserStage, stage) == -1)
+                    {
+                        if (mapLocked == false)
+                        {
+                            StageManager.AddStage(ywpUserStage, nextStage);
+                        }
+                        res.LockedStageResultList.Add(new LockedStageResultList()
+                        {
+                            StageId = nextStage,
+                            Title = "",
+                            ConditionType = 0,
+                            Description = "",
+                            OriginStageId = 0,
+                        });
+                    }
+                }
+            }
+           
         }
         public static void HandleTutorial(GameEndRequest deserialized, GameEndResponse res, TutorialList? tutorialList, StageData LevelData, int FirstClear)
         {
@@ -426,7 +456,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
             if (gameEndType == GameEndType.GameEnd)
             {
                 int FirstClear = 0;
-                HandleStage(deserialized, res, ref FirstClear, ywpUserStage, ywpUserMap);
+                HandleStage(deserialized, res, ref FirstClear, ywpUserStage, ywpUserMap, LevelData);
                 await HandleDrop(deserialized, res, dictionaryYoukaiTable, dictionaryDiff, userYoukaiTable, youkaiDiff, userYoukaiSkillTable,  youkaiSkillDiff, userItemTable, playerIconTable, userData, LevelData, FirstClear, userBonus);
                 HandleTutorial(deserialized, res, tutorialList, LevelData, FirstClear);
                 HandleMenuFunc(deserialized, res, LevelData, menufuncListTable, FirstClear);

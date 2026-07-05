@@ -62,6 +62,11 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
         [JsonProperty("tutorial_edit")]
         public TutorialEntryRespRes ?TutorialEdit { get; set; }
 
+        //alternate stage IDs to unlock that are different to the calculated
+        [JsonProperty("altUnlock")]
+
+        public int[] AltUnlock = null;
+
         [JsonProperty("locked_stage")]
         public List<LockedStageResultList?>? LockedStage {  get; set; }
     }
