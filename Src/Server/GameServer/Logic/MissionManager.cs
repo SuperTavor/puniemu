@@ -26,6 +26,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
             MissionType.CollectTotalStars,
             MissionType.TotalCrank,
             MissionType.TotalLoginDays,
+            MissionType.UseTotalItems,
             MissionType.AddTotalYokaiToMedallium,
             MissionType.FuseTotalYokai,
             MissionType.TotalPurchaseShop,
