@@ -42,6 +42,13 @@ namespace Puniemu.Src.Server.GameServer.Requests.BuyItem.Logic
                 return;
             }
 
+            if (deserialized.GoodsCount <= 0 || deserialized.GoodsCount > 99)
+            {
+                 await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(
+                     JsonConvert.SerializeObject(new MsgBoxResponse($"Invalid quantity.", "Error"))));
+                 return;
+            }
+
             if(item.LockConditionFlg == 1)
             {
                 var userShopitem = userShop.Items.Where(x => x.ItemID == item.ItemId);
