@@ -271,7 +271,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
             {
                 foreach (MenufuncEntry item in LevelData.Menufunc)
                 {
-                    if (FirstClear == 1)
+                    var localApp = menufuncListTable.Items.FirstOrDefault(x => x.AppId == item.Id);
+                    if (localApp == null || localApp.AppFlg == 0)
                     {
                         MenufuncManager.AddApp(menufuncListTable, item.Id, (int)item.Value);
                     }

@@ -70,7 +70,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
             ctx.Request.BodyReader.AdvanceTo(readResult.Buffer.End);
             var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             var deserialized = JsonConvert.DeserializeObject<GameStartRequest>(requestJsonString!);
-
+            Console.WriteLine(deserialized.StageId);
             // send bad requests if bad requests send
             var userData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized!.Gdkey!, "ywp_user_data");
             
@@ -217,11 +217,18 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
                             isMaxSkill = YwpUserYoukaiSkillTab.Items[skillIdx].Level >= 7;
                         }
                         var mstYokaiItem = mstYokai.Items.Where(x => x.YoukaiId == yokaiId).FirstOrDefault();
-                        if(!(mstYokaiItem == null) && mstYokaiItem.YoukaiRarity != RarityType.RarityNone && !isBoss && isAfterJibanyan && !isMaxSkill)
+                        var autobefriend = i.DefaultBefriends == 1 && YwpUserYoukaiTab.FindIndex([enemyId.ToString()]) == -1;
+                        if(autobefriend)
                         {
                             var yokaiRank = mstYokaiItem.YoukaiRarity;
                             var befrienders = DeckManager.GetBefrienderSpots(UserDeck, mstYokaiItem, YwpUserYoukaiSkillTab);
-                            item.LotYoukaiInfoList = LotYoukaiManager.GenerateLotYoukai(befrienders, yokaiRank, isSuperShrine);
+                            item.LotYoukaiInfoList = LotYoukaiManager.GenerateLotYoukai(befrienders, yokaiRank, isSuperShrine, true);
+                        }
+                        else if (!(mstYokaiItem == null) && mstYokaiItem.YoukaiRarity != RarityType.RarityNone && !isBoss && isAfterJibanyan && !isMaxSkill)
+                        {
+                            var yokaiRank = mstYokaiItem.YoukaiRarity;
+                            var befrienders = DeckManager.GetBefrienderSpots(UserDeck, mstYokaiItem, YwpUserYoukaiSkillTab);
+                            item.LotYoukaiInfoList = LotYoukaiManager.GenerateLotYoukai(befrienders, yokaiRank, isSuperShrine, false);
                             //Console.WriteLine(JsonConvert.SerializeObject(item.LotYoukaiInfoList));
                         }
                     }

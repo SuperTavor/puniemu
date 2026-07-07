@@ -93,8 +93,9 @@ public static class LotYoukaiManager
         return Math.Clamp(preClamp, 0f, 1f);
     }
 
-    private static string GenerateLotResult(RarityType enemyRank, float soultimateBoost, bool isSuperShrine)
+    private static string GenerateLotResult(RarityType enemyRank, float soultimateBoost, bool isSuperShrine, bool autobefriend)
     {
+        if (autobefriend) return "11111";
         var bits = new char[5];
         for (int bitPos = 0; bitPos < 5; bitPos++)
         {
@@ -154,7 +155,7 @@ public static class LotYoukaiManager
         }
         return ptsArr;
     }
-    public static LotYoukaiInfoList GenerateLotYoukai(BefriendYokaiInfo[] befrienders, RarityType enemyRank, bool isSuperShrine)
+    public static LotYoukaiInfoList GenerateLotYoukai(BefriendYokaiInfo[] befrienders, RarityType enemyRank, bool isSuperShrine, bool autobefriend)
     {
         var ptsArr = GetBefrienderPts(befrienders);
         var patterns = GenerateLotPatterns(befrienders);
@@ -166,7 +167,7 @@ public static class LotYoukaiManager
             lotList.Entries.Add(new LotYoukaiInfo
             {
                 LotPattern = pattern,
-                LotResult = GenerateLotResult(enemyRank, soultimateBoost, isSuperShrine)
+                LotResult = GenerateLotResult(enemyRank, soultimateBoost, isSuperShrine, autobefriend)
             });
         }
 
