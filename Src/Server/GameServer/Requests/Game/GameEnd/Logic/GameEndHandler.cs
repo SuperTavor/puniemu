@@ -202,7 +202,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                     if (ogMapIndex != -1)
                     {
                         var ogMap = ywpMstMap[ogMapIndex];
-                        if (ogMap.NextMapId != 0 && ogMap.NextMapId != 1015) //Yopple inc is buggy so we limiting it for now
+                        if (ogMap.NextMapId != 0) 
                             UnlockMap(ogMap.NextMapId);
 
                         else if (ogMap.ExtraMapId != 0)
