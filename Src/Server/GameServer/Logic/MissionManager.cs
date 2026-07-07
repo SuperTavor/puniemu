@@ -109,6 +109,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
             {
                 var nextMissionCfgItem = seriesCfgItem.Missions[nextMissionCfgIdx];
                 var newProgress = currentMission.MissionParamProgress;
+                var newTarget = nextMissionCfgItem.Params[0];
                 if (NotCarryOver.Contains(nextMissionCfgItem.MissionType)) newProgress = 0;
                 if(nextMissionCfgItem.MissionType == MissionType.GetSpecificYokaiToLevel)
                 {
@@ -120,6 +121,8 @@ namespace Puniemu.Src.Server.GameServer.Logic
                     {
                         newProgress = myYokai.Level;
                     }
+
+                    newTarget = nextMissionCfgItem.Params[1];
                 }
                 var newMission = new YwpUserMission()
                 {
@@ -127,7 +130,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
                     SeqNo = int.Parse("1" + nextMissionCfgItem.MissionID.ToString()),
                     MissionCompleteStatus = MissionCompleteStatus.NotComplete,
                     IsAppear = 1,
-                    MissionParamTarget = nextMissionCfgItem.Params[0],
+                    MissionParamTarget = newTarget,
                     MissionParamProgress = newProgress,
                     NewStatus = MissionNewStatus.ShowNewPopup,
                 };
