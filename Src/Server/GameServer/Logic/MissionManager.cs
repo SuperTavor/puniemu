@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Puniemu.Src.Server.GameServer.DataClasses.Mission;
 using Puniemu.Src.Server.GameServer.DataClasses.Mission.CustomMissionCfg;
+using Puniemu.Src.TableParser.DataClasses;
 using Puniemu.Src.TableParser.Logic;
 using Puniemu.Src.UserDataManager.Logic;
 using System.Collections.Immutable;
@@ -91,7 +92,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
             return _mstMission;
         }
 
-        public static async void TryUnlockNextMission(int missionId, TableParser<YwpUserMission> userMission)
+        public static async void TryUnlockNextMission(int missionId, TableParser<YwpUserMission> userMission, TableParser<YwpUserYoukai> userYokai)
         {
             var currentMissionIdx = userMission.Items.FindIndex(x => x.MissionID == missionId);
             var currentMission = userMission.Items[currentMissionIdx];
@@ -109,6 +110,17 @@ namespace Puniemu.Src.Server.GameServer.Logic
                 var nextMissionCfgItem = seriesCfgItem.Missions[nextMissionCfgIdx];
                 var newProgress = currentMission.MissionParamProgress;
                 if (NotCarryOver.Contains(nextMissionCfgItem.MissionType)) newProgress = 0;
+                if(nextMissionCfgItem.MissionType == MissionType.GetSpecificYokaiToLevel)
+                {
+                    int yokaiId = nextMissionCfgItem.Params[0];
+
+                    var myYokai = userYokai.Items.FirstOrDefault(x => x.YoukaiId == yokaiId);
+
+                    if(myYokai != null)
+                    {
+                        newProgress = myYokai.Level;
+                    }
+                }
                 var newMission = new YwpUserMission()
                 {
                     MissionID = nextMissionCfgItem.MissionID,

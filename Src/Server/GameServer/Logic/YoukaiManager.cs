@@ -113,6 +113,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
             {
                 var um = await MissionManager.UpdateProgress(gdkey, DataClasses.Mission.MissionType.AddTotalYokaiToMedallium, 1, userMission, manualMissionSave);
                 await MissionManager.UpdateProgress(gdkey, MissionType.BefriendSpecificYokai, (int)YoukaiId, um, manualMissionSave);
+                await MissionManager.UpdateProgress(gdkey, MissionType.GetSpecificYokaiToLevel, (int)YoukaiId, progressToUpdate2: 1, paramUserMission: um, manualSave: manualMissionSave);
                 // add new youkai
                 var tmpIdx = 0;
                 var levelType = int.Parse(YoukaiMstTable.Table[MstYoukaiIndex][5]);

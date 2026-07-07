@@ -1,5 +1,6 @@
 namespace Puniemu.Src.Server.GameServer.DataClasses;
 public enum RewardType {
+    None = 0,
     Icon = 12,
     YMoney = 3,
     Yokai = 2,

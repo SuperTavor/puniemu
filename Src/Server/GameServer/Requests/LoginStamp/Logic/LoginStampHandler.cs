@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using Puniemu.Src.DataManager.Logic;
 using Puniemu.Src.Server.GameServer.DataClasses;
 using Puniemu.Src.Server.GameServer.Logic;
 using Puniemu.Src.Server.GameServer.Requests.LoginStamp.DataClasses;
@@ -35,6 +36,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.LoginStamp.Logic
             var userYoukaiSkillTable = new TableParser<YwpUserYoukaiSkill>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserID!, "ywp_user_youkai_skill")!);
             var dictionaryYoukaiTable = new TableParser.Logic.TableParser("");
 
+            var inbox = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<List<PresentBoxList>>(deserialized.Level5UserID, "ywp_user_present_box_list");
 
             var LoginStamp = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager!.GamedataCache["ywp_mst_login_stamp"]!)!["tableData"]);
             var LoginStampReward = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager!.GamedataCache["ywp_mst_login_stamp_reward"]!)!["tableData"]);
@@ -93,8 +95,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.LoginStamp.Logic
 
             // set ywp_mst_login_stamp_reward
             var current_item_count = 0;
-            var current_item_id = 0L;
-            var current_item_type = 0;
+            var currentRewardId = 0;
+            var currentRewardType = RewardType.None;
             res.LoginStampReward = new();
             foreach (string[] elements in LoginStampReward.Table)
             {
@@ -103,14 +105,14 @@ namespace Puniemu.Src.Server.GameServer.Requests.LoginStamp.Logic
                     LoginStampReward entry = new LoginStampReward();
                     entry.StampId = StampId;
                     entry.RewardDayCnt = int.Parse(elements[1]);
-                    entry.RewardItemType = int.Parse(elements[2]);
+                    entry.RewardItemType = (RewardType)int.Parse(elements[2]);
                     entry.RewardItemId = int.Parse(elements[3]);
                     entry.RewardItemCnt = int.Parse(elements[4]);
                     if (entry.RewardDayCnt == day)
                     {
                         current_item_count = entry.RewardItemCnt;
-                        current_item_id = entry.RewardItemId;
-                        current_item_type = entry.RewardItemType;
+                        currentRewardId = entry.RewardItemId;
+                        currentRewardType = entry.RewardItemType;
                     }
                     res.LoginStampReward.Add(entry);
                 }
@@ -140,24 +142,25 @@ namespace Puniemu.Src.Server.GameServer.Requests.LoginStamp.Logic
             // add won youkai, money, item... (in the future we might create a signle function to add item/youkai for the whole server)
             if (walk == 1)
             {
-                if (current_item_type == 1)
+                if (currentRewardType == RewardType.Item)
                 {
                     var itemsList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserID!, "ywp_user_item");
                     var userItemTable = new TableParser<YwpUserItem>(itemsList!);
-                    userItemTable = ItemManager.AddItem(userItemTable, current_item_id, current_item_count);
+                    userItemTable = ItemManager.AddItem(userItemTable, currentRewardId, current_item_count);
                     res.ItemPopupResult = new();
                     res.ItemPopupResult.IsLimitOver = 0;
                     res.ItemPopupResult.Count = current_item_count;
-                    res.ItemPopupResult.ItemId = current_item_id;
+                    res.ItemPopupResult.ItemId = currentRewardId;
                     await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_item", userItemTable.ToString());
                     LOGIN_STAMP_TABLES.Add("ywp_user_item");
+
                 }
-                if (current_item_type == 2)
+                if (currentRewardType == RewardType.Yokai)
                 {
                     var dictionaryYoukai = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserID!, "ywp_user_dictionary");
-                    dictionaryYoukaiTable = DictionaryManager.EditDictionary(new TableParser.Logic.TableParser(dictionaryYoukai!), current_item_id, false, true);
-                    await YoukaiManager.AddYoukai(userYoukaiTable, current_item_id, userYoukaiSkillTable, userBonus, deserialized.Level5UserID);
-                    res.YoukaiPopupResult = new(current_item_id, userYoukaiTable, userYoukaiSkillTable);
+                    dictionaryYoukaiTable = DictionaryManager.EditDictionary(new TableParser.Logic.TableParser(dictionaryYoukai!), currentRewardId, false, true);
+                    await YoukaiManager.AddYoukai(userYoukaiTable, currentRewardId, userYoukaiSkillTable, userBonus, deserialized.Level5UserID);
+                    res.YoukaiPopupResult = new(currentRewardId, userYoukaiTable, userYoukaiSkillTable);
                     await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_dictionary", dictionaryYoukaiTable.ToString());
                     await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_youkai", userYoukaiTable.ToString());
                     await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_youkai_skill", userYoukaiSkillTable!.ToString());
@@ -167,18 +170,18 @@ namespace Puniemu.Src.Server.GameServer.Requests.LoginStamp.Logic
                     LOGIN_STAMP_TABLES.Add("ywp_user_youkai_skill");
                     LOGIN_STAMP_TABLES.Add("ywp_user_youkai_bonus_effect");
                 }
-                if (current_item_type == 3)
+                if (currentRewardType == RewardType.YMoney)
                 {
                     userData!.YMoney += current_item_count;
                 }
-                if (current_item_type == 4)
+                if (currentRewardType == RewardType.Hitodama)
                 {
                     userData!.Hitodama += current_item_count;
                 }
-                if (current_item_type == 12)
+                if (currentRewardType == RewardType.Icon)
                 {
                     var playerIcon = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserID!, "ywp_user_player_icon");
-                    playerIconTable = PlayerIconManager.AddIcon(new TableParser.Logic.TableParser(playerIcon!), (int)current_item_id);
+                    playerIconTable = PlayerIconManager.AddIcon(new TableParser.Logic.TableParser(playerIcon!), (int)currentRewardId);
                     
                     await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_player_icon", playerIconTable.ToString());
                     LOGIN_STAMP_TABLES.Add("ywp_user_player_icon");

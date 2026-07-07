@@ -198,6 +198,10 @@ class Program
         {
             await UpdateWatchReadFlgHandler.HandleAsync(ctx);
         });
+        app.MapPost("/serialConfirm.nhn", async ctx =>
+        {
+            await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(new Src.Server.GameServer.DataClasses.MsgBoxResponse("Coming soon", "Discord integration"))));
+        });
         app.MapPost("/getMaster.nhn", async ctx =>
         {
             await GetMasterHandler.HandleAsync(ctx);

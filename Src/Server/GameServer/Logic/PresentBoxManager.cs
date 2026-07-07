@@ -11,9 +11,9 @@ using System.Text;
 
 namespace Puniemu.Src.Server.GameServer.Logic
 {
-    public class PresentBox
+    public class PresentBoxManager
     {
-        public static PresentBoxList CreatePresent(string? recv_userId, bool all_recieve, bool bonus, YwpUserData userdata, int itemId, int itemType, int itemCnt, string bodyText)
+        public static PresentBoxList CreatePresent(string? recv_userId, bool all_recieve, bool bonus, YwpUserData userdata, int rewardId, RewardType rewardType, int itemCnt, string bodyText)
         {
             PresentBoxList present = new PresentBoxList();
             present.BonusLimitMsg = "";
@@ -25,7 +25,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
                 present.BonusYmoney = 10;
             }
             present.DistItemCnt = itemCnt;
-            present.DistItemId = itemId;
+            present.DistItemId = rewardId;
             present.Seq = (long)(Random.Shared.NextDouble() * 1_000_000_000_000L);
 
             present.CanReceiveAll = all_recieve ? 1 : 0;

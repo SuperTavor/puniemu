@@ -102,8 +102,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.Conflate.Logic
                 _ => false
             };
         }
-        private static void ApplyFusionObject(RewardType rewardType, long fusionObjId, TableParser<YwpUserYoukai> userYokai, TableParser<YwpUserYoukaiSkill> userSkill, TableParser<YwpUserItem> userItem) 
-        {
+        private static void ApplyFusionObject(RewardType rewardType, long fusionObjId, TableParser<YwpUserYoukai> userYokai, TableParser<YwpUserYoukaiSkill> userSkill, TableParser<YwpUserItem> userItem)
+        { 
             switch(rewardType)
             {
                 case RewardType.Yokai:

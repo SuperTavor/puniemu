@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Puniemu.Src.Server.GameServer.DataClasses;
 
 namespace Puniemu.Src.Server.GameServer.Requests.LoginStamp.DataClasses
 {
@@ -6,10 +7,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.LoginStamp.DataClasses
     {
         // item id
         [JsonProperty("rewardItemId")]
-        public long RewardItemId = 0L;
+        public int RewardItemId = 0;
         // type of the item
         [JsonProperty("rewardItemType")]
-        public int RewardItemType = 0;
+        public RewardType RewardItemType = 0;
         // stamp id
         [JsonProperty("stampId")]
         public int StampId = 0;

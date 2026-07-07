@@ -282,7 +282,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
             res.StageType = MasterStageData.StageItems[stageInfoIdx].StageType; //maybe, not sure
             res.BattleType = deserialized.BattleType; //maybe, not sure
             //Console.WriteLine(deserialized.StageId);
-
             // save userdata and send response
             res.RequestID = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
             var dictionary = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_dictionary");

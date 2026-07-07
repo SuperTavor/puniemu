@@ -23,5 +23,4 @@ public enum MissionType {
     BuySpecificItemAtShop = 60201, //done
     BefriendSpecificYokai = 40101, //done
     UseSpecificItemInBattle = 30001, //done
-
 }
