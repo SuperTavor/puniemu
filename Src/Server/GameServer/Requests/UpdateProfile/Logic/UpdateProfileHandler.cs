@@ -24,16 +24,26 @@ namespace Puniemu.Src.Server.GameServer.Requests.UpdateProfile.Logic
             YwpUserData userData = (await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data"))!;
 
             // Unlocked Icons and Ttiles
-            var userPlayerIcon = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_player_icon");
+            var userPlayerIcon = new TableParser.Logic.TableParser(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_player_icon"));
             var userPlayerTitle = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_player_title");
             var userPlayerPlate = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_player_plate");
             var userPlayerEffect = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_player_effect");
             var userPlayerCodename = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_player_codename");
 
+
             // Change current Icons/Titles ID by the Icons/Titles ID inside the requests data
             if (deserialized.IconID > 0)
             {
-                userData!.IconID=deserialized.IconID;
+                if (userPlayerIcon.Table.Contains([deserialized.IconID.ToString()]))
+                {
+                    userData!.IconID = deserialized.IconID;
+                }
+                else
+                {
+                    var err = JsonConvert.SerializeObject(new MsgBoxResponse("Error", "Error"));
+                    await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(err));
+                    return;
+                }
             }
             if (deserialized.TitleID > 0)
             {
@@ -52,7 +62,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.UpdateProfile.Logic
                 userData!.PlateID = deserialized.PlateID;
             }
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_data", userData);
-            var updateProfileResponse = new UpdateProfileResponse(userPlayerIcon!, userPlayerTitle!, userPlayerPlate!, userPlayerEffect!, userPlayerCodename!,  userData!);
+            var updateProfileResponse = new UpdateProfileResponse(userPlayerIcon.ToString()!, userPlayerTitle!, userPlayerPlate!, userPlayerEffect!, userPlayerCodename!,  userData!);
             var marshalledResponse = JsonConvert.SerializeObject(updateProfileResponse);
             var encryptedResponse = NHNCrypt.Logic.NHNCrypt.EncryptResponse(marshalledResponse);
             await ctx.Response.WriteAsync(encryptedResponse);
