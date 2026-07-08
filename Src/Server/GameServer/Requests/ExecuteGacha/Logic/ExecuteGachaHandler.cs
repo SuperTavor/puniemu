@@ -40,12 +40,15 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             var userBonus = new TableParser<YwpUserYoukaiBonusEffect>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserId, "ywp_user_youkai_bonus_effect"));
             var dictionaryListTable = new TableParser.Logic.TableParser(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_dictionary")!);
             var userYokaiTable = new TableParser<YwpUserYoukai>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_youkai")!);
-
             var userSkillTable = new TableParser<YwpUserYoukaiSkill>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_youkai_skill")!);
             //var bonusMap = new TableParser.Logic.TableParser(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_youkai_bonus_effect")!);
             //var strongMap = new TableParser.Logic.TableParser(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Level5UserId!, "ywp_user_youkai_strong_skill")!);
 
-          
+            var mstYokai = new TableParser<YwpMstYoukai>(
+                JsonConvert.DeserializeObject<Dictionary<string, string>>(
+                    DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai"]!
+                    )!["tableData"]
+            );
             var tutorialList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<TutorialList>(deserialized.Level5UserId, "ywp_user_tutorial_list");
             bool tutorial_changed = false;
             if (tutorialList.GetStatus(2, 2) == 0)
@@ -141,17 +144,26 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             var prizes = new List<GachaPrize>();
             //const int DUPLICATE_REWARD_ITEM_ID = 20506; // exemple d'item donné en cas de doublon
 
-
             if (deserialized.RequestYoukaiId == 0)
             {
-               for(int i = 0; i < pullCount; i++)
-               {
-                    prizes.Add(await GachaPoolManager.CrankReward(gachaId, userYokaiTable, userSkillTable, dictionaryListTable, userItemtable, userBonus,deserialized.Level5UserId));
-               }
+                for (int i = 0; i < pullCount; i++)
+                {
+                    prizes.Add(await GachaPoolManager.CrankReward(gachaId, userYokaiTable, userSkillTable, dictionaryListTable, userItemtable, userBonus, deserialized.Level5UserId));
+                }
             }
-            else if(deserialized.RequestYoukaiId != 0 && GachaYoukaiChoiceManager.IsChoiceOk(gachaId, deserialized.RequestYoukaiId))
+            
+            else if (deserialized.RequestYoukaiId != 0 && GachaYoukaiChoiceManager.IsChoiceOk(gachaId, deserialized.RequestYoukaiId))
             {
-                prizes.Add(await GachaPoolManager.RegisterYokaiAndGetPrize(deserialized.RequestYoukaiId, CapsuleColor.Gray, 0, 
+                //Check yokai rarity type
+                var ykIdx = mstYokai.Items.FindIndex(x => x.YoukaiId == deserialized.RequestYoukaiId);
+                if(ykIdx == -1)
+                {
+                    var errSession = new MsgBoxResponse("Error occured", "Error");
+                    await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(errSession)));
+                    return;
+                }
+                var rarity = mstYokai.Items[ykIdx].YoukaiRarity;
+                prizes.Add(await GachaPoolManager.RegisterYokaiAndGetPrize(deserialized.RequestYoukaiId, CapsuleColor.Red, rarity, 
                     userYokaiTable, userSkillTable, dictionaryListTable, userItemtable, gachaId, userBonus, deserialized.Level5UserId));
                 pullCount = 1;
             }
