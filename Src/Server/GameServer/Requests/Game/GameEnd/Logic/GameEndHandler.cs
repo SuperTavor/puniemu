@@ -169,7 +169,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 }
                 conditionCount++;
             }
-
+            
             StageManager.EditStage(ywpUserStage, deserialized.StageId, 1, deserialized.Score, res.UserGameResultData.StarGetFlg1, res.UserGameResultData.StarGetFlg2, res.UserGameResultData.StarGetFlg3, ywpUserStage.Items[stageIndex].NumClear + 1);
 
             bool mapLocked = false;
@@ -316,6 +316,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                         }
                     }
                 }
+                //placeholder
+                i.DropItemFlg = 0;
                 // add dropped item id
                 if (i.DropItemFlg != 0)
                 {
@@ -410,9 +412,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 await GeneralUtils.SendBadRequest(ctx);
                 return;
             }
-
-
-            int newStarsCnt = 0;
+            
             var youkaiDiff = new TableParser<YwpUserYoukai>("");
             var youkaiSkillDiff = new TableParser<YwpUserYoukaiSkill>("");
             var dictionaryDiff = new TableParser<YwpUserDictionary>("");
@@ -480,6 +480,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 HandleTutorial(deserialized, res, tutorialList, LevelData, FirstClear);
                 HandleMenuFunc(deserialized, res, LevelData, menufuncListTable, FirstClear);
             }
+
+            var userStageIdx = ywpUserStage.Items.FindIndex(x => x.StageId == deserialized.StageId);
+            var newStars = (res.UserGameResultData.StarGetFlg1 + res.UserGameResultData.StarGetFlg2 + res.UserGameResultData.StarGetFlg3) - (ywpUserStage.Items[userStageIdx].Star1 + ywpUserStage.Items[userStageIdx].Star2 + ywpUserStage.Items[userStageIdx].Star3);
             // yokai user list
             await HandleUserYoukai(deserialized, res, userYoukaiTable, youkaiDiff, deserialized.Gdkey);
 
@@ -526,7 +529,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 totalSoult += kai.SkillUseNum;
             }
             var userMission = await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.CollectTotalScore, deserialized.Score, null, true);
-            await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.CollectTotalStars, newStarsCnt, userMission, true);
+            await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.CollectTotalStars, newStars, userMission, true);
             await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.DoTotalSoults, totalSoult, userMission, true);
             await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.CreateTotalBonusBalls, deserialized.BonusBlockNum, userMission, true);
             await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.EnterFeverTimeTotalTimes, deserialized.FeverTimeNum, userMission, true);
@@ -537,7 +540,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
             var encryptedRes = NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(resdict));
             ctx.Response.Headers.ContentType = "application/json";
             await ctx.Response.WriteAsync(encryptedRes);
-            GenerateFriendData.RefreshYwpUserFriendRank(deserialized.Gdkey!, newStarsCnt, 0);
+            GenerateFriendData.RefreshYwpUserFriendRank(deserialized.Gdkey!, newStars, 0);
         }
     }
 }
