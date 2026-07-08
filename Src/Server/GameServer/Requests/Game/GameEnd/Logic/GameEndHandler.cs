@@ -526,7 +526,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 totalSoult += kai.SkillUseNum;
             }
             var userMission = await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.CollectTotalScore, deserialized.Score, null, true);
-            await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.CollectTotalStars, res.UserGameResultData.StarGetFlg1 + res.UserGameResultData.StarGetFlg2 + res.UserGameResultData.StarGetFlg3, userMission, true);
+            await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.CollectTotalStars, newStarsCnt, userMission, true);
             await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.DoTotalSoults, totalSoult, userMission, true);
             await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.CreateTotalBonusBalls, deserialized.BonusBlockNum, userMission, true);
             await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.EnterFeverTimeTotalTimes, deserialized.FeverTimeNum, userMission, true);
