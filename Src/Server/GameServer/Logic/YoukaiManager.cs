@@ -95,12 +95,12 @@ namespace Puniemu.Src.Server.GameServer.Logic
 
         public static void DeleteYoukai(TableParser<YwpUserYoukai> userYokai, TableParser<YwpUserYoukaiSkill> userSkill, long youkaiId)
         {
-            var yokaiIdx = userYokai.FindIndex([youkaiId.ToString()]);
+            var yokaiIdx = userYokai.Items.FindIndex(x=>x.YoukaiId == youkaiId);
             if (yokaiIdx == -1) throw new NotImplementedException("Yokai not found in user");
-            var skillIdx = userSkill.FindIndex([youkaiId.ToString()]);
+            var skillIdx = userSkill.Items.FindIndex(x => x.YoukaiId == youkaiId);
             if (skillIdx == -1) throw new NotImplementedException("Skill not found in user");
-            userYokai.Items.Remove(userYokai.Items[yokaiIdx]);
-            userSkill.Items.Remove(userSkill.Items[skillIdx]);
+            userYokai.Items.RemoveAt(yokaiIdx);
+            userSkill.Items.RemoveAt(skillIdx);
         }
         public static async Task AddYoukai(TableParser<YwpUserYoukai> userYokai, long YoukaiId, TableParser<YwpUserYoukaiSkill> userSkill, TableParser<YwpUserYoukaiBonusEffect> userBonus, 
             string gdkey, TableParser<YwpUserMission> userMission = null, bool manualMissionSave = false)
