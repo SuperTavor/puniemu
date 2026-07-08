@@ -73,6 +73,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
             Console.WriteLine(deserialized.StageId);
             // send bad requests if bad requests send
             var userData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized!.Gdkey!, "ywp_user_data");
+            var UserStage = new TableParser.Logic.TableParser<YwpUserStage>((await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_stage"))!);
             
             if (deserialized == null || userData == null)
             {
@@ -148,18 +149,17 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
             }
 
             // Determine if it's was first clear 
-            var UserStage = new TableParser.Logic.TableParser((await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_stage"))!);
             var stageIdx = UserStage.FindIndex([deserialized.StageId.ToString()]);
             if (stageIdx == -1)
             {
-                UserStage.AddRow([deserialized.StageId.ToString(), "0", "0", "0", "0", "0", "0", "0"]);
+                UserStage.AddItem(new YwpUserStage());
                 await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_stage", UserStage.ToString());
                 res.IsFirstClear = 1;
             }
             else
             {
                 //user_stage status is true if completed, firstClear is the other way around
-                if (int.Parse(UserStage.Table[stageIdx][1]) == 0)
+                if (UserStage.Items[stageIdx].StageStatus == 0)
                 {
                     res.IsFirstClear = 1;
                 }
@@ -213,7 +213,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
                         isMaxSkill = YwpUserYoukaiSkillTab.Items[skillIdx].Level >= 7;
                     }
                     var mstYokaiItem = mstYokai.Items.Where(x => x.YoukaiId == yokaiId).FirstOrDefault();
-                    var notHaveYokai = YwpUserYoukaiTab.FindIndex([enemyId.ToString()]) == -1;
+                    var t = YwpUserYoukaiTab.Items.FindIndex(x => x.YoukaiId == yokaiId);
+                    var notHaveYokai = t == -1;
 
                     var autobefriend = i.DefaultBefriends == 1 && notHaveYokai;
                     if(autobefriend)
@@ -221,6 +222,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
                         var yokaiRank = mstYokaiItem.YoukaiRarity;
                         var befrienders = DeckManager.GetBefrienderSpots(UserDeck, mstYokaiItem, YwpUserYoukaiSkillTab);
                         item.LotYoukaiInfoList = LotYoukaiManager.GenerateLotYoukai(befrienders, yokaiRank, isSuperShrine, true);
+    
                     }
                     else if (!(mstYokaiItem == null) && mstYokaiItem.YoukaiRarity != RarityType.RarityNone && !isBoss && isAfterJibanyan && !isMaxSkill)
                     {
@@ -255,10 +257,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
 
             var currentDeck = UserDeck.Items[0];
             AddToUserYoukaiList(currentDeck.MiddleYoukaiId);
-            AddToUserYoukaiList(currentDeck.FarLeftYoukaiId);
+            AddToUserYoukaiList(currentDeck.MiddleLeftYoukaiId);
 
-            AddToUserYoukaiList(currentDeck.LeftYoukaiId);
-            AddToUserYoukaiList(currentDeck.RightYoukaiId);
+            AddToUserYoukaiList(currentDeck.MiddleRightYoukaiId);
+            AddToUserYoukaiList(currentDeck.FarLeft);
             AddToUserYoukaiList(currentDeck.FarRightYoukaiId);
 
 

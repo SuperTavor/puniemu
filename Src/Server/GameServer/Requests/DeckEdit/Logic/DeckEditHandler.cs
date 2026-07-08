@@ -64,9 +64,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.DeckEdit.Logic
                 return;
             }
             UserDeck.Items[0].MiddleYoukaiId = deserialized!.YoukaiIdList![0]["youkaiId"];
-            UserDeck.Items[0].FarLeftYoukaiId = deserialized!.YoukaiIdList![1]["youkaiId"];
-            UserDeck.Items[0].LeftYoukaiId = deserialized!.YoukaiIdList![2]["youkaiId"];
-            UserDeck.Items[0].RightYoukaiId = deserialized!.YoukaiIdList![3]["youkaiId"];
+            UserDeck.Items[0].MiddleLeftYoukaiId = deserialized!.YoukaiIdList![1]["youkaiId"];
+            UserDeck.Items[0].MiddleRightYoukaiId = deserialized!.YoukaiIdList![2]["youkaiId"];
+            UserDeck.Items[0].FarLeft = deserialized!.YoukaiIdList![3]["youkaiId"];
             UserDeck.Items[0].FarRightYoukaiId = deserialized!.YoukaiIdList![4]["youkaiId"];
 
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_youkai_deck", UserDeck.ToString());

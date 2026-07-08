@@ -312,7 +312,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                             DictionaryManager.EditDictionary(ref dictionaryDiff, YoukaiId, true, true);
                             res.UserGameResultData.RewardYoukaiId = YoukaiId;
                             await YoukaiManager.AddYoukai(userYoukaiTable, YoukaiId, userYoukaiSkillTable, userBonus, deserialized.Gdkey);
-                            await YoukaiManager.AddYoukai(youkaiDiff, YoukaiId, youkaiSkillDiff, userBonus, deserialized.Gdkey);
+                            //await YoukaiManager.AddYoukai(youkaiDiff, YoukaiId, youkaiSkillDiff, userBonus, deserialized.Gdkey);
                         }
                     }
                 }

@@ -177,29 +177,11 @@ namespace Puniemu.Src.Server.GameServer.Logic
         }
         public static int GetYoukaiSkillIndex(TableParser<YwpUserYoukaiSkill> parser, long YoukaiId)
         {
-            uint count = 0;
-            foreach (YwpUserYoukaiSkill i in parser.Items)
-            {
-                if (i.YoukaiId == YoukaiId)
-                {
-                    return (int)count;
-                }
-                count += 1;
-            }
-            return -1;
+            return parser.Items.FindIndex(x => x.YoukaiId == YoukaiId);
         }
         public static int GetYoukaiIndex(TableParser<YwpUserYoukai> parser, long YoukaiId)
         {
-            uint count = 0;
-            foreach (YwpUserYoukai i in parser.Items)
-            {
-                if (i.YoukaiId == YoukaiId)
-                {
-                    return (int)count;
-                }
-                count += 1;
-            }
-            return -1;
+            return parser.Items.FindIndex(x => x.YoukaiId == YoukaiId);
         }
     }
 }
