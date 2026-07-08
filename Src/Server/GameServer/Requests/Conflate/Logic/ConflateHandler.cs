@@ -11,7 +11,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Conflate.Logic
 {
     public class ConflateHandler
     {
-        private static TableParser<YwpMstConflate> _mstConflate = new TableParser<YwpMstConflate>((string)JsonConvert.DeserializeObject<Dictionary<string, object>>(gm.GamedataCache["ywp_mst_conflate"])["tableData"]);
+        private static TableParser<YwpMstConflate> _mstConflate = new TableParser<YwpMstConflate>((string)JsonConvert.DeserializeObject<Dictionary<string, object>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_conflate"])["tableData"]);
         public static async Task HandleAsync(HttpContext ctx)
         {
             ctx.Request.EnableBuffering();
