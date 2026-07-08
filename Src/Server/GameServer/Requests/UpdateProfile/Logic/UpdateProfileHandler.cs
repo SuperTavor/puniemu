@@ -34,7 +34,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.UpdateProfile.Logic
             // Change current Icons/Titles ID by the Icons/Titles ID inside the requests data
             if (deserialized.IconID > 0)
             {
-                if (userPlayerIcon.Table.Contains([deserialized.IconID.ToString()]))
+                var arr = new string[1] { deserialized.IconID.ToString() };
+                if (userPlayerIcon.FindIndex(arr) != -1)
                 {
                     userData!.IconID = deserialized.IconID;
                 }
