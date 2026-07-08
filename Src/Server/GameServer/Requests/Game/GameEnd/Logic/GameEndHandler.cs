@@ -345,6 +345,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                     {
                         userData.Hitodama += entry.ItemCount;
                     }
+                    else if(entry.ItemType == 3)
+                    {
+                        userData.YMoney += entry.ItemCount;
+                    }
                     else if (entry.ItemType == 12)
                     {
                         var idx = playerIconTable.FindIndex([entry.ItemId.ToString()]);
