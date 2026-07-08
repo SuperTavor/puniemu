@@ -18,6 +18,9 @@ namespace Puniemu.Src.DataManager.Logic
 
         public static string? GameVersion { get; private set; }
 
+        public static string EmailForAuthMessages { get; private set; }
+
+        public static string AppPasswordForAuthMessages { get; private set; }
         //Can be displayed in text boxes
         public static string? ServerName { get; private set; }
 
@@ -31,6 +34,8 @@ namespace Puniemu.Src.DataManager.Logic
             SupabaseURL = config["SupabaseURL"];
             GameVersion = config["GameVersion"];
             ServerName = config["ServerName"];
+            EmailForAuthMessages = config["EmailForAuthMessages"];
+            AppPasswordForAuthMessages = config["AppPasswordForAuthMessages"];
             if (bool.TryParse(config["IsWibWob"], out bool isWib))
             {
                 IsWibWob = isWib;

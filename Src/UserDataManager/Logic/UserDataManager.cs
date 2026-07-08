@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using Puniemu.Src.Server.GameServer.DataClasses;
 using Puniemu.Src.UserDataManager.DataClasses;
 using Supabase;
+using Supabase.Gotrue;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.ComponentModel;
@@ -285,6 +286,62 @@ namespace Puniemu.Src.UserDataManager.Logic
             return account?.Gdkey ?? string.Empty;
         }
 
+        public static async Task TransferGdkeys(string udkeyFrom, string udkeyTo)
+        {
+            var fromResponse = await SupabaseClient!
+                .From<Device>()
+                .Where(d => d.UdKey == udkeyFrom)
+                .Get();
+
+            var toResponse = await SupabaseClient!
+                .From<Device>()
+                .Where(d => d.UdKey == udkeyTo)
+                .Get();
+
+            var fromDevice = fromResponse.Models.FirstOrDefault();
+            var toDevice = toResponse.Models.FirstOrDefault();
+
+            if (fromDevice == null)
+                throw new Exception($"Device {udkeyFrom} not found");
+
+            if (toDevice == null)
+                throw new Exception($"Device {udkeyTo} not found");
+
+            toDevice.Gdkeys = new List<string>();
+
+            foreach (var gdkey in fromDevice.Gdkeys)
+            {
+                if (!toDevice.Gdkeys.Contains(gdkey))
+                    toDevice.Gdkeys.Add(gdkey);
+            }
+
+            fromDevice.Gdkeys.Clear();
+
+            await SupabaseClient
+                .From<Device>()
+                .Update(toDevice);
+
+            await SupabaseClient
+                .From<Device>()
+                .Update(fromDevice);
+        }
+        public static async Task<Mail> GetDataByMail(string email)
+        {
+            var response = await SupabaseClient!.From<Mail>().Where(a => a.MailAddress == email).Get();
+            return response.Models.FirstOrDefault();
+        }
+        public static async Task AddOrEditEmail(string email, string udkey)
+        {
+            var mail = new Mail
+            {
+                MailAddress = email,
+                CurrentUdkey = udkey
+            };
+
+            await SupabaseClient!
+                .From<Mail>()
+                .Upsert(mail);
+        }
         public static async Task<string> GetGdkeyFromUserId(string userId)
         {
             var response = await SupabaseClient!.From<Account>().Where(a => a.UserId == userId).Get();
@@ -301,9 +358,28 @@ namespace Puniemu.Src.UserDataManager.Logic
         // Gets all corresponding GDKeys from under a specified UDKey.
         public static async Task<List<string>> GetGdkeysFromUdkeyAsync(string udkey)
         {
-            var response = await SupabaseClient!.From<Device>().Where(d => d.UdKey == udkey).Get();
+            var response = await SupabaseClient!
+                .From<Device>()
+                .Where(d => d.UdKey == udkey)
+                .Get();
+
             var device = response.Models.FirstOrDefault();
-            return device?.Gdkeys!;
+
+            if (device?.Gdkeys != null)
+            {
+                foreach (var gdkey in device.Gdkeys)
+                {
+                    var account = await GetAccountFromGdkeyAsync(gdkey);
+
+                    if (string.IsNullOrEmpty(account.Udkey))
+                    {
+                        account.Udkey = udkey;
+                        account.IsDirty = true;
+                    }
+                }
+            }
+
+            return device?.Gdkeys ?? new List<string>();
         }
 
         // Add a gdkey association to a udkey

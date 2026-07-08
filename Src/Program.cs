@@ -60,6 +60,8 @@ using Puniemu.Src.Server.GameServer.Requests.Watch.UpdateWatchReadFlg.Logic;
 using Puniemu.Src.Server.GameServer.Requests.Conflate.Logic;
 using Puniemu.Src.Server.GameServer.Requests.UseAddition.Logic;
 using Puniemu.Src.Server.GameServer.Requests.MissionReward.Logic;
+using Puniemu.Src.Server.CustomAuth.Requests.Link.Logic;
+using Puniemu.Src.Server.GameServer.Requests.SerialConfirm.Logic;
 namespace Puniemu.Src;
 class Program
 {
@@ -116,6 +118,7 @@ class Program
             await next();
         });
         //Assign handlers
+        AssignCustomAuthHandlers(app);
         AssignDataDownloadHandler(app);
         AssignL5IDHandlers(app);
         AssignGameServerHandlers(app);
@@ -184,8 +187,47 @@ class Program
         });
     }
 
+    static void AssignCustomAuthHandlers(WebApplication app)
+    {
+        app.MapPost("/auth/link", async ctx =>
+        {
+            await InitAccountActionHandler.HandleAsync(ctx, true);
+        });
+        app.MapPost("/auth/restore", async ctx =>
+        {
+            await InitAccountActionHandler.HandleAsync(ctx, false);
+        });
+    }
+
+
     static void AssignGameServerHandlers(WebApplication app)
     {
+        //Used as a bootstrap for custom auth
+        app.MapGet("/help/inquiry/top.nhn", async ctx =>
+        {
+            var html = await File.ReadAllTextAsync(
+                Path.Combine(app.Environment.ContentRootPath, "dataDownload/help.html"));
+
+            var userId = ctx.Request.Query["userId"].ToString();
+            var appVer = ctx.Request.Query["appVer"].ToString();
+            var sdkVer = ctx.Request.Query["sdkVer"].ToString();
+
+            var inject = $$"""
+        <script>
+        window.__PARAMS__ = {
+            userId: {{System.Text.Json.JsonSerializer.Serialize(userId)}},
+            appVer: {{System.Text.Json.JsonSerializer.Serialize(appVer)}},
+            sdkVer: {{System.Text.Json.JsonSerializer.Serialize(sdkVer)}}
+        };
+        </script>
+        """;
+
+            html = inject + html;
+
+            ctx.Response.ContentType = "text/html; charset=utf-8";
+            await ctx.Response.WriteAsync(html);
+        });
+
         app.MapPost("/init.nhn", async ctx =>
         {
             await InitHandler.HandleAsync(ctx);
@@ -200,7 +242,7 @@ class Program
         });
         app.MapPost("/serialConfirm.nhn", async ctx =>
         {
-            await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(new Src.Server.GameServer.DataClasses.MsgBoxResponse("Coming soon", "Discord integration"))));
+            await SerialConfirmHandler.HandleAsync(ctx);
         });
         app.MapPost("/getMaster.nhn", async ctx =>
         {

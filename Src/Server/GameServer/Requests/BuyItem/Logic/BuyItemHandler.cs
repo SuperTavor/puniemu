@@ -115,7 +115,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.BuyItem.Logic
                 userItems.Items[itemIdx].Count += deserialized.GoodsCount;
             }
 
-            var userMission = await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.TotalPurchaseShop, 1, null, true);
+            var userMission = await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.TotalPurchaseShop, deserialized.GoodsCount, null, true);
             await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.BuySpecificItemAtShop, deserialized.GoodsId, userMission, true);
             await MissionManager.SaveUserMission(deserialized.Gdkey, userMission);
             res.YwpUserItem = userItems.ToString();

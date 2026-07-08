@@ -14,6 +14,9 @@ namespace Puniemu.Src.UserDataManager.DataClasses
         [Column("character_id")]
         public string? CharacterId { get; set; }
 
+        [Column("udkey")]
+        public string Udkey { get; set; }
+
         [Column("user_id")]
         public string? UserId { get; set; }
 

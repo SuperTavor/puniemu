@@ -25,6 +25,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.MissionReward.Logic
             var userYokai = new TableParser<YwpUserYoukai>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_youkai"));
             var userSkill = new TableParser<YwpUserYoukaiSkill>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_youkai_skill"));
             var userBonus = new TableParser<YwpUserYoukaiBonusEffect>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_youkai_bonus_effect"));
+            var userDict = new TableParser.Logic.TableParser(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_dictionary"));
             var userShop = new TableParser<YwpUserShopItemUnlock>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_shop_item_unlock"));
             var userIcon = new TableParser.Logic.TableParser(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_player_icon"));
             var userTitle = new TableParser.Logic.TableParser(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_player_title"));
@@ -97,6 +98,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.MissionReward.Logic
             {
                 res.Youkai = new YokaiWonPopup(mstMissionItem.RewardID, userYokai, userSkill);
                 await YoukaiManager.AddYoukai(userYokai, mstMissionItem.RewardID, userSkill, userBonus, deserialized.Level5UserID, userMission, true);
+                DictionaryManager.EditDictionary(userDict, mstMissionItem.RewardID, true, true);
             }
             else if(mstMissionItem.RewardType == RewardType.AddItemToShop)
             {
