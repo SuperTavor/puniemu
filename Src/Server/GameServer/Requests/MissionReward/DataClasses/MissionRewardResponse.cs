@@ -36,6 +36,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.MissionReward.DataClasses
         [JsonProperty("ywp_user_youkai")]
         public string UserYoukai { get; set; }
 
+        [JsonProperty("ywp_user_dictionary")]
+        public string UserDict { get; set; }
+
         [JsonProperty("ywp_user_youkai_skill")]
         public string UserSkill { get; set; }
 
