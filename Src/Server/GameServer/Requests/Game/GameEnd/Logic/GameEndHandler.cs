@@ -289,6 +289,11 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
             foreach (EnemyYoukaiResultList i in deserialized!.EnemyYoukaiResultList!)
             {
                 var MstEnemyParamIndex = MstEnemyParam.FindIndex([i.EnemyId.ToString()]);
+                var paramId = long.Parse(MstEnemyParam.Table[0][0]);
+                if(LevelData.Enemy.FindIndex(x => x.EnemyId == paramId) == -1)
+                {
+                    throw new InvalidOperationException();
+                }
                 long YoukaiId = 0L;
                 if (MstEnemyParamIndex != -1)
                     YoukaiId = long.Parse(MstEnemyParam.Table[MstEnemyParamIndex][1]);
@@ -462,7 +467,16 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
             {
                 int FirstClear = 0;
                 HandleStage(deserialized, res, ref FirstClear, ywpUserStage, ywpUserMap, LevelData);
-                await HandleDrop(deserialized, res, dictionaryYoukaiTable, dictionaryDiff, userYoukaiTable, youkaiDiff, userYoukaiSkillTable,  youkaiSkillDiff, userItemTable, playerIconTable, userData, LevelData, FirstClear, userBonus);
+                try
+                {
+                    await HandleDrop(deserialized, res, dictionaryYoukaiTable, dictionaryDiff, userYoukaiTable, youkaiDiff, userYoukaiSkillTable, youkaiSkillDiff, userItemTable, playerIconTable, userData, LevelData, FirstClear, userBonus);
+                }
+                catch(InvalidOperationException)
+                {
+                    var err = JsonConvert.SerializeObject(new MsgBoxResponse("Yokai not on stage", "Error"));
+                    await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(err));
+                    return;
+                }
                 HandleTutorial(deserialized, res, tutorialList, LevelData, FirstClear);
                 HandleMenuFunc(deserialized, res, LevelData, menufuncListTable, FirstClear);
             }

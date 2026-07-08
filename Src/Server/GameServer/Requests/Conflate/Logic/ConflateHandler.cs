@@ -11,7 +11,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Conflate.Logic
 {
     public class ConflateHandler
     {
-
+        private static TableParser<YwpMstConflate> _mstConflate = new TableParser<YwpMstConflate>((string)JsonConvert.DeserializeObject<Dictionary<string, object>>(gm.GamedataCache["ywp_mst_conflate"])["tableData"]);
         public static async Task HandleAsync(HttpContext ctx)
         {
             ctx.Request.EnableBuffering();
@@ -22,8 +22,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.Conflate.Logic
             var deserialized = JsonConvert.DeserializeObject<ConflateRequest>(requestJsonString!);
             var res = new ConflateResponse();
             var gm = DataManager.Logic.DataManager.GameDataManager;
-            var mstConflateRaw = (string)JsonConvert.DeserializeObject<Dictionary<string, object>>(gm.GamedataCache["ywp_mst_conflate"])["tableData"];
-            var mstConflate = new TableParser<YwpMstConflate>(mstConflateRaw);
             var userYokai = new TableParser<YwpUserYoukai>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_youkai"));
             var userSkill = new TableParser<YwpUserYoukaiSkill>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_youkai_skill"));
             var userItem = new TableParser<YwpUserItem>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_item"));
@@ -32,7 +30,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Conflate.Logic
             res.YwpUserData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data");
 
             //Find how the fusion looks
-            var mstConflateItem = mstConflate.Items.FirstOrDefault(x => x.ConflateID == deserialized.ConflateID);
+            var mstConflateItem = _mstConflate.Items.FirstOrDefault(x => x.ConflateID == deserialized.ConflateID);
             if (mstConflateItem == null)
             {
                 await ctx.Response.WriteAsync(JsonConvert.SerializeObject(new MsgBoxResponse("Invalid conflate", "Err")));
