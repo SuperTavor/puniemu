@@ -289,7 +289,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
             foreach (EnemyYoukaiResultList i in deserialized!.EnemyYoukaiResultList!)
             {
                 var MstEnemyParamIndex = MstEnemyParam.FindIndex([i.EnemyId.ToString()]);
-                var paramId = long.Parse(MstEnemyParam.Table[0][0]);
+                var paramId = long.Parse(MstEnemyParam.Table[MstEnemyParamIndex][0]);
                 if(LevelData.Enemy.FindIndex(x => x.EnemyId == paramId) == -1)
                 {
                     throw new InvalidOperationException();
