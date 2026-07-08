@@ -12,6 +12,18 @@ namespace Puniemu.Src.Server.GameServer.Requests.DeckEdit.Logic
 {
     public static class DeckEditHandler
     {
+        private static bool IsTeamOk(TableParser<YwpUserYoukai> userYokai, List<Dictionary<string,int>> yokaiIdList)
+        {
+            foreach(var item in yokaiIdList)
+            {
+                var id = item["youkaiId"];
+                if(userYokai.Items.FindIndex(x => x.YoukaiId == id) == -1)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
         public static async Task HandleAsync(HttpContext ctx)
         {
             ctx.Request.EnableBuffering();
@@ -35,7 +47,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.DeckEdit.Logic
 
             // Get Watch Id
             var userData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized!.Gdkey!, "ywp_user_data");
-
+            var userYokai = new TableParser<YwpUserYoukai>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_youkai"));
             //Construct response
             var res = new DeckEditResponse();
             var resdict = await res.ToDictionary();
@@ -43,6 +55,14 @@ namespace Puniemu.Src.Server.GameServer.Requests.DeckEdit.Logic
             // Get and edit deck data
             var UserDeck = new TableParser<YwpUserDeck>((await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai_deck"))!);
 
+
+            //Validate that teh user has all the yokai provided before setting team
+            if(!IsTeamOk(userYokai, deserialized.YoukaiIdList))
+            {
+                var err = JsonConvert.SerializeObject(new MsgBoxResponse("You dont have this yokai", "Error"));
+                await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(err));
+                return;
+            }
             UserDeck.Items[0].MiddleYoukaiId = deserialized!.YoukaiIdList![0]["youkaiId"];
             UserDeck.Items[0].FarLeftYoukaiId = deserialized!.YoukaiIdList![1]["youkaiId"];
             UserDeck.Items[0].LeftYoukaiId = deserialized!.YoukaiIdList![2]["youkaiId"];
