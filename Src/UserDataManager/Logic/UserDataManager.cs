@@ -315,7 +315,7 @@ namespace Puniemu.Src.UserDataManager.Logic
                     toDevice.Gdkeys.Add(gdkey);
             }
 
-            fromDevice.Gdkeys.Clear();
+            fromDevice.Gdkeys = new List<string>();
 
             await SupabaseClient
                 .From<Device>()
