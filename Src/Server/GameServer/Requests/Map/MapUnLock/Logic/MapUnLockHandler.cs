@@ -31,7 +31,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapUnLock.Logic
             var service = await MapUnLockService.BuildAsync(deserialized);
             try
             {
-                service.Unlock();
+                await service.Unlock();
             }
             catch(MapUnlockException ex)
             {

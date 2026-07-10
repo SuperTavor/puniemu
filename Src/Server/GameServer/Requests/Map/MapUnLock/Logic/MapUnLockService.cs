@@ -89,7 +89,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Map.MapUnLock.Logic
 
             return response;
         }
-        public void Unlock()
+        public async Task Unlock()
         {
             switch (_unlockType)
             {
@@ -105,7 +105,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Map.MapUnLock.Logic
             }
 
           
-            GenerateFriendData.RefreshYwpUserFriend(_gdkey, -1, -1, _userData!.PlayerName, -1, "");
+            await GenerateFriendData.RefreshYwpUserFriend(_gdkey, -1, -1, _userData!.PlayerName, -1, "");
             
             _userStage.Items[_userStageIndex].StageStatus = 0;
             _userMap.Items[_userMapIndex].IsUnlocked = 1;

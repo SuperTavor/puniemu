@@ -57,7 +57,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
                 return $"+{days} days";
             }
         }
-        public static async void RefreshYwpUserFriend(string gdkey, int TitleId, int IconId, string PlayerName, long YoukaiId, string LastPlayDt)
+        public static async Task RefreshYwpUserFriend(string gdkey, int TitleId, int IconId, string PlayerName, long YoukaiId, string LastPlayDt)
         {
             // update friends list
             var me = (await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(gdkey, "ywp_user_data"))!;
@@ -85,7 +85,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
                 await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(targetGdkey, "ywp_user_friend", friendFriendList!);
             }
         }
-        public static async void RefreshYwpUserFriendRank(string gdkey, int addStars, int mode)
+        public static async Task RefreshYwpUserFriendRank(string gdkey, int addStars, int mode)
         {
             static void EditElement(FriendRankEntry element, int addStars, YwpUserData userData)
             {

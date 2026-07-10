@@ -28,7 +28,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Rename.Logic
             {
                 userData.PlayerName = deserialized.NewPlayerName;
             }
-            GenerateFriendData.RefreshYwpUserFriend(deserialized.Level5UserID, -1,-1, userData!.PlayerName, -1, "");
+            await GenerateFriendData.RefreshYwpUserFriend(deserialized.Level5UserID, -1,-1, userData!.PlayerName, -1, "");
             var renameResponse = new RenameResponse(userData!);
             var marshalledResponse = JsonConvert.SerializeObject(renameResponse);
             var encryptedResponse = NHNCrypt.Logic.NHNCrypt.EncryptResponse(marshalledResponse);

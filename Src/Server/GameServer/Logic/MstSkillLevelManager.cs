@@ -1,5 +1,6 @@
 ﻿using Puniemu.Src.Server.GameServer.DataClasses;
 using Puniemu.Src.TableParser.Logic;
+using System.Collections.Concurrent;
 
 namespace Puniemu.Src.Server.GameServer.Logic
 {
@@ -9,7 +10,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
 
         private static bool _isLoaded = false;
 
-        private static Dictionary<(long, int), YwpMstYoukaiSkillLevel> _cache = new ();
+        private static ConcurrentDictionary<(long, int), YwpMstYoukaiSkillLevel> _cache = new ();
 
         const float BEFRIENDER_SLT_PNT_DIVISOR = 187.5f;
         private static void EnsureLoaded()

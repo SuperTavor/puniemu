@@ -92,7 +92,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
             return _mstMission;
         }
 
-        public static async void TryUnlockNextMission(int missionId, TableParser<YwpUserMission> userMission, TableParser<YwpUserYoukai> userYokai)
+        public static async Task TryUnlockNextMission(int missionId, TableParser<YwpUserMission> userMission, TableParser<YwpUserYoukai> userYokai)
         {
             var currentMissionIdx = userMission.Items.FindIndex(x => x.MissionID == missionId);
             var currentMission = userMission.Items[currentMissionIdx];

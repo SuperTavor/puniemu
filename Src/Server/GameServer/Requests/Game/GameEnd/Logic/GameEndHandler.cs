@@ -540,7 +540,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
             var encryptedRes = NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(resdict));
             ctx.Response.Headers.ContentType = "application/json";
             await ctx.Response.WriteAsync(encryptedRes);
-            GenerateFriendData.RefreshYwpUserFriendRank(deserialized.Gdkey!, newStars, 0);
+            await GenerateFriendData.RefreshYwpUserFriendRank(deserialized.Gdkey!, newStars, 0);
         }
     }
 }

@@ -116,7 +116,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.MissionReward.Logic
             res.UserYoukai = userYokai.ToString();
             res.UserSkill = userSkill.ToString();
             res.UserBonus = userBonus.ToString();
-            MissionManager.TryUnlockNextMission(deserialized.MissionID, userMission, userYokai);
+            await MissionManager.TryUnlockNextMission(deserialized.MissionID, userMission, userYokai);
             MissionManager.SortUserMission(userMission, 0, false);
             res.UserMission = userMission.ToString();
             res.UserItem = userItem.ToString();

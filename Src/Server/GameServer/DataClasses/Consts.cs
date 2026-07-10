@@ -12,6 +12,7 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
             "ywp_user_conflate",
             "ywp_user_treasure_series",
             "ywp_user_youkai",
+            "ywp_mst_event_match",
             "ywp_user_stage_rank",
             "ywp_user_youkai_legend_release_history",
             "ywp_user_tutorial_list",

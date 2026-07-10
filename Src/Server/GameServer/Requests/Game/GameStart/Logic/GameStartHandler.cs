@@ -258,11 +258,77 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
             var currentDeck = UserDeck.Items[0];
             AddToUserYoukaiList(currentDeck.MiddleYoukaiId);
             AddToUserYoukaiList(currentDeck.MiddleLeftYoukaiId);
-
             AddToUserYoukaiList(currentDeck.MiddleRightYoukaiId);
             AddToUserYoukaiList(currentDeck.FarLeft);
             AddToUserYoukaiList(currentDeck.FarRightYoukaiId);
 
+            //Check tribe unity
+            int currentKindGroupSize = 0;
+            int currentKind = -1;
+            HashSet<(int kind, int size)> unities = new();
+            List<UserYoukaiItem> sortedList = [
+                    res.UserYoukaiList[3],
+                    res.UserYoukaiList[1],
+                    res.UserYoukaiList[0],
+                    res.UserYoukaiList[2],
+                    res.UserYoukaiList[4]
+            ];//needs to be sorted as left to right instead of center outward so it reflects the actual closeness of the tribes
+            foreach(var yokai in sortedList)
+            {
+                var mstItem = mstYokai.Items.FirstOrDefault(x => x.YoukaiId == yokai.YoukaiId);
+                if (mstItem == null) continue;
+                if(mstItem.YoukaiKind != currentKind)
+                {
+                    if(currentKindGroupSize >= 2)
+                    {
+                        unities.Add((currentKind, currentKindGroupSize));
+                    }
+                    currentKindGroupSize = 1;
+                    currentKind = mstItem.YoukaiKind; 
+                }
+                else
+                {
+                    currentKindGroupSize++;
+                }
+                
+            }
+            if (currentKindGroupSize >= 2)
+            {
+                unities.Add((currentKind, currentKindGroupSize));
+            }
+            //Apply tribe unity
+            foreach (var yokai in res.UserYoukaiList)
+            {
+                var mstItem = mstYokai.Items.FirstOrDefault(x => x.YoukaiId == yokai.YoukaiId);
+                if (mstItem == null) continue;
+                var unity = unities.FirstOrDefault(x => x.kind == mstItem.YoukaiKind);
+                if (unity == default) continue;
+                /*
+                 Unity bonuses without skills are as follows:
+                10% for 2
+                20% for 3
+                25% for 4
+                30% for 5
+                note that different tribes ofc do different unities, so 2 brave 2 charming will be 2*10% boost 
+                and they only apply on the yokai of said tribes
+                 */
+
+                int multiplier = unity.size switch
+                {
+                    2 => 10,
+                    3 => 20,
+                    4 => 25,
+                    5 => 30,
+                    _ => 0
+                };
+                if (multiplier > 0)
+                {
+                    Console.WriteLine("Applied tribe unity bonus for tribe " + mstItem.YoukaiKind + ": " + multiplier + "%.");
+                    yokai.Hp += yokai.Hp * multiplier / 100;
+                    yokai.AttackPower += yokai.AttackPower * multiplier / 100;
+                }
+               
+            }
 
             // Edit tutorial flg
             if (LevelData.TutorialEdit != null && LevelData.TutorialEdit.TutorialReq != null)

@@ -15,6 +15,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
             if(!_isLoaded)
             {
                 _mstSkill = new TableParser<YwpMstYoukaiSkill>(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai_skill"]!)!["tableData"]);
+                _isLoaded = true;
             }
         }
 

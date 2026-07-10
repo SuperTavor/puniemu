@@ -67,7 +67,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.UpdateProfile.Logic
             var marshalledResponse = JsonConvert.SerializeObject(updateProfileResponse);
             var encryptedResponse = NHNCrypt.Logic.NHNCrypt.EncryptResponse(marshalledResponse);
             await ctx.Response.WriteAsync(encryptedResponse);
-            GenerateFriendData.RefreshYwpUserFriend(deserialized.Level5UserID, userData.CharacterTitleID, userData.IconID, "", -1, "");
+            await GenerateFriendData.RefreshYwpUserFriend(deserialized.Level5UserID, userData.CharacterTitleID, userData.IconID, "", -1, "");
         }
     }
 }
