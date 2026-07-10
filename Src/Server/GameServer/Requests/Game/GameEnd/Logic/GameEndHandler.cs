@@ -202,11 +202,16 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                     if (ogMapIndex != -1)
                     {
                         var ogMap = ywpMstMap[ogMapIndex];
-                        if (ogMap.NextMapId != 0) 
+                        if (ogMap.NextMapId != 0)
+                        {
                             UnlockMap(ogMap.NextMapId);
+                        }
 
-                        else if (ogMap.ExtraMapId != 0)
+                        if (ogMap.ExtraMapId != 0)
+                        {
                             UnlockMap(ogMap.ExtraMapId);
+
+                        }
                     }
                 }
                 if (nextStage != -1 && StageManager.GetStageIndex(ywpUserStage, nextStage) == -1)
