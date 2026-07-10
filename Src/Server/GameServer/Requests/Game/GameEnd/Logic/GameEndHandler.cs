@@ -463,6 +463,16 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                     DictionaryManager.EditDictionary(ref dictionaryDiff, YoukaiId, true, false);
                 }
             }
+            // snapshot the OLD per-star flags BEFORE HandleStage overwrites them via EditStage
+            int oldStageIdx = StageManager.GetStageIndex(ywpUserStage, deserialized.StageId);
+            int oldStar1 = 0, oldStar2 = 0, oldStar3 = 0;
+            if (oldStageIdx != -1)
+            {
+                oldStar1 = (int)ywpUserStage.Items[oldStageIdx].Star1;
+                oldStar2 = (int)ywpUserStage.Items[oldStageIdx].Star2;
+                oldStar3 = (int)ywpUserStage.Items[oldStageIdx].Star3;
+            }
+
             if (gameEndType == GameEndType.GameEnd)
             {
                 int FirstClear = 0;
@@ -471,7 +481,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 {
                     await HandleDrop(deserialized, res, dictionaryYoukaiTable, dictionaryDiff, userYoukaiTable, youkaiDiff, userYoukaiSkillTable, youkaiSkillDiff, userItemTable, playerIconTable, userData, LevelData, FirstClear, userBonus);
                 }
-                catch(InvalidOperationException)
+                catch (InvalidOperationException)
                 {
                     var err = JsonConvert.SerializeObject(new MsgBoxResponse("Yokai not on stage", "Error"));
                     await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(err));
@@ -482,7 +492,12 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
             }
 
             var userStageIdx = ywpUserStage.Items.FindIndex(x => x.StageId == deserialized.StageId);
-            var newStars = (res.UserGameResultData.StarGetFlg1 + res.UserGameResultData.StarGetFlg2 + res.UserGameResultData.StarGetFlg3) - (ywpUserStage.Items[userStageIdx].Star1 + ywpUserStage.Items[userStageIdx].Star2 + ywpUserStage.Items[userStageIdx].Star3);
+
+            // compare each star flag individually: newly earned = earned now AND not earned before
+            int newStars = 0;
+            if (res.UserGameResultData.StarGetFlg1 == 1 && oldStar1 != 1) newStars++;
+            if (res.UserGameResultData.StarGetFlg2 == 1 && oldStar2 != 1) newStars++;
+            if (res.UserGameResultData.StarGetFlg3 == 1 && oldStar3 != 1) newStars++;
             // yokai user list
             await HandleUserYoukai(deserialized, res, userYoukaiTable, youkaiDiff, deserialized.Gdkey);
 
@@ -529,7 +544,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 totalSoult += kai.SkillUseNum;
             }
             var userMission = await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.CollectTotalScore, deserialized.Score, null, true);
-            await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.CollectTotalStars, newStars, userMission, true);
+            if (newStars > 0)
+            {
+                userMission = await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.CollectTotalStars, newStars, userMission, true);
+            }
             await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.DoTotalSoults, totalSoult, userMission, true);
             await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.CreateTotalBonusBalls, deserialized.BonusBlockNum, userMission, true);
             await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.EnterFeverTimeTotalTimes, deserialized.FeverTimeNum, userMission, true);
