@@ -43,18 +43,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.Logic
             else res = new DataClasses.Puni.LoginResponse();
 
             var userYokai = new TableParser<YwpUserYoukai>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_youkai"));
-            var userDict = new TableParser<YwpUserDictionary>();
-            foreach(var kai in userYokai.Items)
-            {
-                userDict.AddItem(new()
-                {
-                    YoukaiId = kai.YoukaiId,
-                    IsSeen = 1,
-                    IsBefriend = 1,
-                });
-            }
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "ywp_user_dictionary", userDict.ToString());
-
             await res.ConstructAsync(deserialized!.Gdkey!);
             //Get the user tables
             var resdict = (await res.ToDictionary())!;            

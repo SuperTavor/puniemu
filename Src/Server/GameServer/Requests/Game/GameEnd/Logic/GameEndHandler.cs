@@ -97,7 +97,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
                 }
                 // we get the condition parameter
                 long param1 = MasterStageData.ConditionItems[tempIndex].ConditionVal1;
-                bool good = ConditionManager.ComputeStageCondition(MasterStageData.ConditionItems[tempIndex].ConditionType, deserialized, MasterStageData.ConditionItems[tempIndex].ConditionVal1, MasterStageData.ConditionItems[tempIndex].ConditionVal2, MasterStageData.ConditionItems[tempIndex].ConditionVal3);
+                var stage = ywpUserStage.Items[StageManager.GetStageIndex(ywpUserStage, deserialized.StageId)];
+                bool good = ConditionManager.ComputeStageCondition(MasterStageData.ConditionItems[tempIndex].ConditionType, deserialized, stage, MasterStageData.ConditionItems[tempIndex].ConditionVal1, MasterStageData.ConditionItems[tempIndex].ConditionVal2, MasterStageData.ConditionItems[tempIndex].ConditionVal3);
                 Console.WriteLine(tempConditionId.ToString() + " | " + good.ToString() + " | " + MasterStageData.ConditionItems[tempIndex].ConditionType.ToString());
 
                 // 1-3 are generally the condition for stars, 4+ are generally locked levels condition

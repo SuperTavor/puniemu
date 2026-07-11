@@ -263,46 +263,28 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
             AddToUserYoukaiList(currentDeck.FarRightYoukaiId);
 
             //Check tribe unity
-            int currentKindGroupSize = 0;
-            int currentKind = -1;
-            HashSet<(int kind, int size)> unities = new();
-            List<UserYoukaiItem> sortedList = [
-                    res.UserYoukaiList[3],
-                    res.UserYoukaiList[1],
-                    res.UserYoukaiList[0],
-                    res.UserYoukaiList[2],
-                    res.UserYoukaiList[4]
-            ];//needs to be sorted as left to right instead of center outward so it reflects the actual closeness of the tribes
-            foreach(var yokai in sortedList)
+            Dictionary<int,int> unities = new();
+            foreach(var yokai in res.UserYoukaiList)
             {
                 var mstItem = mstYokai.Items.FirstOrDefault(x => x.YoukaiId == yokai.YoukaiId);
                 if (mstItem == null) continue;
-                if(mstItem.YoukaiKind != currentKind)
+                if(unities.ContainsKey(mstItem.YoukaiKind))
                 {
-                    if(currentKindGroupSize >= 2)
-                    {
-                        unities.Add((currentKind, currentKindGroupSize));
-                    }
-                    currentKindGroupSize = 1;
-                    currentKind = mstItem.YoukaiKind; 
+                    unities[mstItem.YoukaiKind]++;
                 }
                 else
                 {
-                    currentKindGroupSize++;
+                    unities.Add(mstItem.YoukaiKind, 1);
                 }
                 
             }
-            if (currentKindGroupSize >= 2)
-            {
-                unities.Add((currentKind, currentKindGroupSize));
-            }
+
             //Apply tribe unity
             foreach (var yokai in res.UserYoukaiList)
             {
                 var mstItem = mstYokai.Items.FirstOrDefault(x => x.YoukaiId == yokai.YoukaiId);
                 if (mstItem == null) continue;
-                var unity = unities.FirstOrDefault(x => x.kind == mstItem.YoukaiKind);
-                if (unity == default) continue;
+                var unitySize = unities[mstItem.YoukaiKind];
                 /*
                  Unity bonuses without skills are as follows:
                 10% for 2
@@ -313,7 +295,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
                 and they only apply on the yokai of said tribes
                  */
 
-                int multiplier = unity.size switch
+                int multiplier = unitySize switch
                 {
                     2 => 10,
                     3 => 20,

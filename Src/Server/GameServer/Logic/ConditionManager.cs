@@ -37,7 +37,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
             }
             else return false;
         }
-        public static bool ComputeStageCondition(ConditionType type, GameEndRequest deserialized, long param1, long param2, long param3)
+        public static bool ComputeStageCondition(ConditionType type, GameEndRequest deserialized, YwpUserStage stageItem, long param1, long param2, long param3)
         {
             if (type == ConditionType.MinScore && deserialized.Score >= param1)
             {
@@ -70,9 +70,13 @@ namespace Puniemu.Src.Server.GameServer.Logic
                 // Youkai ID specified as -1 to say that the soult check is generic and not specific
                 return IsFinishWithSoult(deserialized.EnemyYoukaiResultList, youkaiId: -1);
             }
-            else if (type == ConditionType.ClearStageNTimes && false) //idk
+            else if (type == ConditionType.ClearStageNTimes) //idk
             {
-                return true;
+                var timestoClear = param1;
+                if(stageItem.NumClear >= timestoClear)
+                {
+                    return true;
+                }
             }
             else if (type == ConditionType.MinLinkSize && deserialized.LinkSizeMax >= param1)
             {
