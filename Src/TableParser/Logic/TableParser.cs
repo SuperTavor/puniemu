@@ -160,6 +160,7 @@ namespace Puniemu.Src.TableParser.Logic
 
         public TableParser(string? src = "", string prefix = "", string delimiter = "|")
         {
+            if (src == null) src = "";
             _delimiter = delimiter;
             if (prefix != "")
             {

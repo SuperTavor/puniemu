@@ -62,6 +62,7 @@ using Puniemu.Src.Server.GameServer.Requests.UseAddition.Logic;
 using Puniemu.Src.Server.GameServer.Requests.MissionReward.Logic;
 using Puniemu.Src.Server.CustomAuth.Requests.Link.Logic;
 using Puniemu.Src.Server.GameServer.Requests.SerialConfirm.Logic;
+using Puniemu.Src.Server.GameServer.Requests.ReleaseYoukai.Logic;
 namespace Puniemu.Src;
 class Program
 {
@@ -231,6 +232,10 @@ class Program
         app.MapPost("/init.nhn", async ctx =>
         {
             await InitHandler.HandleAsync(ctx);
+        });
+        app.MapPost("/releaseYoukai.nhn", async ctx =>
+        {
+            await ReleaseYoukaiHandler.HandleAsync(ctx);
         });
         app.MapPost("/initWatch.nhn", async ctx =>
         {

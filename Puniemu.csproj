@@ -25,7 +25,6 @@
     
 	<ItemGroup>
 	  <Folder Include="Database\" />
-	  <Folder Include="Src\Server\GameServer\Requests\ReleaseYoukai\" />
 	</ItemGroup>
   <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
 
