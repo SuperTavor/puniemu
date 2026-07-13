@@ -70,7 +70,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
                 // Youkai ID specified as -1 to say that the soult check is generic and not specific
                 return IsFinishWithSoult(deserialized.EnemyYoukaiResultList, youkaiId: -1);
             }
-            else if (type == ConditionType.ClearStageNTimes) //idk
+            else if (type == ConditionType.ClearStageNTimes)
             {
                 var timestoClear = param1;
                 if(stageItem.NumClear >= timestoClear)

@@ -212,7 +212,20 @@ namespace Puniemu.Src.Server.GameServer.Logic
                             }
                         }
                     }
+                    else if(missionType == MissionType.CompleteStageInSeconds)
+                    {
+                        var playerStageId = progressToUpdate;
+                        var playerTime = progressToUpdate2;
+                        var paramStageId = missionCfgItem.Params[0];
+                        var paramTime = missionCfgItem.Params[1];
 
+                        mission.MissionParamProgress = playerTime;
+
+                        if (playerStageId == paramStageId && playerTime <= paramTime)
+                        {
+                            mission.MissionCompleteStatus = MissionCompleteStatus.CompletePendingReward;
+                        }
+                    }
                 }
             }
             if (!manualSave)

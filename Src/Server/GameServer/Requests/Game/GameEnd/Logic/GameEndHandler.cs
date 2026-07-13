@@ -557,6 +557,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
             await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.DoTotalSoults, totalSoult, userMission, true);
             await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.CreateTotalBonusBalls, deserialized.BonusBlockNum, userMission, true);
             await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.EnterFeverTimeTotalTimes, deserialized.FeverTimeNum, userMission, true);
+            await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.CompleteStageInSeconds, deserialized.StageId, userMission, true, deserialized.ClearTimeSec);
             await MissionManager.UpdateProgress(deserialized.Gdkey, GameServer.DataClasses.Mission.MissionType.PopTotalPuni, deserialized.EraseNumTotal, userMission, true);
             await MissionManager.SaveUserMission(deserialized.Gdkey, userMission);
 
