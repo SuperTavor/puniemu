@@ -30,11 +30,11 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapWarp.Logic
                 await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(new MsgBoxResponse("Yopple Inc is under construction!", "Coming soon!"))));
                 return;
             }
-            //if(!deserialized.MapId.ToString().StartsWith("1"))
-            //{
-            //    await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(new MsgBoxResponse("The sewers are under construction", "Coming soon!"))));
-            //    return;
-            //}
+            if (!deserialized.MapId.ToString().StartsWith("1") && deserialized.MapId != 7001)
+            {
+                await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(new MsgBoxResponse("The sewers are under construction", "Coming soon!"))));
+                return;
+            }
             var userData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data")!;
             var userStage = new TableParser.Logic.TableParser<YwpUserStage>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_stage")!);
             var userMap = new TableParser.Logic.TableParser<YwpUserMap>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_map")!);
@@ -47,7 +47,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapWarp.Logic
             {
                 MapManager.AddMap(userMap, deserialized.MapId);
                 //var errSession = new MsgBoxResponse("Error", "Error");
-                //await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(errSession)));
+                //await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerialibizeObject(errSession)));
                 //return;
             }
 

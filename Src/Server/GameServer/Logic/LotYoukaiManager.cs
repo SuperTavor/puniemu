@@ -41,10 +41,10 @@ public static class LotYoukaiManager
     // Base befriend rates per enemy yokai rank
     public static readonly Dictionary<RarityType, float> BaseRateByRank = new()
     {
-        { RarityType.RarityE,   0.08f  },
-        { RarityType.RarityD,   0.07f  },
-        { RarityType.RarityC,   0.06f  },
-        { RarityType.RarityB,   0.04f  },
+        { RarityType.RarityE,   0.11f  },
+        { RarityType.RarityD,   0.10f  },
+        { RarityType.RarityC,   0.08f  },
+        { RarityType.RarityB,   0.06f  },
         { RarityType.RarityA,   0.01f  },
         { RarityType.RarityS,   0.01f  },
         { RarityType.RaritySS,  0.10f  }, // pass battles should get their odds overridden in stage_data
@@ -64,18 +64,25 @@ public static class LotYoukaiManager
     private static float GetSoultimateBoost(string pattern, BefriendYokaiInfo[] befrienders, float[] ptsArr)
     {
         double totalMultiplier = 1.0;
-        for(int i = 0; i < pattern.Length; i++)
-        {
-            var c = pattern[i];
-            var useCount = (byte)(c - '0');
-            const double BASE = 0.08;
-            double percent = 0;
-            for(int j = 0; j < useCount; j++)
-            {
-                percent += ptsArr[i] * (BASE - (0.006 * j));
-            }
-            double multiplier = 1 + (percent / 100);
 
+        double[] diminishingWeights = { 0.6, 0.3, 0.1 };
+
+        for (int i = 0; i < pattern.Length; i++)
+        {
+            var useCount = (byte)(pattern[i] - '0');
+
+            double percent = 0;
+
+            for (int j = 0; j < useCount; j++)
+            {
+                double weight = j < diminishingWeights.Length
+                    ? diminishingWeights[j]
+                    : 0;
+
+                percent += ptsArr[i] * weight;
+            }
+
+            double multiplier = 1 + (percent / 100);
             totalMultiplier *= multiplier;
         }
 
