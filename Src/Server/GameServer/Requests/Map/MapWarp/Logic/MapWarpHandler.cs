@@ -24,12 +24,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapWarp.Logic
             var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             var deserialized = JsonConvert.DeserializeObject<MapWarpRequest>(requestJsonString!);
             ctx.Response.ContentType = "application/json";
-
-            if (!deserialized.MapId.ToString().StartsWith("1") && deserialized.MapId != 7001)
-            {
-                await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(new MsgBoxResponse("The sewers are under construction", "Coming soon!"))));
-                return;
-            }
             var unavailableMaps = JsonConvert.DeserializeObject<List<int>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["unavailable_maps"]) ?? new List<int>();
             var userData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data")!;
             var userStage = new TableParser.Logic.TableParser<YwpUserStage>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_stage")!);
