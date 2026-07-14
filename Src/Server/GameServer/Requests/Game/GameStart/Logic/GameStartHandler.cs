@@ -10,6 +10,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using Puniemu.Src.Server.GameServer.Logic;
 using Puniemu.Src.UserDataManager.Logic;
+using Puniemu.Src.Server.GameServer.Requests.GameEnd.DataClasses;
 namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
 {
     public static class GameStartHandler
@@ -176,9 +177,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
 
             var isSuperShrine = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<bool>(deserialized.Gdkey, "ywp_user_addition");
             // Create EnemyInfoList (Use an new (but imcomplete right now) format)
-            foreach (EnemyStageEntry i in (LevelData.Enemy))
+            void AddEnemy(long enemyId, int isDefBefriend)
             {
-                long enemyId = i.EnemyId;
                 var enemyParamsIdx = enemyParams.FindIndex([enemyId.ToString()]);
                 if (enemyParamsIdx != -1)
                 {
@@ -198,9 +198,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
                         LotItemInfoList = "0000", //todo
                         EnableFoodInfoList = new(), //todo
                     };
-                   
-                  
-                    bool isBoss = MasterStageData.StageItems[stageInfoIdx].BossFlag != 0;
+
+                    var enemyMstYokai = mstYokai.Items.FirstOrDefault(x => x.YoukaiId == long.Parse(enemyParams.Table[enemyParamsIdx][1]));
+
+                    bool befriendable = enemyMstYokai != null && enemyMstYokai.FoodType != 0;
                     bool isAfterJibanyan = tutorialList.GetStatus(1, 2) == 1;
                     var yokaiId = int.Parse(enemyParams.Table[enemyParamsIdx][1]);
                     var skillIdx = YoukaiManager.GetYoukaiSkillIndex(YwpUserYoukaiSkillTab, enemyId);
@@ -208,7 +209,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
                     //LB not implemented yet
 
                     bool isMaxSkill = false;
-                    if(skillIdx != -1)
+                    if (skillIdx != -1)
                     {
                         isMaxSkill = YwpUserYoukaiSkillTab.Items[skillIdx].Level >= 7;
                     }
@@ -216,23 +217,58 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
                     var t = YwpUserYoukaiTab.Items.FindIndex(x => x.YoukaiId == yokaiId);
                     var notHaveYokai = t == -1;
 
-                    var autobefriend = i.DefaultBefriends == 1 && notHaveYokai;
-                    if(autobefriend)
+                    var autobefriend = isDefBefriend == 1 && notHaveYokai;
+                    if (autobefriend)
                     {
                         var yokaiRank = mstYokaiItem.YoukaiRarity;
                         var befrienders = DeckManager.GetBefrienderSpots(UserDeck, mstYokaiItem, YwpUserYoukaiSkillTab);
                         item.LotYoukaiInfoList = LotYoukaiManager.GenerateLotYoukai(befrienders, yokaiRank, isSuperShrine, true);
-    
+
                     }
-                    else if (!(mstYokaiItem == null) && mstYokaiItem.YoukaiRarity != RarityType.RarityNone && !isBoss && isAfterJibanyan && !isMaxSkill)
+                    else if (!(mstYokaiItem == null) && mstYokaiItem.YoukaiRarity != RarityType.RarityNone && befriendable && isAfterJibanyan && !isMaxSkill)
                     {
                         var yokaiRank = mstYokaiItem.YoukaiRarity;
                         var befrienders = DeckManager.GetBefrienderSpots(UserDeck, mstYokaiItem, YwpUserYoukaiSkillTab);
                         item.LotYoukaiInfoList = LotYoukaiManager.GenerateLotYoukai(befrienders, yokaiRank, isSuperShrine, false);
                         //Console.WriteLine(JsonConvert.SerializeObject(item.LotYoukaiInfoList));
                     }
-                    
+
                     res.EnemyYoukaiList.Add(item);
+                }
+            }
+            foreach (EnemyStageEntry i in (LevelData.Enemy))
+            {
+                AddEnemy(i.EnemyId, i.DefaultBefriends);
+            }
+
+            //Check rare encounters and add, if there are already 3 yokai replace the weakest one
+            var rareYokai = LevelData.RareYokai;
+            if(rareYokai != null)
+            {
+                foreach (var kai in rareYokai)
+                {
+                    var isAddYokai = Random.Shared.Next(100) < kai.Rate;
+                    if (isAddYokai)
+                    {
+                        if (res.EnemyYoukaiList.Count == 3)
+                        {
+                            int lowestStatAvg = Int32.MaxValue;
+                            EnemyYoukai selectedItem = null;
+                            foreach (var item in res.EnemyYoukaiList)
+                            {
+                                var statAvg = (item.AttackPower + item.Hp) / 2;
+                                if (statAvg < lowestStatAvg)
+                                {
+                                    selectedItem = item;
+                                    lowestStatAvg = statAvg;
+                                }
+                            }
+                            res.EnemyYoukaiList.Remove(selectedItem);
+                        }
+
+                        AddEnemy(kai.EnemyID, 0);
+                    }
+
                 }
             }
 

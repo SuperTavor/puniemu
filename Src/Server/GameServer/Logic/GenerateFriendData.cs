@@ -65,6 +65,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
             foreach (FriendEntry item in myFriendList!)
             {
                 string? targetGdkey = await UserDataManager.Logic.UserDataManager.GetGdkeyFromUserId(item.UserId!);
+                if (string.IsNullOrEmpty(targetGdkey)) continue;
                 var friendFriendList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<List<FriendEntry>>(targetGdkey, "ywp_user_friend");
                 foreach (FriendEntry item2 in friendFriendList!)
                 {
@@ -119,6 +120,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
                     continue;
                 }
                 string? targetGdkey = await UserDataManager.Logic.UserDataManager.GetGdkeyFromUserId(item.UserId!);
+                if (targetGdkey == string.Empty || targetGdkey == null) continue;
                 var friendFriendRankList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<List<FriendRankEntry>>(targetGdkey, "ywp_user_friend");
                 foreach (FriendRankEntry item2 in friendFriendRankList!)
                 {

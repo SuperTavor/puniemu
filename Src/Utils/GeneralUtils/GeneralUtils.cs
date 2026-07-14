@@ -34,6 +34,7 @@ namespace Puniemu.Src.Utils.GeneralUtils
                 object? tableObj = new();
                 if (table.StartsWith("ywp_user"))
                 {
+                    if (gdkey == "" || gdkey == null) continue;
                     if(isDownloadOnce && userTables != null)
                     {
                         tableObj = userTables[table];
@@ -44,7 +45,15 @@ namespace Puniemu.Src.Utils.GeneralUtils
                     }
                 }
                 //Meaning it's constant
-                else tableText = DataManager.Logic.DataManager.GameDataManager!.GamedataCache[table];
+                else if (DataManager.Logic.DataManager.GameDataManager!.GamedataCache.TryGetValue(table, out string outData)) 
+                {
+                    tableText = outData;
+                }
+                else
+                {
+                    Console.WriteLine("Table not found: " + table);
+                    continue;
+                }
 
                 if (tableText != null)
                 {

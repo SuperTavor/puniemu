@@ -48,6 +48,15 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
         [JsonProperty("itemCnt")]
         public int ItemCount { get; set; }
     }
+
+    public class RareYokaiEntry
+    {
+        [JsonProperty("enemyId")]
+        public long EnemyID { get; set; }
+
+        [JsonProperty("rate")]
+        public double Rate { get; set; }
+    }
     public class StageData
     {
         // list of enemy id
@@ -61,6 +70,11 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
         // tutorial edition
         [JsonProperty("tutorial_edit")]
         public TutorialEntryRespRes ?TutorialEdit { get; set; }
+
+        //Rare encounters
+        //Dictionary is enemyParamId, percentageToDrop
+        [JsonProperty("rare_yokai")]
+        public List<RareYokaiEntry> RareYokai { get; set; }
 
         //alternate stage IDs to unlock that are different to the calculated
         [JsonProperty("altUnlock")]

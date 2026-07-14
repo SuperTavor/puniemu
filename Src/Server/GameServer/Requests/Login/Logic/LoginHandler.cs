@@ -35,13 +35,13 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.Logic
             }
             await ShopLimitManager.CheckShopLimitReset(deserialized.Gdkey);
             var mapsToAdd = JsonConvert.DeserializeObject<List<int>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["maps_to_add_login"]);
-            var userMap = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<List<YwpUserMap>>(deserialized.Gdkey, "ywp_user_map");
+            var userMap = new TableParser<YwpUserMap>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_map"));
             foreach(var map in mapsToAdd)
             {
-                var mapItem = userMap.FirstOrDefault(x => x.MapId == map);
+                var mapItem = userMap.Items.FirstOrDefault(x => x.MapId == map);
                 if(mapItem == null)
                 {
-                    userMap.Add(new()
+                    userMap.Items.Add(new()
                     {
                         MapId = map,
                         IsUnlocked = 1,
@@ -49,7 +49,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.Logic
                     });
                 }
             }
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "ywp_user_map", userMap);
+            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "ywp_user_map", userMap.ToString());
             //Construct response
             CommonLoginResponse res = new CommonLoginResponse();
             if (DataManager.Logic.DataManager.IsWibWob)
@@ -79,7 +79,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.Logic
             var resdict = (await res.ToDictionary())!;            
             //for now for testing just add puni login tables, similar anyway
             await GeneralUtils.AddTablesToResponse(Consts.LOGIN_TABLES_PUNI,resdict!,true,deserialized!.Gdkey!);
-            resdict["ywp_user_map"] = userMap;
+            resdict["ywp_user_map"] = userMap.ToString();
             //Set last login time to now
             acc.LastLoginTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             var encryptedRes = NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(resdict));

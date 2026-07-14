@@ -25,11 +25,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapWarp.Logic
             var deserialized = JsonConvert.DeserializeObject<MapWarpRequest>(requestJsonString!);
             ctx.Response.ContentType = "application/json";
 
-            if (!deserialized.MapId.ToString().StartsWith("1") && deserialized.MapId != 7001)
-            {
-                await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(new MsgBoxResponse("The sewers are under construction", "Coming soon!"))));
-                return;
-            }
             var userTuto = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<TutorialList>(deserialized.Level5UserID, "ywp_user_tutorial_list")!;
             var unavailableMaps = JsonConvert.DeserializeObject<List<int>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["unavailable_maps"]) ?? new List<int>();
             var addTutoMaps = JsonConvert.DeserializeObject<Dictionary<int, List<TutorialEntry>>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["map_add_tutorial"]) ?? new Dictionary<int, List<TutorialEntry>>();
