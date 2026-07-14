@@ -24,7 +24,15 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapWarp.Logic
             var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             var deserialized = JsonConvert.DeserializeObject<MapWarpRequest>(requestJsonString!);
             ctx.Response.ContentType = "application/json";
+
+            if (!deserialized.MapId.ToString().StartsWith("1") && deserialized.MapId != 7001)
+            {
+                await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(new MsgBoxResponse("The sewers are under construction", "Coming soon!"))));
+                return;
+            }
+            var userTuto = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<TutorialList>(deserialized.Level5UserID, "ywp_user_tutorial_list")!;
             var unavailableMaps = JsonConvert.DeserializeObject<List<int>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["unavailable_maps"]) ?? new List<int>();
+            var addTutoMaps = JsonConvert.DeserializeObject<Dictionary<int, List<TutorialEntry>>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["map_add_tutorial"]) ?? new Dictionary<int, List<TutorialEntry>>();
             var userData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data")!;
             var userStage = new TableParser.Logic.TableParser<YwpUserStage>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_stage")!);
             var userMap = new TableParser.Logic.TableParser<YwpUserMap>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_map")!);
@@ -34,12 +42,12 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapWarp.Logic
                 .ToObject<List<YwpMstMap>>();
             var userMapIdx = userMap.FindIndex([deserialized.MapId.ToString()]);
             var mstMapIdx = mstMap.FindIndex(x => x.MapId == deserialized.MapId);
-            if(mstMapIdx == -1)
+            if (mstMapIdx == -1)
             {
                 await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(new MsgBoxResponse($"Map doesn't exist", "Error"))));
                 return;
             }
-            if(unavailableMaps.Contains((int)deserialized.MapId))
+            if (unavailableMaps.Contains((int)deserialized.MapId))
             {
                 await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(new MsgBoxResponse($"{mstMap[mstMapIdx].MapName}\n is under construction!", "Coming soon!"))));
                 return;
@@ -51,11 +59,21 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapWarp.Logic
                 //await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerialibizeObject(errSession)));
                 //return;
             }
-
+            //Add tutorials from map_add_tutorial
+            foreach (var map in addTutoMaps)
+            {
+                if (map.Key == deserialized.MapId)
+                {
+                    foreach (var tut in map.Value)
+                    {
+                        userTuto.EditTutorialFlg(tut.TutorialType, tut.TutorialId, tut.TutorialStatus);
+                    }
+                }
+            }
 
             //Add stage if doesnt exist
             var stageId = long.Parse(deserialized.MapId.ToString() + "001");
-            
+
             if (userStage.FindIndex([stageId.ToString()]) == -1)
             {
                 //Stage status 2 = Need to be unlocked
@@ -137,7 +155,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapWarp.Logic
             var compiledUserStage = userStage.ToString();
             resdict!["ywp_user_stage"] = compiledUserStage;
             resdict!["ywp_user_map"] = userMap.ToString();
+            resdict["ywp_user_tutorial_list"] = userTuto!;
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_data", userData);
+            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_tutorial_list", userTuto);
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_stage", compiledUserStage);
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_map", resdict!["ywp_user_map"]);
             await GeneralUtils.AddTablesToResponse(ywpKeys, resdict!, true, deserialized!.Level5UserID!);
