@@ -25,16 +25,12 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapWarp.Logic
             var deserialized = JsonConvert.DeserializeObject<MapWarpRequest>(requestJsonString!);
             ctx.Response.ContentType = "application/json";
 
-            if(deserialized.MapId == 1015)
-            {
-                await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(new MsgBoxResponse("Yopple Inc is under construction!", "Coming soon!"))));
-                return;
-            }
             if (!deserialized.MapId.ToString().StartsWith("1") && deserialized.MapId != 7001)
             {
                 await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(new MsgBoxResponse("The sewers are under construction", "Coming soon!"))));
                 return;
             }
+            var unavailableMaps = JsonConvert.DeserializeObject<List<int>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["unavailable_maps"]) ?? new List<int>();
             var userData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data")!;
             var userStage = new TableParser.Logic.TableParser<YwpUserStage>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_stage")!);
             var userMap = new TableParser.Logic.TableParser<YwpUserMap>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_map")!);
@@ -42,8 +38,19 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapWarp.Logic
 
             var mstMap = ((Newtonsoft.Json.Linq.JArray)mstMapObj["data"])
                 .ToObject<List<YwpMstMap>>();
-            var mapIdx = userMap.FindIndex([deserialized.MapId.ToString()]);
-            if (mapIdx == -1)
+            var userMapIdx = userMap.FindIndex([deserialized.MapId.ToString()]);
+            var mstMapIdx = mstMap.FindIndex(x => x.MapId == deserialized.MapId);
+            if(mstMapIdx == -1)
+            {
+                await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(new MsgBoxResponse($"Map doesn't exist", "Error"))));
+                return;
+            }
+            if(unavailableMaps.Contains((int)deserialized.MapId))
+            {
+                await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(new MsgBoxResponse($"{mstMap[mstMapIdx].MapName}\n is under construction!", "Coming soon!"))));
+                return;
+            }
+            if (userMapIdx == -1)
             {
                 MapManager.AddMap(userMap, deserialized.MapId);
                 //var errSession = new MsgBoxResponse("Error", "Error");
@@ -58,7 +65,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapWarp.Logic
             if (userStage.FindIndex([stageId.ToString()]) == -1)
             {
                 //Stage status 2 = Need to be unlocked
-                var map = mstMap.Where(x => x.MapId == deserialized.MapId).First();
+                var map = mstMap[mstMapIdx];
                 int status = 2;
                 //needs no unlock
                 if (map.NeedYmoney == 0 && map.NeedYoukaiId == 0 && map.NeedYoukaiLevel == 0 && map.NeedFriendPoint == 0)
@@ -138,6 +145,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapWarp.Logic
             resdict!["ywp_user_map"] = userMap.ToString();
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_data", userData);
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_stage", compiledUserStage);
+            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserID!, "ywp_user_map", resdict!["ywp_user_map"]);
             await GeneralUtils.AddTablesToResponse(ywpKeys, resdict!, true, deserialized!.Level5UserID!);
             var marshalledResponse = JsonConvert.SerializeObject(resdict);
             var encryptedResponse = NHNCrypt.Logic.NHNCrypt.EncryptResponse(marshalledResponse);

@@ -173,7 +173,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
             }
         }
         public static async Task<TableParser<YwpUserMission>> UpdateProgress(string gdkey, MissionType missionType, int progressToUpdate, 
-            TableParser<YwpUserMission> paramUserMission = null, bool manualSave = false, int progressToUpdate2 = -1)
+            TableParser<YwpUserMission> paramUserMission = null, bool manualSave = false, int progressToUpdate2 = -1, bool replaceValue = false)
         {
             TableParser<YwpUserMission> userMission;
             if (paramUserMission == null)

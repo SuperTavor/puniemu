@@ -8,6 +8,7 @@ using Puniemu.Src.TableParser.Logic;
 using System.Buffers;
 using System.IO;
 using System.Numerics;
+using System.Security;
 using System.Text;
 
 namespace Puniemu.Src.Server.GameServer.Logic
