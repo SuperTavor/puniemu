@@ -49,8 +49,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.Conflate.Logic
                 {
                     throw new InvalidOperationException("Missing fusion components");
                 }
-                ApplyFusionObject(mstConflateItem.FuseObject1Type, mstConflateItem.FuseObject1ID, userYokai, userSkill, userItem, userDictionary);
-                ApplyFusionObject(mstConflateItem.FuseObject2Type, mstConflateItem.FuseObject2ID, userYokai, userSkill, userItem, userDictionary);
+                ApplyFusionObject(mstConflateItem.FuseObject1Type, mstConflateItem.FuseObject1ID, userYokai, userSkill, userItem, userDictionary, userBonus);
+                ApplyFusionObject(mstConflateItem.FuseObject2Type, mstConflateItem.FuseObject2ID, userYokai, userSkill, userItem, userDictionary, userBonus);
             }
             catch(InvalidOperationException ex)
             {
@@ -100,12 +100,12 @@ namespace Puniemu.Src.Server.GameServer.Requests.Conflate.Logic
                 _ => false
             };
         }
-        private static void ApplyFusionObject(RewardType rewardType, long fusionObjId, TableParser<YwpUserYoukai> userYokai, TableParser<YwpUserYoukaiSkill> userSkill, TableParser<YwpUserItem> userItem, TableParser<YwpUserDictionary> userDict)
+        private static void ApplyFusionObject(RewardType rewardType, long fusionObjId, TableParser<YwpUserYoukai> userYokai, TableParser<YwpUserYoukaiSkill> userSkill, TableParser<YwpUserItem> userItem, TableParser<YwpUserDictionary> userDict, TableParser<YwpUserYoukaiBonusEffect> userBonus)
         { 
             switch(rewardType)
             {
                 case RewardType.Yokai:
-                    YoukaiManager.DeleteYoukai(userYokai, userSkill, fusionObjId);
+                    YoukaiManager.DeleteYoukai(userYokai, userSkill, fusionObjId, userBonus);
                     DictionaryManager.EditDictionary(ref userDict, fusionObjId, true, false);
                     break;
                 case RewardType.Item:

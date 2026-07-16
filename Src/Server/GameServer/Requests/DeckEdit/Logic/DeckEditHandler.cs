@@ -53,7 +53,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.DeckEdit.Logic
             var resdict = await res.ToDictionary();
 
             // Get and edit deck data
-            var UserDeck = new TableParser<YwpUserDeck>((await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai_deck"))!);
+            var UserDeck = new TableParser<YwpUserYoukaiDeck>((await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai_deck"))!);
 
 
             //Validate that teh user has all the yokai provided before setting team
@@ -66,7 +66,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.DeckEdit.Logic
             UserDeck.Items[0].MiddleYoukaiId = deserialized!.YoukaiIdList![0]["youkaiId"];
             UserDeck.Items[0].MiddleLeftYoukaiId = deserialized!.YoukaiIdList![1]["youkaiId"];
             UserDeck.Items[0].MiddleRightYoukaiId = deserialized!.YoukaiIdList![2]["youkaiId"];
-            UserDeck.Items[0].FarLeft = deserialized!.YoukaiIdList![3]["youkaiId"];
+            UserDeck.Items[0].FarLeftYoukaiId = deserialized!.YoukaiIdList![3]["youkaiId"];
             UserDeck.Items[0].FarRightYoukaiId = deserialized!.YoukaiIdList![4]["youkaiId"];
 
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_youkai_deck", UserDeck.ToString());

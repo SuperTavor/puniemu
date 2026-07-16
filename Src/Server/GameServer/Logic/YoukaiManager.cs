@@ -94,12 +94,14 @@ namespace Puniemu.Src.Server.GameServer.Logic
             }
         }
 
-        public static void DeleteYoukai(TableParser<YwpUserYoukai> userYokai, TableParser<YwpUserYoukaiSkill> userSkill, long youkaiId)
+        public static void DeleteYoukai(TableParser<YwpUserYoukai> userYokai, TableParser<YwpUserYoukaiSkill> userSkill, long youkaiId, TableParser<YwpUserYoukaiBonusEffect> bonus) 
         {
             var yokaiIdx = userYokai.Items.FindIndex(x=>x.YoukaiId == youkaiId);
             if (yokaiIdx == -1) throw new NotImplementedException("Yokai not found in user");
             var skillIdx = userSkill.Items.FindIndex(x => x.YoukaiId == youkaiId);
             if (skillIdx == -1) throw new NotImplementedException("Skill not found in user");
+            var bonusIdx = bonus.Items.FindIndex(x => x.YoukaiID == youkaiId);
+            if (bonusIdx != -1) bonus.Items.RemoveAt(bonusIdx);
             userYokai.Items.RemoveAt(yokaiIdx);
             userSkill.Items.RemoveAt(skillIdx);
         }
@@ -109,7 +111,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
             var YoukaiMstTable = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager!.GamedataCache["ywp_mst_youkai"]!)!["tableData"]);
             var YoukaiLevelMstTable = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai_level"]!)!["tableData"]);
             var UserYoukaiIndex = GetYoukaiIndex(userYokai, YoukaiId);
-            var MstYoukaiIndex = YoukaiMstTable.FindIndex([YoukaiId.ToString()]);
+            var MstYoukaiIndex = YoukaiMstTable.Table.FindIndex(x => x[0] == YoukaiId.ToString());
             if (UserYoukaiIndex == -1)
             {
                 var um = await MissionManager.UpdateProgress(gdkey, DataClasses.Mission.MissionType.AddTotalYokaiToMedallium, 1, userMission, manualMissionSave);
@@ -117,6 +119,7 @@ namespace Puniemu.Src.Server.GameServer.Logic
                 await MissionManager.UpdateProgress(gdkey, MissionType.GetSpecificYokaiToLevel, (int)YoukaiId, progressToUpdate2: 1, paramUserMission: um, manualSave: manualMissionSave);
                 // add new youkai
                 var tmpIdx = 0;
+
                 var levelType = int.Parse(YoukaiMstTable.Table[MstYoukaiIndex][5]);
                 foreach (string[] str in YoukaiLevelMstTable.Table)
                 {

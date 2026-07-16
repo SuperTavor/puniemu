@@ -127,7 +127,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
             var YwpUserYoukaiSSkillTab = new TableParser.Logic.TableParser((await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai_strong_skill"))!);
 
             var mstYokai = new TableParser.Logic.TableParser<YwpMstYoukai>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai"]);
-            var UserDeck = new TableParser.Logic.TableParser<YwpUserDeck>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai_deck"));
+            var UserDeck = new TableParser.Logic.TableParser<YwpUserYoukaiDeck>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai_deck"));
             var tutorialList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<TutorialList>(deserialized!.Gdkey!, "ywp_user_tutorial_list");
 
             //get current stage info
@@ -296,7 +296,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
             AddToUserYoukaiList(currentDeck.MiddleYoukaiId);
             AddToUserYoukaiList(currentDeck.MiddleLeftYoukaiId);
             AddToUserYoukaiList(currentDeck.MiddleRightYoukaiId);
-            AddToUserYoukaiList(currentDeck.FarLeft);
+            AddToUserYoukaiList(currentDeck.FarLeftYoukaiId);
             AddToUserYoukaiList(currentDeck.FarRightYoukaiId);
 
             //Check tribe unity

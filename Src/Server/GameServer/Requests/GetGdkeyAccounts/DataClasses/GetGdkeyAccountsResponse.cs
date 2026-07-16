@@ -22,7 +22,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetGdkeyAccounts.DataClasses
                     if (item == null)
                     {
                         await UserDataManager.Logic.UserDataManager.DeleteUser(udkey, gdkey);
-                        return null;
+                        continue;
                     }
                     playerItems.Add(item.Value);
                 }

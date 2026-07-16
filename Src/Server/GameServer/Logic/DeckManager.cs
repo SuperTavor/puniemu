@@ -24,14 +24,14 @@ namespace Puniemu.Src.Server.GameServer.Logic
 
         //Rank, soultiamte level
         //Rank is RarityNone if not a befriender
-        public static BefriendYokaiInfo[] GetBefrienderSpots(TableParser<YwpUserDeck> deck, YwpMstYoukai mstYokaiItem, TableParser<YwpUserYoukaiSkill> userSkill)
+        public static BefriendYokaiInfo[] GetBefrienderSpots(TableParser<YwpUserYoukaiDeck> deck, YwpMstYoukai mstYokaiItem, TableParser<YwpUserYoukaiSkill> userSkill)
         {
             var currentDeck = deck.Items[0];
             var spots = new BefriendYokaiInfo[5];
             spots[0] = GetIsBefriender(currentDeck.MiddleYoukaiId, mstYokaiItem, userSkill);
             spots[1] = GetIsBefriender(currentDeck.MiddleLeftYoukaiId, mstYokaiItem, userSkill);
             spots[2] = GetIsBefriender(currentDeck.MiddleRightYoukaiId, mstYokaiItem, userSkill);
-            spots[3] = GetIsBefriender(currentDeck.FarLeft, mstYokaiItem, userSkill);
+            spots[3] = GetIsBefriender(currentDeck.FarLeftYoukaiId, mstYokaiItem, userSkill);
             spots[4] = GetIsBefriender(currentDeck.FarRightYoukaiId, mstYokaiItem, userSkill);
 
             return spots;

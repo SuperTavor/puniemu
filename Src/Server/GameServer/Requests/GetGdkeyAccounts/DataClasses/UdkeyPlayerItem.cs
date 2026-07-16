@@ -42,7 +42,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GetGdkeyAccounts.DataClasses
             {
                 return null;
             }
-
+            if (userData == null) return null;
             var res = await UserDataManager.Logic.UserDataManager.SupabaseClient!.From<Account>().Where(x => x.Gdkey == gdkey).Get();
             var account = res.Model!;
             UdkeyPlayerItem playerItem = new();

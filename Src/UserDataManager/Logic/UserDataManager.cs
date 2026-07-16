@@ -239,6 +239,7 @@ namespace Puniemu.Src.UserDataManager.Logic
         public static async Task<T?> GetYwpUserAsync<T>(string gdkey, string tableId)
         {
             var account = await GetAccountFromGdkeyAsync(gdkey);
+            if (account == null) return default;
             if (!account.YwpUserTables.TryGetValue(tableId, out var tbl) || tbl == null)
                 return default;
             JToken token = JToken.FromObject(tbl);
