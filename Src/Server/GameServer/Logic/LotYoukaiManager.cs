@@ -47,7 +47,7 @@ public static class LotYoukaiManager
         { RarityType.RarityB,   0.06f  },
         { RarityType.RarityA,   0.01f  },
         { RarityType.RarityS,   0.01f  },
-        { RarityType.RaritySS,  0.10f  }, // pass battles should get their odds overridden in stage_data
+        { RarityType.RaritySS,  0.03f  }, // pass battles should get their odds overridden in stage_data
     };
 
     // 0=no food, 1=1-heart, 2=2-heart, 3=3-heart, 4=4-heart

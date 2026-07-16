@@ -11,6 +11,7 @@ using System.Text;
 using Puniemu.Src.Server.GameServer.Logic;
 using Puniemu.Src.UserDataManager.Logic;
 using Puniemu.Src.Server.GameServer.Requests.GameEnd.DataClasses;
+using Microsoft.AspNetCore.Mvc.Formatters;
 namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
 {
     public static class GameStartHandler
@@ -177,15 +178,19 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
 
             var isSuperShrine = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<bool>(deserialized.Gdkey, "ywp_user_addition");
             // Create EnemyInfoList (Use an new (but imcomplete right now) format)
-            void AddEnemy(long enemyId, int isDefBefriend)
+
+            void AddEnemy(long enemyId, int isDefBefriend, int hp = -1, int atk = -1)
             {
+
                 var enemyParamsIdx = enemyParams.FindIndex([enemyId.ToString()]);
+                if (hp == -1) hp = int.Parse(enemyParams.Table[enemyParamsIdx][2]);
+                if (atk == -1) atk = int.Parse(enemyParams.Table[enemyParamsIdx][3]);
                 if (enemyParamsIdx != -1)
                 {
                     var item = new EnemyYoukai()
                     {
-                        Hp = int.Parse(enemyParams.Table[enemyParamsIdx][2]),
-                        AttackPower = int.Parse(enemyParams.Table[enemyParamsIdx][3]),
+                        Hp = hp,
+                        AttackPower = atk,
                         ActionTurn = int.Parse(enemyParams.Table[enemyParamsIdx][4]),
                         DropItemCount = 0, //todo
                         DropItemID = 0, //todo
@@ -242,34 +247,26 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
             }
 
             //Check rare encounters and add, if there are already 3 yokai replace the weakest one
-            var rareYokai = LevelData.RareYokai;
-            if(rareYokai != null)
+            var rareEnemyId = RareEnemyManager.GetDrop(deserialized.StageId);
+            if(rareEnemyId != -1)
             {
-                foreach (var kai in rareYokai)
+                if (res.EnemyYoukaiList.Count == 3)
                 {
-                    var isAddYokai = Random.Shared.Next(100) < kai.Rate;
-                    if (isAddYokai)
+                    int lowestStatAvg = Int32.MaxValue;
+                    EnemyYoukai selectedItem = null;
+                    foreach (var item in res.EnemyYoukaiList)
                     {
-                        if (res.EnemyYoukaiList.Count == 3)
+                        var statAvg = (item.AttackPower + item.Hp) / 2;
+                        if (statAvg < lowestStatAvg)
                         {
-                            int lowestStatAvg = Int32.MaxValue;
-                            EnemyYoukai selectedItem = null;
-                            foreach (var item in res.EnemyYoukaiList)
-                            {
-                                var statAvg = (item.AttackPower + item.Hp) / 2;
-                                if (statAvg < lowestStatAvg)
-                                {
-                                    selectedItem = item;
-                                    lowestStatAvg = statAvg;
-                                }
-                            }
-                            res.EnemyYoukaiList.Remove(selectedItem);
+                            selectedItem = item;
+                            lowestStatAvg = statAvg;
                         }
-
-                        AddEnemy(kai.EnemyID, 0);
                     }
-
+                    res.EnemyYoukaiList.Remove(selectedItem);
                 }
+
+                AddEnemy(rareEnemyId, 0);
             }
 
             void AddToUserYoukaiList(long youkaiId)
