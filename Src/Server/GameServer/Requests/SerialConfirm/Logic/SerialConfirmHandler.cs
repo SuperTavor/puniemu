@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Puniemu.Src.Server.CustomAuth;
 using Puniemu.Src.Server.GameServer.DataClasses;
 using Puniemu.Src.Server.GameServer.Requests.Rename.DataClasses;
@@ -36,7 +36,13 @@ namespace Puniemu.Src.Server.GameServer.Requests.SerialConfirm.Logic
             }
             if (AuthManager.CodeCache.TryGetValue(code, out var val))
             {
-                if(val.isLink)
+                if (val.udkey != deserialized.DeviceId)
+                {
+                    var errRes = new MsgBoxResponse("It's not your account", "Error");
+                    await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(errRes)));
+                    return;
+                }
+                if (val.isLink)
                 {
                     AuthManager.CodeCache.Remove(code, out _);
                     await UserDataManager.Logic.UserDataManager.AddOrEditEmail(val.email, val.udkey);
@@ -57,9 +63,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.SerialConfirm.Logic
                     //Transfer gdkeys from old udkey to new udkey
                     var oldUdkey = linkedData.CurrentUdkey;
                     var newUdkey = val.udkey;
-                    if(oldUdkey == newUdkey)
+                    if (oldUdkey == newUdkey)
                     {
-                        var errRes = new MsgBoxResponse("You cannot transfer data to the same device.", "Error");
+                        var errRes = new MsgBoxResponse("You cannot transfer data\nto the same device.", "Error");
                         await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(errRes)));
                         return;
                     }
