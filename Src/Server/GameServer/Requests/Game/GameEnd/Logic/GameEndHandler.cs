@@ -291,12 +291,12 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
             YwpUserData userData, StageData LevelData, int FirstClear, TableParser<YwpUserYoukaiBonusEffect> userBonus)
         {
             var MstEnemyParam = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai_enemy_param"]!)!["tableData"]);
-
+            var lastEnemies = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<List<EnemyYoukai>>(deserialized.Gdkey, "last_enemy");
             foreach (EnemyYoukaiResultList i in deserialized!.EnemyYoukaiResultList!)
             {
                 var MstEnemyParamIndex = MstEnemyParam.FindIndex([i.EnemyId.ToString()]);
                 var paramId = long.Parse(MstEnemyParam.Table[MstEnemyParamIndex][0]);
-                if(LevelData.Enemy.FindIndex(x => x.EnemyId == paramId) == -1)
+                if(lastEnemies.FindIndex(x => x.EnemyID == i.EnemyId) == -1)
                 {
                     throw new InvalidOperationException();
                 }

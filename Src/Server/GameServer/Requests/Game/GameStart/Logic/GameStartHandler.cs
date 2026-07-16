@@ -179,6 +179,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
             var isSuperShrine = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<bool>(deserialized.Gdkey, "ywp_user_addition");
             // Create EnemyInfoList (Use an new (but imcomplete right now) format)
 
+            bool isAfterJibanyan = tutorialList.GetStatus(1, 2) == 1;
             void AddEnemy(long enemyId, int isDefBefriend, int hp = -1, int atk = -1)
             {
 
@@ -207,7 +208,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
                     var enemyMstYokai = mstYokai.Items.FirstOrDefault(x => x.YoukaiId == long.Parse(enemyParams.Table[enemyParamsIdx][1]));
 
                     bool befriendable = enemyMstYokai != null && enemyMstYokai.FoodType != 0;
-                    bool isAfterJibanyan = tutorialList.GetStatus(1, 2) == 1;
+                    
                     var yokaiId = int.Parse(enemyParams.Table[enemyParamsIdx][1]);
                     var skillIdx = YoukaiManager.GetYoukaiSkillIndex(YwpUserYoukaiSkillTab, enemyId);
 
@@ -248,15 +249,18 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
 
             //Check rare encounters and add, if there are already 3 yokai replace the weakest one
             var rareEnemyId = RareEnemyManager.GetDrop(deserialized.StageId);
-            if(rareEnemyId != -1)
+            if(rareEnemyId != -1 && isAfterJibanyan)
             {
+                //Rare encounter hp and attack are the average of all other stages
+                int generalAttackAverage = (int)res.EnemyYoukaiList.Average(x => x.AttackPower);
+                int generalHpAverage = (int)res.EnemyYoukaiList.Average(x => x.Hp);
                 if (res.EnemyYoukaiList.Count == 3)
                 {
-                    int lowestStatAvg = Int32.MaxValue;
+                    float lowestStatAvg = Int32.MaxValue;
                     EnemyYoukai selectedItem = null;
                     foreach (var item in res.EnemyYoukaiList)
                     {
-                        var statAvg = (item.AttackPower + item.Hp) / 2;
+                        float statAvg = (item.AttackPower + item.Hp) / 2;
                         if (statAvg < lowestStatAvg)
                         {
                             selectedItem = item;
@@ -266,9 +270,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
                     res.EnemyYoukaiList.Remove(selectedItem);
                 }
 
-                AddEnemy(rareEnemyId, 0);
+                AddEnemy(rareEnemyId, 0, generalHpAverage, generalAttackAverage);
             }
-
+            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "last_enemy", res.EnemyYoukaiList);
             void AddToUserYoukaiList(long youkaiId)
             {
                 //get index of yokai info in general ywpuseryokai table
