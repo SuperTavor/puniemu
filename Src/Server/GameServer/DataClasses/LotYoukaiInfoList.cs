@@ -22,8 +22,9 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
             if (token.Type == JTokenType.Array)
             {
                 //def behavior for wibwob
-                var normal = token.ToObject<LotYoukaiInfoList>();
-                return normal;
+                //deserialize the inner list directly - ToObject<LotYoukaiInfoList> would re-enter this converter and recurse forever
+                var entries = token.ToObject<List<LotYoukaiInfo>>(serializer) ?? new();
+                return new LotYoukaiInfoList() { Entries = entries };
             }
             else if (token.Type == JTokenType.String)
             {

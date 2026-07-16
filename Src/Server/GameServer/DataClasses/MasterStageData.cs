@@ -19,16 +19,25 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
     }
     public static class MasterStageData
     {
-        private static List<NecessaryMasterStageDataItem> _stageItems = new();
+        private static readonly object _initLock = new();
 
+        private static List<NecessaryMasterStageDataItem> _stageItems = new();
         private static List<StageConditionItem> _conditionItems = new();
+        private static volatile bool _isInitStage = false;
+        private static volatile bool _isInitCond = false;
+
         public static List<NecessaryMasterStageDataItem> StageItems
         {
             get
             {
                 if (!_isInitStage)
-                    InitStage();
-
+                {
+                    lock (_initLock)
+                    {
+                        if (!_isInitStage)
+                            InitStage();
+                    }
+                }
                 return _stageItems;
             }
         }
@@ -38,8 +47,13 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
             get
             {
                 if (!_isInitCond)
-                    InitCond();
-
+                {
+                    lock (_initLock)
+                    {
+                        if (!_isInitCond)
+                            InitCond();
+                    }
+                }
                 return _conditionItems;
             }
             set
@@ -47,34 +61,38 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
                 _conditionItems = value;
             }
         }
-        private static bool _isInitStage = false;
-        private static bool _isInitCond = false;
+
         private static void InitCond()
         {
             var data = DataManager.Logic.DataManager.GameDataManager!.GamedataCache["ywp_mst_stage_condition"];
-            _isInitCond = true;
             var obj = JObject.Parse(data);
+
+            List<StageConditionItem> built;
             //puni
             if (obj["tableData"] != null)
             {
-                var tbl = new TableParser<StageConditionItem>(obj["tableData"]!.ToString(), delimiter:"^");
-                ConditionItems = tbl.Items;
+                var tbl = new TableParser<StageConditionItem>(obj["tableData"]!.ToString(), delimiter: "^");
+                built = tbl.Items;
             }
             else if (obj["data"] is JArray arr)
             {
-                var condList = arr.ToObject<List<StageConditionItem>>();
-                ConditionItems = condList;
+                built = arr.ToObject<List<StageConditionItem>>()!;
             }
             else
             {
                 throw new InvalidDataException("Bad ywp_mst_stage_condition");
             }
+
+            _conditionItems = built;
+            _isInitCond = true;
         }
+
         private static void InitStage()
         {
             var ywpMstStage = DataManager.Logic.DataManager.GameDataManager!.GamedataCache["ywp_mst_stage"];
-            _isInitStage = true;
             var obj = JObject.Parse(ywpMstStage);
+
+            var built = new List<NecessaryMasterStageDataItem>();
             //Puni
             if (obj["tableData"] != null)
             {
@@ -83,7 +101,7 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
 
                 foreach (var item in prsr.Items)
                 {
-                    StageItems.Add(new NecessaryMasterStageDataItem
+                    built.Add(new NecessaryMasterStageDataItem
                     {
                         StageId = item.StageId,
                         StageType = item.StageType,
@@ -93,19 +111,17 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
                         UseActionID = item.UseActionId,
                         UseActionPoint = item.UseActionPoint,
                         UseActionType = item.UseActionType
-
                     });
                 }
-                
             }
             //WibWob
             else if (obj["data"] is JArray arr)
             {
                 var stageList = arr.ToObject<List<WibwobMstStageItem>>();
 
-                foreach (var item in stageList)
+                foreach (var item in stageList!)
                 {
-                    StageItems.Add(new NecessaryMasterStageDataItem
+                    built.Add(new NecessaryMasterStageDataItem
                     {
                         StageId = item.StageID,
                         StageType = item.StageType,
@@ -117,12 +133,14 @@ namespace Puniemu.Src.Server.GameServer.DataClasses
                         UseActionType = item.UseActionType
                     });
                 }
-                
             }
             else
             {
                 throw new InvalidDataException("Bad ywp_mst_stage");
             }
+
+            _stageItems = built;
+            _isInitStage = true;
         }
 
         public static int GetStageConditionIndex(long ConditionId)
