@@ -104,6 +104,10 @@ namespace Puniemu.Src.Server.GameServer.Requests.MissionReward.Logic
             {
                 userShop.Items.Add(new() { ItemID = mstMissionItem.RewardID });
             }
+            else if(mstMissionItem.RewardType == RewardType.IncreaseMaxFriends)
+            {
+                userData.FriendMaxCount += 1;
+            }
             else
             {
                 var err = new MsgBoxResponse("Unsupported reward type.", "Err");

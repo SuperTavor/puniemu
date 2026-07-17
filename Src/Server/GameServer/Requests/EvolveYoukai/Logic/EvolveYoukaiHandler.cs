@@ -60,6 +60,28 @@ namespace Puniemu.Src.Server.GameServer.Requests.EvolveYoukai.Logic
             var evolvedYokaiUserItem = userYokai.Items.FirstOrDefault(x => x.YoukaiId == mstItem.EvolutionYoukaiId);
             evolvedYokaiUserItem.Level = oldLevel;
 
+            // AddYoukai created the evolved Yo-kai at Level 1 / Exp 0. We copied the level
+            // above but must also bring Exp, the exp bar, and stats in line with that level.
+            // Otherwise the next exp gain (orb or battle) sees Exp far below the level's
+            // BaseExp, and the level-up loop in MoneyExpManager runs the Yo-kai straight to
+            // max level (and skips its evolution-gate cap). Only evolving Yo-kai hit this.
+            var evoMst = mstYokai.Items.First(x => x.YoukaiId == mstItem.EvolutionYoukaiId);
+            var levelTbl = new TableParser<YwpMstYoukaiLevel>(
+                DataManager.Logic.DataManager.GameDataManager.GetTableStringFromJson("ywp_mst_youkai_level"));
+            int lvlIdx = MstYoukaiManager.GetYoukaiLevelIndex(levelTbl, evoMst.LevelType, oldLevel);
+            if (lvlIdx != -1)
+            {
+                var lvlInfo = levelTbl.Items[lvlIdx];
+                evolvedYokaiUserItem.Exp = lvlInfo.BaseExp;
+                evolvedYokaiUserItem.ExpDenominator = (lvlInfo.MaxExp + 1) - lvlInfo.BaseExp;
+                evolvedYokaiUserItem.ExpNumerator = 0;
+                evolvedYokaiUserItem.Percentage = 0;
+            }
+            int hpOff = (evoMst.MaxHp - evoMst.BaseHp) / evoMst.MaxLevel;
+            int atkOff = (evoMst.MaxAtk - evoMst.BaseAtk) / evoMst.MaxLevel;
+            evolvedYokaiUserItem.Hp = evoMst.BaseHp + hpOff * (oldLevel - 1);
+            evolvedYokaiUserItem.Atk = evoMst.BaseAtk + atkOff * (oldLevel - 1);
+
             var deck = userDeck.Items[0];
             if (deck.MiddleYoukaiId == deserialized.YokaiID) deck.MiddleYoukaiId = mstItem.EvolutionYoukaiId;
             if (deck.MiddleLeftYoukaiId == deserialized.YokaiID) deck.MiddleLeftYoukaiId = mstItem.EvolutionYoukaiId;

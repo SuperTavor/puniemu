@@ -19,5 +19,8 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.DataClasses
 
         [JsonProperty("items")]
         public Dictionary<string, List<long>> Items { get; set; }
+
+        [JsonProperty("rateUp")]
+        public Dictionary<long, double>? RateUp { get; set; }
     }
 }

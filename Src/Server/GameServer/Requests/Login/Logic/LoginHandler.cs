@@ -58,19 +58,19 @@ namespace Puniemu.Src.Server.GameServer.Requests.Login.Logic
             }
             else res = new DataClasses.Puni.LoginResponse();
 
-            var userYokai = new TableParser<YwpUserYoukai>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_youkai"));
-            var userSkill = new TableParser<YwpUserYoukaiSkill>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_youkai_skill"));
-            var userBonus = new TableParser<YwpUserYoukaiBonusEffect>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_youkai_bonus_effect"));
-            var userDict = new TableParser<YwpUserDictionary>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_dictionary"));
-            await YoukaiManager.AddYoukai(userYokai, 2281000, userSkill, userBonus, deserialized.Gdkey);
-            DictionaryManager.EditDictionary(ref userDict, 2281000, true, true);
-            userYokai.Items.FirstOrDefault(x => x.YoukaiId == 2281000).Level = 32;
+            //var userYokai = new TableParser<YwpUserYoukai>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_youkai"));
+            //var userSkill = new TableParser<YwpUserYoukaiSkill>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_youkai_skill"));
+            //var userBonus = new TableParser<YwpUserYoukaiBonusEffect>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_youkai_bonus_effect"));
+            //var userDict = new TableParser<YwpUserDictionary>(await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Gdkey, "ywp_user_dictionary"));
+            //await YoukaiManager.AddYoukai(userYokai, 2281000, userSkill, userBonus, deserialized.Gdkey);
+            //DictionaryManager.EditDictionary(ref userDict, 2281000, true, true);
+            //userYokai.Items.FirstOrDefault(x => x.YoukaiId == 2281000).Level = 32;
 
 
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "ywp_user_youkai", userYokai.ToString());
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "ywp_user_youkai_skill", userSkill.ToString());
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "ywp_user_youkai_bonus_effect", userBonus.ToString());
-            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "ywp_user_dictionary", userDict.ToString());
+            //await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "ywp_user_youkai", userYokai.ToString());
+            //await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "ywp_user_youkai_skill", userSkill.ToString());
+            //await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "ywp_user_youkai_bonus_effect", userBonus.ToString());
+            //await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Gdkey, "ywp_user_dictionary", userDict.ToString());
             await res.ConstructAsync(deserialized!.Gdkey!);
             //Get the user tables
             var resdict = (await res.ToDictionary())!;            

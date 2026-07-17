@@ -45,6 +45,18 @@ namespace Puniemu.Src.Server.GameServer.Logic
                 int levelIndex = 0;
                 int level = result.Before.Level;
 
+                // Heal Yo-kai whose stored Exp is below their level's band (e.g. granted
+                // or placed at a level without a matching Exp, like the login freebie or a
+                // fresh evolution). Otherwise After.Exp stays below every bracket from this
+                // level up, the loop never matches, and the Yo-kai jumps straight to max.
+                int curLevelIndex = MstYoukaiManager.GetYoukaiLevelIndex(
+                    YoukaiLevelMstTable, MasterYoukai.LevelType, result.Before.Level);
+                if (curLevelIndex != -1 &&
+                    result.Before.Exp < YoukaiLevelMstTable.Items[curLevelIndex].BaseExp)
+                {
+                    result.Before.Exp = YoukaiLevelMstTable.Items[curLevelIndex].BaseExp;
+                }
+
                 result.After.Exp = result.Before.Exp + expToAdd;
 
                 while (levelIndex != -1)

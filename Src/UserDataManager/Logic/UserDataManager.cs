@@ -231,7 +231,9 @@ namespace Puniemu.Src.UserDataManager.Logic
         {
             var response = await SupabaseClient!.From<Device>().Where(d => d.UdKey == udkey).Get();
             var device = response.Models.FirstOrDefault()!;
+
             device.Gdkeys!.Remove(gdkey);
+
             await device.Update<Device>();
         }
 

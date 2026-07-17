@@ -196,8 +196,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
 
                     var rank = (RarityType)value;
                     var yokaisToRoll = gacha.Yokais[pool];
-                    var roll = Random.Shared.Next(yokaisToRoll.Count);
-                    var resultYokai = yokaisToRoll[roll];
+                    var resultYokai = PickYokai(yokaisToRoll, gacha.RateUp);
 
                     if (mode == GachaMaxedYokaiMode.RerollUntilValid)
                     {
@@ -216,7 +215,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
 
                             if (candidates.Count > 0)
                             {
-                                resultYokai = candidates[Random.Shared.Next(candidates.Count)];
+                                resultYokai = PickYokai(candidates, gacha.RateUp);
                             }
                             else
                             {
@@ -263,6 +262,34 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
                     SkillMaxYoukaiID = lastMaxedYokai
                 }
             };
+        }
+
+        //Picks one yokai from a bucket. If the gacha defines rateUp weights, the pick is
+        //weighted (a yokai's weight is its rateUp value, or 1.0 if it isn't listed); otherwise
+        //every yokai in the bucket is equally likely (legacy uniform behavior).
+        private static long PickYokai(List<long> yokais, Dictionary<long, double>? rateUp)
+        {
+            if (rateUp == null || rateUp.Count == 0)
+                return yokais[Random.Shared.Next(yokais.Count)];
+
+            double totalWeight = 0;
+            foreach (var yokai in yokais)
+                totalWeight += rateUp.TryGetValue(yokai, out var w) ? w : 1.0;
+
+            //No positive weight in this bucket (e.g. every member explicitly set to 0) -> fall back to uniform.
+            if (totalWeight <= 0)
+                return yokais[Random.Shared.Next(yokais.Count)];
+
+            double roll = Random.Shared.NextDouble() * totalWeight;
+            double cumulative = 0;
+            foreach (var yokai in yokais)
+            {
+                cumulative += rateUp.TryGetValue(yokai, out var w) ? w : 1.0;
+                if (roll <= cumulative)
+                    return yokai;
+            }
+
+            return yokais[yokais.Count - 1]; //floating-point safety net
         }
 
         private static string? RollPool(Dictionary<string, double> weights, int gachaId, ISet<string>? excludedPools = null)
