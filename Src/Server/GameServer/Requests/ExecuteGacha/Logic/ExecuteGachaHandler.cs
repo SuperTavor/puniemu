@@ -76,7 +76,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             long priceId = long.Parse(GachaMstTable.Table[gachaIndex][4]);
             int priceNum = int.Parse(GachaMstTable.Table[gachaIndex][5]);
 
-            // Lire le gachaType depuis ywp_mst_gacha colonne 6
+            
             int gachaType = int.Parse(GachaMstTable.Table[gachaIndex][6]);
 
             if (priceType == 1) // YMONEY
@@ -148,7 +148,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             // MAIN HANDLER
 
             var prizes = new List<GachaPrize>();
-            //const int DUPLICATE_REWARD_ITEM_ID = 20506; // exemple d'item donné en cas de doublon
+            //const int DUPLICATE_REWARD_ITEM_ID = 20506; 
 
             if (deserialized.RequestYoukaiId == 0)
             {
@@ -182,7 +182,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
                 return;
             }
 
-            // ONI FEVER — gachaType lu depuis ywp_mst_gacha colonne 6
+            
             int feverChargeType = 0;
             object? gachaListForResponse = null;
             var userGachaList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<List<YwpUserGachaEntry>>(deserialized!.Level5UserId!, "ywp_user_gacha");
