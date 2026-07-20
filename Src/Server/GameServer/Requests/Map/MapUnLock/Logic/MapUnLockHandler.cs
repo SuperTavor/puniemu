@@ -8,7 +8,6 @@ using System.Buffers;
 using Puniemu.Src.Server.GameServer.Logic;
 using Puniemu.Src.TableParser.DataClasses;
 using Puniemu.Src.TableParser.Logic;
-using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
 using Puniemu.Src.Utils.GeneralUtils;
 using Puniemu.Src.UserDataManager.Logic;

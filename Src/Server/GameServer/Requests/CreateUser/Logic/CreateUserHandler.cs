@@ -6,7 +6,6 @@ using Puniemu.Src.TableParser.DataClasses;
 using Puniemu.Src.UserDataManager.DataClasses;
 using Puniemu.Src.UserDataManager.Logic;
 using Puniemu.Src.TableParser.Logic;
-using Supabase.Postgrest;
 using System.Buffers;
 using System.Text;
 using Puniemu.Src.Server.GameServer.Logic;
@@ -118,8 +117,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
             ctx.Request.BodyReader.AdvanceTo(readResult.Buffer.End);
             var requestJsonString = NHNCrypt.Logic.NHNCrypt.DecryptRequest(encRequest);
             var deserialized = JsonConvert.DeserializeObject<CreateUserRequest>(requestJsonString!);
-            var dbres = await UserDataManager.Logic.UserDataManager.SupabaseClient!.From<Account>().Where(x => x.Gdkey == deserialized.Level5UserID).Get();
-            var acc = dbres.Model!;
+            var acc = await UserDataManager.Logic.UserDataManager.GetAccountFromGdkeyAsync(deserialized.Level5UserID);
             ctx.Response.ContentType = "application/json";
             // in wibwob the title is not gender specific in puni yes
             var title = PlayerTitle.Kun_Little;
@@ -130,7 +128,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.CreateUser.Logic
             generatedUserData.UserID = acc.UserId;
             acc.UserId = generatedUserData.UserID;
             acc.IsDirty = true;
-            await acc.Update<Account>();
+            await UserDataManager.Logic.UserDataManager.UpdateAccountAsync(acc);
             try
             {
                 await RegisterDefaultTables(deserialized, generatedUserData, acc.Gdkey);

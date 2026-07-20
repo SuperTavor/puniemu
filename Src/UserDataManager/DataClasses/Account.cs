@@ -1,39 +1,36 @@
-﻿using Newtonsoft.Json;
-using Supabase.Postgrest.Attributes;
-using Supabase.Postgrest.Models;
+using Newtonsoft.Json;
 
 namespace Puniemu.Src.UserDataManager.DataClasses
 {
-    [Table("account")]
-    public class Account : BaseModel
+    // Maps to the "account" table
+    public class Account
     {
-        [Column("gdkey")]
-        [PrimaryKey("gdkey",false)]
+        // column: gdkey (primary key)
         public string? Gdkey { get; set; }
 
-        [Column("character_id")]
+        // column: character_id
         public string? CharacterId { get; set; }
 
-        [Column("udkey")]
-        public string Udkey { get; set; }
+        // column: udkey
+        public string? Udkey { get; set; }
 
-        [Column("user_id")]
+        // column: user_id
         public string? UserId { get; set; }
 
-        [Column("ywp_user_tables")]
-        public Dictionary<string,object?>? YwpUserTables { get; set; }
+        // column: ywp_user_tables (jsonb)
+        public Dictionary<string, object?>? YwpUserTables { get; set; }
 
-        [Column("last_lgn_time")]
+        // column: last_lgn_time
         public string? LastLoginTime { get; set; }
 
-        [Column("start_date")]
+        // column: start_date (stored as text)
         public long StartDate { get; set; }
 
-        [Column("opening_tutorial_flag")]
+        // column: opening_tutorial_flag
         public bool OpeningTutorialFlag { get; set; }
 
         [JsonIgnore]
         //used for the account cache
-        public bool IsDirty { get; set; } = false; 
+        public bool IsDirty { get; set; } = false;
     }
 }

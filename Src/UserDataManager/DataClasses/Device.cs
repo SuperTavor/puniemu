@@ -1,16 +1,12 @@
-﻿using Supabase.Postgrest.Attributes;
-using Supabase.Postgrest.Models;
-
 namespace Puniemu.Src.UserDataManager.DataClasses
 {
-    [Table("device")]
-    public class Device : BaseModel
+    // Maps to the "device" table
+    public class Device
     {
-        [Column("udkey")]
-        [PrimaryKey("udkey",false)]
+        // column: udkey (primary key)
         public string? UdKey { get; set; }
 
-        [Column("gdkeys")]
+        // column: gdkeys (text[])
         public List<string>? Gdkeys { get; set; }
 
     }

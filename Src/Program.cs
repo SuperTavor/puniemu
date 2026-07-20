@@ -74,6 +74,11 @@ class Program
         //Add the config to DataManager so it can be used globally
         DataManager.Logic.DataManager.StaticInit(builder.Configuration);
 
+        builder.WebHost.ConfigureKestrel(options =>
+        {
+            options.Limits.MaxConcurrentConnections = DataManager.Logic.DataManager.MaxConnections;
+        });
+
         var app = builder.Build();
         //Rewrite to redirect mainly all .NHN requests to .NHN/, as ASP.NET Core thinks it's static serving otherwise or something 
         //second rewrite is in case it's for example /////////////////////init.nhn it makes it /init.nhn
@@ -83,6 +88,24 @@ class Program
 
 
         app.UseRewriter(rewriteOptions);
+
+        //Refuse new players while the account cache is at capacity
+        app.Use(async (ctx, next) =>
+        {
+            try
+            {
+                await next();
+            }
+            catch (UserDataManager.Logic.UserDataManager.ServerFullException)
+            {
+                if (!ctx.Response.HasStarted)
+                {
+                    ctx.Response.StatusCode = 503;
+                    var serverFullMsg = new Src.Server.GameServer.DataClasses.MsgBoxResponse("The server is full.\nPlease try again later.", "Busy");
+                    await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(serverFullMsg)));
+                }
+            }
+        });
 
         //Init database connection
         UserDataManager.Logic.UserDataManager.Initialize();
@@ -121,51 +144,12 @@ class Program
         });
         //Assign handlers
         AssignCustomAuthHandlers(app);
-        AssignDataDownloadHandler(app);
         AssignL5IDHandlers(app);
         AssignGameServerHandlers(app);
         AssignDefault(app);
         app.Run();
     }
 
-    static void AssignDataDownloadHandler(WebApplication app)
-    {
-        app.MapGet("/eal/{*filePath}", async (HttpContext ctx, string filePath) =>
-        {
-            Console.WriteLine(filePath);
-
-            if (string.IsNullOrEmpty(filePath))
-            {
-                ctx.Response.StatusCode = 400;
-                await ctx.Response.WriteAsync("no file bro");
-                return;
-            }
-
-            string storageRoot = Path.Combine(Directory.GetCurrentDirectory(), "dataDownload");
-
-            string fullPath = Path.GetFullPath(Path.Combine(storageRoot, filePath));
-
-            if (!fullPath.StartsWith(storageRoot, StringComparison.OrdinalIgnoreCase) || !File.Exists(fullPath))
-            {
-                ctx.Response.StatusCode = 404;
-                await ctx.Response.WriteAsync("404 ");
-                return;
-            }
-
-            var provider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
-            if (!provider.TryGetContentType(fullPath, out string? contentType))
-            {
-                contentType = "application/octet-stream"; 
-            }
-
-            string fileName = Path.GetFileName(fullPath);
-            ctx.Response.ContentType = contentType;
-
-            ctx.Response.Headers.Append("Content-Disposition", $"attachment; filename=\"{fileName}\"");
-
-            await ctx.Response.SendFileAsync(fullPath);
-        });
-    }
     static void AssignL5IDHandlers(WebApplication app)
     {
         const string L5ID_BASE = "/api/v1/";

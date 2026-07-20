@@ -1,17 +1,13 @@
-﻿using Supabase.Postgrest.Attributes;
-using Supabase.Postgrest.Models;
-
 namespace Puniemu.Src.UserDataManager.DataClasses
 {
-    [Table("mail")]
-    public class Mail : BaseModel
+    // Maps to the "mail" table
+    public class Mail
     {
-        [Column("mail")]
-        [PrimaryKey("mail", false)]
+        // column: mail (primary key)
         public string? MailAddress { get; set; }
 
-        [Column("currentUdkey")]
-        public string CurrentUdkey { get; set; }
+        // column: "currentUdkey"
+        public string? CurrentUdkey { get; set; }
 
     }
 }
