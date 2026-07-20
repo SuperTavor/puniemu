@@ -17,11 +17,6 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
 {
     public class ExecuteGachaHandler
     {
-        private static readonly Dictionary<int, int> BingoKaiGachaTypeMap = new()
-        {
-            { 500055, 3 },
-        };
-
         private const int FEVER_PULLS_REQUIRED = 5;
 
         public static async Task HandleAsync(HttpContext ctx)
@@ -80,6 +75,9 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             int priceType = int.Parse(GachaMstTable.Table[gachaIndex][3]);
             long priceId = long.Parse(GachaMstTable.Table[gachaIndex][4]);
             int priceNum = int.Parse(GachaMstTable.Table[gachaIndex][5]);
+
+            // Lire le gachaType depuis ywp_mst_gacha colonne 6
+            int gachaType = int.Parse(GachaMstTable.Table[gachaIndex][6]);
 
             if (priceType == 1) // YMONEY
             {
@@ -184,36 +182,34 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
                 return;
             }
 
+            // ONI FEVER — gachaType lu depuis ywp_mst_gacha colonne 6
             int feverChargeType = 0;
             object? gachaListForResponse = null;
-            if (BingoKaiGachaTypeMap.TryGetValue(gachaId, out int feverGachaType))
+            var userGachaList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<List<YwpUserGachaEntry>>(deserialized!.Level5UserId!, "ywp_user_gacha");
+            if (userGachaList != null)
             {
-                var userGachaList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<List<YwpUserGachaEntry>>(deserialized!.Level5UserId!, "ywp_user_gacha");
-                if (userGachaList != null)
+                var feverEntry = userGachaList.FirstOrDefault(g => g.GachaType == gachaType);
+                if (feverEntry != null)
                 {
-                    var feverEntry = userGachaList.FirstOrDefault(g => g.GachaType == feverGachaType);
-                    if (feverEntry != null)
+                    int feverIncrement = 100 / FEVER_PULLS_REQUIRED;
+                    int newPctg = feverEntry.FeverPctg + feverIncrement * pullCount;
+                    if (newPctg >= 100)
                     {
-                        int feverIncrement = 100 / FEVER_PULLS_REQUIRED;
-                        int newPctg = feverEntry.FeverPctg + feverIncrement * pullCount;
-                        if (newPctg >= 100)
+                        feverChargeType = 2;
+                        int remainder = newPctg % 100;
+                        feverEntry.FeverPctg = remainder;
+                        await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_gacha", userGachaList);
+                        gachaListForResponse = new List<object>
                         {
-                            feverChargeType = 2;
-                            int remainder = newPctg % 100;
-                            feverEntry.FeverPctg = remainder;
-                            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_gacha", userGachaList);
-                            gachaListForResponse = new List<object>
-                            {
-                                new { feverPctg = 100, gachaType = feverEntry.GachaType }
-                            };
-                        }
-                        else
-                        {
-                            feverChargeType = 1;
-                            feverEntry.FeverPctg = newPctg;
-                            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_gacha", userGachaList);
-                            gachaListForResponse = userGachaList;
-                        }
+                            new { feverPctg = 100, gachaType = feverEntry.GachaType }
+                        };
+                    }
+                    else
+                    {
+                        feverChargeType = 1;
+                        feverEntry.FeverPctg = newPctg;
+                        await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_gacha", userGachaList);
+                        gachaListForResponse = userGachaList;
                     }
                 }
             }
