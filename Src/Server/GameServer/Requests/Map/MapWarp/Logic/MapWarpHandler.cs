@@ -6,7 +6,6 @@ using Puniemu.Src.Server.GameServer.DataClasses;
 using System.Text;
 using System.Buffers;
 using Puniemu.Src.Server.GameServer.Logic;
-using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
 using Puniemu.Src.Utils.GeneralUtils;
 using Puniemu.Src.TableParser.DataClasses;
@@ -140,7 +139,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.MapWarp.Logic
                     maps.Add(map);
                 }
             }
-            if (maps.IsNullOrEmpty())
+            if (maps == null || maps.Count == 0)
             {
                 var errSession = new MsgBoxResponse("Error", "Error");
                 await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(errSession)));

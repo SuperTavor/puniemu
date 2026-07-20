@@ -1,4 +1,3 @@
-using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Puniemu.Src.Server.GameServer.DataClasses;
@@ -186,7 +185,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameEnd.Logic
 
                 if (newMapIndex == -1)
                 {
-                    mapLocked = !ywpMstMap[mstIndex].TextUnlock.IsNullOrEmpty();
+                    mapLocked = !string.IsNullOrEmpty(ywpMstMap[mstIndex].TextUnlock);
                     MapManager.AddMap(ywpUserMap, ywpMstMap[mstIndex].MapId);
                 }
 

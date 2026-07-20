@@ -3,7 +3,6 @@ using Puniemu.Src.Server.GameServer.Requests.FriendRequestAccept.DataClasses;
 using Puniemu.Src.Server.GameServer.DataClasses;
 using System.Buffers;
 using System.Text;
-using Microsoft.IdentityModel.Tokens;
 using System.Diagnostics.Eventing.Reader;
 using System.Xml.Linq;
 

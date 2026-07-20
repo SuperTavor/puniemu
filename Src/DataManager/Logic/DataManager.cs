@@ -10,6 +10,14 @@ namespace Puniemu.Src.DataManager.Logic
 
         public static string? SupabaseURL { get; private set; }
 
+        public static string? PostgresConnectionString { get; private set; }
+
+        // Kestrel cap on simultaneous open connections
+        public static int MaxConnections { get; private set; }
+
+        // Account cache ceiling. New players are refused while the cache is at capacity.
+        public static int MaxCachedAccounts { get; private set; }
+
         // If false, the data download will be downloaded from a different server rather than the Supabase storage. Supabase storage method isnt implemented yet
         public static bool IsDataDownloadFromSupabase { get; private set; }
 
@@ -32,6 +40,9 @@ namespace Puniemu.Src.DataManager.Logic
         {
             SupabaseKey = config["SupabaseKey"];
             SupabaseURL = config["SupabaseURL"];
+            PostgresConnectionString = config["PostgresConnectionString"];
+            MaxConnections = int.TryParse(config["MaxConnections"], out var maxConnections) ? maxConnections : 1500;
+            MaxCachedAccounts = int.TryParse(config["MaxCachedAccounts"], out var maxCachedAccounts) ? maxCachedAccounts : 2000;
             GameVersion = config["GameVersion"];
             ServerName = config["ServerName"];
             EmailForAuthMessages = config["EmailForAuthMessages"];

@@ -6,7 +6,6 @@ using Puniemu.Src.Server.GameServer.DataClasses;
 using System.Text;
 using System.Buffers;
 using Puniemu.Src.Server.GameServer.Logic;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Puniemu.Src.Server.GameServer.Requests.Rename.Logic
 {
@@ -24,7 +23,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Rename.Logic
             ctx.Response.ContentType = "application/json";
             var userData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data");
 
-            if (userData != null && !deserialized.NewPlayerName.IsNullOrEmpty())
+            if (userData != null && !string.IsNullOrEmpty(deserialized.NewPlayerName))
             {
                 userData.PlayerName = deserialized.NewPlayerName;
             }

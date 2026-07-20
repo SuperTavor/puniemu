@@ -3,7 +3,6 @@ using Puniemu.Src.Server.GameServer.Requests.FriendRequest.DataClasses;
 using Puniemu.Src.Server.GameServer.DataClasses;
 using System.Buffers;
 using System.Text;
-using Microsoft.IdentityModel.Tokens;
 using System.Diagnostics.Eventing.Reader;
 
 
@@ -27,7 +26,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.FriendRequest.Logic
 
             res.ResponseCode = 0;
             bool good = false;
-            if (!targetGdkey.IsNullOrEmpty())
+            if (!string.IsNullOrEmpty(targetGdkey))
             {
                 YwpUserData? myUserData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized!.Level5UserID!, "ywp_user_data");
                 YwpUserData? targetUserData = (await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(targetGdkey!, "ywp_user_data"))!;

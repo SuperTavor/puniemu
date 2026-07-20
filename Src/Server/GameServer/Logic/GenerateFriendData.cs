@@ -1,4 +1,3 @@
-﻿using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Puniemu.Src.Server.GameServer.DataClasses;
 using Puniemu.Src.Server.GameServer.Requests.InitGacha.DataClasses;
@@ -75,11 +74,11 @@ namespace Puniemu.Src.Server.GameServer.Logic
                             item2.TitleId = TitleId;
                         if (IconId > 0)
                             item2.IconId = IconId;
-                        if (!PlayerName.IsNullOrEmpty())
+                        if (!string.IsNullOrEmpty(PlayerName))
                             item2.PlayerName = PlayerName;
                         if (YoukaiId > 0)
                             item2.YoukaiId = YoukaiId;
-                        if (!LastPlayDt.IsNullOrEmpty())
+                        if (!string.IsNullOrEmpty(LastPlayDt))
                             item2.LastPlayDt = LastPlayDt;
                     }
                 }
