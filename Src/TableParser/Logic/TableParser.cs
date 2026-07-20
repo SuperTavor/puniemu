@@ -323,28 +323,35 @@ namespace Puniemu.Src.TableParser.Logic
             }
         }
 
+        // ToString rebuilds _rawTable in place, so concurrent calls on a shared parser
+        // (e.g. MissionManager's static mst mission table) corrupt the list mid-render
+        private readonly object _toStringLock = new();
+
         public override string ToString()
         {
-            PrepareForToString();
-            StringBuilder sb = new StringBuilder();
-            if (_prefix != null)
+            lock (_toStringLock)
             {
-                sb.Append(_prefix + ":");
-            }
-            for (int i = 0; i < _rawTable.Count; i++)
-            {
-                sb.Append(string.Join(_delimiter, _rawTable[i]));
-                if (i < _rawTable.Count - 1)
+                PrepareForToString();
+                StringBuilder sb = new StringBuilder();
+                if (_prefix != null)
                 {
-                    sb.Append('*');
+                    sb.Append(_prefix + ":");
                 }
+                for (int i = 0; i < _rawTable.Count; i++)
+                {
+                    sb.Append(string.Join(_delimiter, _rawTable[i]));
+                    if (i < _rawTable.Count - 1)
+                    {
+                        sb.Append('*');
+                    }
+                }
+                var s = sb.ToString();
+                if (s.StartsWith("*"))
+                    s = s.Substring(1);
+                if (s.EndsWith("*"))
+                    s = s.Substring(0, s.Length - 1);
+                return s;
             }
-            var s = sb.ToString();
-            if (s.StartsWith("*"))
-                s = s.Substring(1);
-            if (s.EndsWith("*"))
-                s = s.Substring(0, s.Length - 1);
-            return s;
         }
     }
 }
