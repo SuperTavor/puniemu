@@ -46,6 +46,21 @@
         Tracer = 30,
         Slasher = 44,
         NoFillerTracer = 41,
+        DirectAttacker = 20, //when Unk1 in YwpMstYoukaiSkillLevel is 1 its single attacker and when Unk1 is 2 its All Attacker
+        SummonOtherPuni = 2, //ex: Komasan soult
+        PuniRearranger = 7, //mirapo damona
+        MultipleAreaPopper = 22, //kingmera
+        BonusBallsMaker = 23, //Mermother
+        AllAttackerAndStunner = 25, //Poofessor
+        InflatorBetter = 26, //Slurpent
+        CrossAreaPopper = 27, //Darknyan
+        AllAttackerAndHealer = 28, //Camellia
+        SingleAttackerAndHPScaling = 31, //Melonyan M
+        PopperDissapear = 32, //Deals more Damage the more his puni disapeears ex: Whisper
+        SingleAttackerLuckScaling = 34, //Dressed-up Whisper (power changes based on luck)
+        SingleAttackerScalingOnPuni = 35, //Prancy-nyan Scale on the number of puni on Board (more is better)
+        AllPopperHealerScalingOnPuni = 36, //Fancy-nyan Heal scale on the number of puni erased (more is better)
+        
 
     }
 }
