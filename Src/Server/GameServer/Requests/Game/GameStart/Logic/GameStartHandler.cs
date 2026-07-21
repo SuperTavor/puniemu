@@ -46,7 +46,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
             var stageIdx = UserStage.FindIndex([stageId.ToString()]);
             if (stageIdx == -1)
             {
-                
+
                 UserStage.AddItem(new YwpUserStage { StageId = stageId, StageStatus = 0, Star1 = 0, Star2 = 0, Star3 = 0, Score = 0, NumClear = 0, Unk2 = 0 });
                 await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(gdkey, "ywp_user_stage", UserStage.ToString());
                 return true;
@@ -76,7 +76,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
             // send bad requests if bad requests send
             var userData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized!.Gdkey!, "ywp_user_data");
             var UserStage = new TableParser.Logic.TableParser<YwpUserStage>((await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_stage"))!);
-            
+
             if (deserialized == null || userData == null)
             {
                 await GeneralUtils.SendBadRequest(ctx);
@@ -113,16 +113,16 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
                     return;
                 }
             }
-            
-            
+
+
             //Construct response
             var res = new GameStartResponse(userData);
 
             // Get mst and user table
-            
+
             var enemyParams = new TableParser.Logic.TableParser(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai_enemy_param"]!)!["tableData"]);
-            
-                
+
+
             var YwpUserYoukaiSkillTab = new TableParser.Logic.TableParser<YwpUserYoukaiSkill>((await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai_skill"))!);
             var YwpUserYoukaiSSkillTab = new TableParser.Logic.TableParser((await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized!.Gdkey!, "ywp_user_youkai_strong_skill"))!);
 
@@ -132,7 +132,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
 
             //get current stage info
             var jsonLevelData = JsonConvert.DeserializeObject<Dictionary<string, StageData>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["stage_data"]);
-            
+
 
             // Throw error if stage dosent have config info
             if (stageInfoIdx == -1 || (jsonLevelData == null || !(jsonLevelData.ContainsKey(deserialized.StageId.ToString()))))
@@ -142,7 +142,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
                 return;
             }
             StageData LevelData = jsonLevelData[deserialized.StageId.ToString()];
-                
+
             // Throw error if enemy list is empty
             if (LevelData.Enemy == null || LevelData.Enemy.Count == 0)
             {
@@ -208,17 +208,15 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
                     var enemyMstYokai = mstYokai.Items.FirstOrDefault(x => x.YoukaiId == long.Parse(enemyParams.Table[enemyParamsIdx][1]));
 
                     bool befriendable = enemyMstYokai != null && enemyMstYokai.FoodType != 0;
-                    
+
                     var yokaiId = int.Parse(enemyParams.Table[enemyParamsIdx][1]);
-                    var skillIdx = YoukaiManager.GetYoukaiSkillIndex(YwpUserYoukaiSkillTab, enemyId);
+
+
+                    var yokaiSkillIdx = YoukaiManager.GetYoukaiSkillIndex(YwpUserYoukaiSkillTab, yokaiId);
+                    bool isMaxSkill = yokaiSkillIdx != -1 && YwpUserYoukaiSkillTab.Items[yokaiSkillIdx].Level >= 7;
 
                     //LB not implemented yet
 
-                    bool isMaxSkill = false;
-                    if (skillIdx != -1)
-                    {
-                        isMaxSkill = YwpUserYoukaiSkillTab.Items[skillIdx].Level >= 7;
-                    }
                     var mstYokaiItem = mstYokai.Items.Where(x => x.YoukaiId == yokaiId).FirstOrDefault();
                     var t = YwpUserYoukaiTab.Items.FindIndex(x => x.YoukaiId == yokaiId);
                     var notHaveYokai = t == -1;
@@ -249,7 +247,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
 
             //Check rare encounters and add, if there are already 3 yokai replace the weakest one
             var rareEnemyId = RareEnemyManager.GetDrop(deserialized.StageId);
-            if(rareEnemyId != -1 && isAfterJibanyan)
+            if (rareEnemyId != -1 && isAfterJibanyan)
             {
                 //Rare encounter hp and attack are the average of all other stages
                 int generalAttackAverage = (int)res.EnemyYoukaiList.Average(x => x.AttackPower);
@@ -300,12 +298,12 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
             AddToUserYoukaiList(currentDeck.FarRightYoukaiId);
 
             //Check tribe unity
-            Dictionary<int,int> unities = new();
-            foreach(var yokai in res.UserYoukaiList)
+            Dictionary<int, int> unities = new();
+            foreach (var yokai in res.UserYoukaiList)
             {
                 var mstItem = mstYokai.Items.FirstOrDefault(x => x.YoukaiId == yokai.YoukaiId);
                 if (mstItem == null) continue;
-                if(unities.ContainsKey(mstItem.YoukaiKind))
+                if (unities.ContainsKey(mstItem.YoukaiKind))
                 {
                     unities[mstItem.YoukaiKind]++;
                 }
@@ -313,7 +311,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
                 {
                     unities.Add(mstItem.YoukaiKind, 1);
                 }
-                
+
             }
 
             //Apply tribe unity
@@ -346,7 +344,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
                     yokai.Hp += yokai.Hp * multiplier / 100;
                     yokai.AttackPower += yokai.AttackPower * multiplier / 100;
                 }
-               
+
             }
 
             // Edit tutorial flg
@@ -381,16 +379,16 @@ namespace Puniemu.Src.Server.GameServer.Requests.Game.GameStart.Logic
             res.DictionaryDiff = dictionaryTable.ToString();
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_requestid", res.RequestID);
             res.UserData = userData;
-            var resdict = JsonConvert.DeserializeObject<Dictionary<string,object?>>(JsonConvert.SerializeObject(res));
-            
+            var resdict = JsonConvert.DeserializeObject<Dictionary<string, object?>>(JsonConvert.SerializeObject(res));
+
             await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Gdkey!, "ywp_user_data", userData);
-            
+
             await GeneralUtils.AddTablesToResponse(Consts.GAME_START_TABLES, resdict!, true, deserialized!.Gdkey!);
-            
+
             var encryptedRes = NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(resdict));
-            
+
             ctx.Response.Headers.ContentType = "application/json";
-            
+
             await ctx.Response.WriteAsync(encryptedRes);
 
         }

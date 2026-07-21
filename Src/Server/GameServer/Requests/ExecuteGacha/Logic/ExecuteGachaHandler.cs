@@ -11,10 +11,13 @@ using Puniemu.Src.Utils.GeneralUtils;
 using System.Buffers;
 using System.Text;
 
+// ONI FEVER : DEVELOPED BY WIBWOB_YT
+
 namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
 {
     public class ExecuteGachaHandler
     {
+        private const int FEVER_PULLS_REQUIRED = 5;
 
         public static async Task HandleAsync(HttpContext ctx)
         {
@@ -27,7 +30,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             var deserialized = JsonConvert.DeserializeObject<ExecuteGachaRequest>(requestJsonString!);
 
             GachaPoolManager.EnsureLoaded();
-            if(!GachaPoolManager.Gachas.ContainsKey(deserialized.GachaId))
+            if (!GachaPoolManager.Gachas.ContainsKey(deserialized.GachaId))
             {
                 var errSession = new MsgBoxResponse($"No pool data exists for:\ngachaId:{deserialized.GachaId}", "Error");
                 await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(errSession)));
@@ -64,14 +67,17 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             int gachaId = deserialized.GachaId;
             var userId = deserialized.UserId;
 
-            int gachaIndex = GetTableIndex.GetIndex(GachaMstTable, new List<Tuple<int, string>>{Tuple.Create(0, deserialized.GachaId.ToString())});
+            int gachaIndex = GetTableIndex.GetIndex(GachaMstTable, new List<Tuple<int, string>> { Tuple.Create(0, deserialized.GachaId.ToString()) });
 
             if (DataManager.Logic.DataManager.IsWibWob) pullCount = 1;
-                else pullCount = int.Parse(GachaMstTable.Table[gachaIndex][11]); 
+            else pullCount = int.Parse(GachaMstTable.Table[gachaIndex][11]);
 
             int priceType = int.Parse(GachaMstTable.Table[gachaIndex][3]);
             long priceId = long.Parse(GachaMstTable.Table[gachaIndex][4]);
             int priceNum = int.Parse(GachaMstTable.Table[gachaIndex][5]);
+
+            
+            int gachaType = int.Parse(GachaMstTable.Table[gachaIndex][6]);
 
             if (priceType == 1) // YMONEY
             {
@@ -97,7 +103,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
                 if (itemIdAction == 81) // Ypoint
                 {
                     int price = priceNum;
-                    foreach(string[] item in itemsListMstTable.Table)
+                    foreach (string[] item in itemsListMstTable.Table)
                     {
                         if (int.Parse(item[1]) == itemIdAction)
                         {
@@ -142,7 +148,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             // MAIN HANDLER
 
             var prizes = new List<GachaPrize>();
-            //const int DUPLICATE_REWARD_ITEM_ID = 20506; // exemple d'item donné en cas de doublon
+            //const int DUPLICATE_REWARD_ITEM_ID = 20506; 
 
             if (deserialized.RequestYoukaiId == 0)
             {
@@ -153,19 +159,19 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
                     prizes.Add(await GachaPoolManager.CrankReward(gachaId, userYokaiTable, userSkillTable, dictionaryListTable, userItemtable, userBonus, deserialized.Level5UserId, mode));
                 }
             }
-            
+
             else if (deserialized.RequestYoukaiId != 0 && GachaYoukaiChoiceManager.IsChoiceOk(gachaId, deserialized.RequestYoukaiId))
             {
                 //Check yokai rarity type
                 var ykIdx = mstYokai.Items.FindIndex(x => x.YoukaiId == deserialized.RequestYoukaiId);
-                if(ykIdx == -1)
+                if (ykIdx == -1)
                 {
                     var errSession = new MsgBoxResponse("Error occured", "Error");
                     await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(errSession)));
                     return;
                 }
                 var rarity = mstYokai.Items[ykIdx].YoukaiRarity;
-                prizes.Add(await GachaPoolManager.RegisterYokaiAndGetPrize(deserialized.RequestYoukaiId, CapsuleColor.Red, rarity, 
+                prizes.Add(await GachaPoolManager.RegisterYokaiAndGetPrize(deserialized.RequestYoukaiId, CapsuleColor.Red, rarity,
                     userYokaiTable, userSkillTable, dictionaryListTable, userItemtable, gachaId, userBonus, deserialized.Level5UserId));
                 pullCount = 1;
             }
@@ -175,6 +181,43 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
                 await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(errSession)));
                 return;
             }
+
+            
+            int feverChargeType = 0;
+            object? gachaListForResponse = null;
+            var userGachaList = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<List<YwpUserGachaEntry>>(deserialized!.Level5UserId!, "ywp_user_gacha");
+            if (userGachaList != null)
+            {
+                var feverEntry = userGachaList.FirstOrDefault(g => g.GachaType == gachaType);
+                if (feverEntry != null)
+                {
+                    int feverIncrement = 100 / FEVER_PULLS_REQUIRED;
+                    int newPctg = feverEntry.FeverPctg + feverIncrement * pullCount;
+                    if (newPctg >= 100)
+                    {
+                        feverChargeType = 2;
+                        int remainder = newPctg % 100;
+                        feverEntry.FeverPctg = remainder;
+                        await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_gacha", userGachaList);
+                        gachaListForResponse = new List<object>
+                        {
+                            new { feverPctg = 100, gachaType = feverEntry.GachaType }
+                        };
+                    }
+                    else
+                    {
+                        feverChargeType = 1;
+                        feverEntry.FeverPctg = newPctg;
+                        await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized!.Level5UserId!, "ywp_user_gacha", userGachaList);
+                        gachaListForResponse = userGachaList;
+                    }
+                }
+            }
+
+            int color1Cnt = prizes.Count(p => p.CapsuleColor == CapsuleColor.Gray);
+            int color2Cnt = prizes.Count(p => p.CapsuleColor == CapsuleColor.Blue);
+            int color3Cnt = prizes.Count(p => p.CapsuleColor == CapsuleColor.Red);
+            int color4Cnt = prizes.Count(p => p.CapsuleColor == CapsuleColor.Gold || p.CapsuleColor == CapsuleColor.Rainbow);
 
             resp.EffectType = 1;
             resp.ResultCode = 0;
@@ -191,7 +234,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             var settings = new JsonSerializerSettings();
             var converter = new ExecuteGachaResponseConverter();
             settings.Converters.Add(converter);
-            var serialized = JsonConvert.SerializeObject(resp,settings);
+            var serialized = JsonConvert.SerializeObject(resp, settings);
             var resdict = JsonConvert.DeserializeObject<Dictionary<string, object>>(serialized)!;
             resdict["ywp_user_youkai"] = userYokaiTable.ToString();
             resdict["ywp_user_data"] = userData;
@@ -205,8 +248,23 @@ namespace Puniemu.Src.Server.GameServer.Requests.ExecuteGacha.Logic
             {
                 resdict["ywp_user_tutorial_list"] = tutorialList;
             }
+            if (feverChargeType > 0)
+            {
+                resdict["rouletteEffect"] = new
+                {
+                    rouletteEffectType = 0,
+                    feverChargeType = feverChargeType,
+                    color1Cnt = color1Cnt,
+                    color2Cnt = color2Cnt,
+                    color3Cnt = color3Cnt,
+                    color4Cnt = color4Cnt,
+                    color4NormalCnt = 0
+                };
+            }
             await MissionManager.UpdateProgress(deserialized.Level5UserId, GameServer.DataClasses.Mission.MissionType.TotalCrank, 1);
             await GeneralUtils.AddTablesToResponse(Consts.EXECUTE_GACHA_TABLES, resdict!, true, deserialized!.Level5UserId!);
+            if (gachaListForResponse != null)
+                resdict["ywp_user_gacha"] = gachaListForResponse;
             var outResponse = NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(resdict));
             await ctx.Response.WriteAsync(outResponse);
             return;

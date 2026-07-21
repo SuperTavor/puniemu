@@ -7,6 +7,7 @@ using System.Text;
 using System.Buffers;
 using Puniemu.Src.Server.GameServer.Logic;
 using Puniemu.Src.TableParser.DataClasses;
+using Puniemu.Src.TableParser.Logic;
 
 namespace Puniemu.Src.Server.GameServer.Requests.GameUseItem.Logic
 {
@@ -24,12 +25,38 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameUseItem.Logic
             ctx.Response.ContentType = "application/json";
             var userData = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<YwpUserData>(deserialized.Level5UserID, "ywp_user_data");
             var playerItem = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_item");
-            var playerItemTable = new TableParser.Logic.TableParser<YwpUserItem>(playerItem!);
+            var playerItemTable = new TableParser<YwpUserItem>(playerItem!);
             var item = playerItemTable.Items.FirstOrDefault(x => x.ItemId == deserialized.ItemId);
-            if(item == null || item.Count <= 0)
+            if (item == null || item.Count <= 0)
             {
                 await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(new MsgBoxResponse("You don't have the item", "Err"))));
                 return;
+            }
+
+            
+            if (deserialized.EnemyId != 0)
+            {
+                var itemsListMstTable = new TableParser<YwpMstItem>(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_item"]!)!["tableData"]);
+                var mstItem = itemsListMstTable.Items.FirstOrDefault(x => x.ItemID == deserialized.ItemId);
+                if (mstItem != null && mstItem.ItemType == ItemType.Food)
+                {
+                    var mstEnemyParam = new TableParser<YwpMstYoukaiEnemyParam>(JsonConvert.DeserializeObject<Dictionary<string, string>>(DataManager.Logic.DataManager.GameDataManager.GamedataCache["ywp_mst_youkai_enemy_param"]!)!["tableData"]);
+                    var enemyEntry = mstEnemyParam.Items.FirstOrDefault(x => x.EnemySetID == deserialized.EnemyId);
+                    if (enemyEntry != null)
+                    {
+                        var userYoukaiSkill = await UserDataManager.Logic.UserDataManager.GetYwpUserAsync<string>(deserialized.Level5UserID, "ywp_user_youkai_skill");
+                        var userYoukaiSkillTable = new TableParser<YwpUserYoukaiSkill>(userYoukaiSkill!);
+                        var skillIdx = YoukaiManager.GetYoukaiSkillIndex(userYoukaiSkillTable, enemyEntry.YoukaiID);
+                        if (skillIdx != -1 && userYoukaiSkillTable.Items[skillIdx].Level >= 7)
+                        {
+                            // Ne pas décrémenter, sauvegarder le compteur inchangé pour resync client
+                            await UserDataManager.Logic.UserDataManager.SetYwpUserAsync(deserialized.Level5UserID, "ywp_user_item", playerItemTable.ToString());
+                            var errorResponse = new GameUseItemMaxLevelResponse(userData!, playerItemTable.ToString(), deserialized.ItemId);
+                            await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(errorResponse)));
+                            return;
+                        }
+                    }
+                }
             }
 
             item.Count--;
@@ -37,9 +64,7 @@ namespace Puniemu.Src.Server.GameServer.Requests.GameUseItem.Logic
             await MissionManager.UpdateProgress(deserialized.Level5UserID, GameServer.DataClasses.Mission.MissionType.UseSpecificItemInBattle, deserialized.ItemId);
             await MissionManager.UpdateProgress(deserialized.Level5UserID, GameServer.DataClasses.Mission.MissionType.UseTotalItems, 1);
             var renameResponse = new GameUseItemResponse(userData!, playerItemTable.ToString(), deserialized.ItemId);
-            var marshalledResponse = JsonConvert.SerializeObject(renameResponse);
-            var encryptedResponse = NHNCrypt.Logic.NHNCrypt.EncryptResponse(marshalledResponse);
-            await ctx.Response.WriteAsync(encryptedResponse);
+            await ctx.Response.WriteAsync(NHNCrypt.Logic.NHNCrypt.EncryptResponse(JsonConvert.SerializeObject(renameResponse)));
         }
     }
 }
