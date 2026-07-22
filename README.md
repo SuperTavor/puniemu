@@ -24,3 +24,51 @@ The project is in no way affiliated with NHN. We do not intend to infringe on th
 - onepiecefreak3 - Reverse engineering help
 - kuronosuFear - Reverse engineering help
 - picky_x_keizen - Logo
+
+------------------
+## Getting started
+
+-------------
+#### Using nix (optional)
+
+This repo contains a `shell.nix`, nix is a powerful tool that creates a virtual envrionment with the neccesary tooling loaded.  
+The project's dependencies will be installed automatically, but only for this project, and will not results in conflicts with other projects' dependencies. 
+Read the doc [here](https://install.determinate.systems/).   
+Install with these commands:    
+``` bash
+curl -L https://install.determinate.systems/nix | sh -s -- install --no-confirm
+. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+nix-shell --run "nix --version"
+echo "This is using nix tools" | lolcat
+```
+Open a new terminal to load nix.    
+Finally, run `nix-shell` to enter the dev environment.   
+
+----------
+
+#### Using just (recommended)
+
+[Just](https://github.com/casey/just) is a useful command binding tools.    
+Run `just` and see the list of binding available.   
+``` bash
+$> just
+just --list
+Available recipes:
+    attach
+    down
+    exec CMD
+    help
+    log
+    reset
+    rm
+    up
+```
+
+----------
+
+1. Copy .env.example into .env and edit the configuration
+2. Run the server (from best to worst option):
+    - (`nix-shell`) `just up`, let just (and nix) do the heavy lifting 
+    - By using the docker-compose.yml to build the puniemu server and postgresql database at the same time
+    - Manually using `dotnet run` and postgres
+
