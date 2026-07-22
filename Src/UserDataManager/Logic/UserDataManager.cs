@@ -49,9 +49,10 @@ namespace Puniemu.Src.UserDataManager.Logic
                 _flushTask = FlushLoopAsync(_cts.Token);
                 Console.WriteLine("db service started");
             }
-            catch
+            catch (Exception ex)
             {
                 Console.WriteLine("Couldn't create postgres data source.");
+                Console.WriteLine(ex.ToString());
                 Environment.Exit(1);
             }
         }
